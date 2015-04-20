@@ -1,0 +1,15 @@
+{
+  "name": "jikkyo",
+  "version": "1.0.0",
+  "description": "Jikkyo App",
+  "scripts": {
+    "start": "cd .. && npm start",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "rot1024",
+  "license": "MIT",
+  "main": "index.html",
+  "window": {
+    "toolbar": false
+  }
+}
