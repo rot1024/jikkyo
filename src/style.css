@@ -1,0 +1,64 @@
+body {
+  margin: 0;
+  background: rgba(0, 0, 0, 0);
+  font-family: sans-serif;
+  cursor: default;
+  -webkit-user-select: none;
+  overflow: hidden;
+}
+
+.container,
+.viwer,
+.titlebar,
+.titlebar h1,
+.titlebar-tbtn {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.container {
+  border: 1px solid #aaa;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.titlebar {
+  bottom: auto;
+  height: 24px;
+  display: flex;
+  padding-left: 12px;
+  background: #444;
+  color: #aaa;
+  line-height: 24px;
+  align-items: stretch;
+  -webkit-app-region: drag;
+}
+
+.titlebar h1 {
+  margin: 0;
+  font-size: 14px;
+  text-align: center;
+  line-height: 24px;
+}
+
+.titlebar-tbtn {
+  padding: 0 12px;
+  text-align: right;
+  line-height: 24px;
+}
+
+.tbtn {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-left: 6px;
+  border-radius: 50%;
+  -webkit-app-region: no-drag;
+}
+
+.tbtn-close { background: red; }
+.tbtn-maximize { background: yellow; }
+.tbtn-minimize { background: green; }

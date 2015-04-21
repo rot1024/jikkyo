@@ -3,9 +3,20 @@
   <head>
     <meta charset="utf-8">
     <title>Jikkyo</title>
+    <link rel="stylesheet" href="style.css">
   </head>
   <body>
-    <p>Hello world</p>
+    <div class="container">
+      <canvas id="viewer" class="viewer"></canvas>
+      <header id="titlebar" class="titlebar">
+        <h1>Jikkyo</h1>
+        <div class="titlebar-tbtn">
+          <div class="tbtn tbtn-minimize"></div>
+          <div class="tbtn tbtn-maximize"></div>
+          <div class="tbtn tbtn-close"></div>
+        </div>
+      </header>
+    </div>
     <script src="main.js"></script>
   </body>
 </html>
