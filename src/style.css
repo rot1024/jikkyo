@@ -1,10 +1,11 @@
 body {
   margin: 0;
   background: rgba(0, 0, 0, 0);
+  font-size: 14px;
   font-family: sans-serif;
+  overflow: hidden;
   cursor: default;
   -webkit-user-select: none;
-  overflow: hidden;
 }
 
 .container {
@@ -17,4 +18,3 @@ body {
   border-radius: 5px;
   overflow: hidden;
 }
-

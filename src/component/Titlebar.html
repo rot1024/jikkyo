@@ -6,14 +6,11 @@
       left: 0;
       top: 0;
       right: 0;
-      height: 24px;
-      background: #333;
-      color: #aaa;
-      line-height: 24px;
-      -webkit-app-region: drag;
+      height: 28px;
+      overflow: hidden;
     }
 
-    .title, .btns {
+    .container, .title, .btns {
       position: absolute;
       left: 0;
       top: 0;
@@ -21,7 +18,22 @@
       bottom: 0;
     }
 
+    .container {
+      bottom: auto;
+      height: 28px;
+      background: #333;
+      color: #aaa;
+      line-height: 28px;
+      transition: top .2s ease-in-out;
+      -webkit-app-region: drag;
+    }
+
+    .container.hidden {
+      top: -28px;
+    }
+
     .title {
+      font-size: 14px;
       text-align: center;
     }
 
@@ -44,26 +56,70 @@
 
   </style>
 
-  <div class="title">Jikkyo</div>
-  <div class="btns">
-    <div class="btn btn-minimize"></div>
-    <div class="btn btn-maximize"></div>
-    <div class="btn btn-close"></div>
+  <div id="container" class="container">
+    <div class="title">Jikkyo</div>
+    <div class="btns">
+      <div id="minimize" class="btn btn-minimize"></div>
+      <div id="maximize" class="btn btn-maximize"></div>
+      <div id="close" class="btn btn-close"></div>
+    </div>
   </div>
+
 </template>
 
 <script>
   (() => {
     "use strict";
 
+    var win = require("nw.gui").Window.get();
     var doc = document.currentScript.ownerDocument;
 
     var titlebar = class extends HTMLElement {
+
+      hideTitlebar() {
+        this.shadowRoot.getElementById("container").classList.add("hidden");
+      }
+
+      showTitlebar() {
+        this.shadowRoot.getElementById("container").classList.remove("hidden");
+      }
+
+      toggleTitlebar() {
+        if (this.isTitlebarShown) this.hideTitlebar();
+        else this.showTitlebar();
+      }
+
+      get isTitlebarShown() {
+        return !this.shadowRoot.getElementById("container").classList.contains("hidden");
+      }
+
       createdCallback() {
         var root = this.createShadowRoot();
         var template = doc.querySelector("template");
+        this._maximized = false;
+        win.on("maximized", () => {
+          this._maximized = true;
+        });
+        win.on("unmaximized", () => {
+          this._maximized = false;
+        });
         root.appendChild(document.importNode(template.content, true));
+        root.getElementById("minimize").addEventListener("click", e => {
+          win.minimize();
+          e.stopPropagation();
+        });
+        root.getElementById("maximize").addEventListener("click", e => {
+          if (this._maximized) win.unmaximize();
+          else win.maximize();
+          this._maximized = !this._maximized;
+          e.stopPropagation();
+        });
+        root.getElementById("close").addEventListener("click", e => {
+          win.close();
+          e.stopPropagation();
+        });
       }
+
     };
 
     window.JikkyoTitlebar = document.registerElement("jikkyo-titlebar", {
