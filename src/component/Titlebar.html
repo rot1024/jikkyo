@@ -55,23 +55,20 @@
 <script>
   (() => {
     "use strict";
-    var doc = document.currentScript.ownerDocument;
-    window.JikkyoTitlebar = document.registerElement("jikkyo-titlebar", {
-      prototype: Object.create(HTMLElement.prototype, {
-        createdCallback: {
-          value() {
-            var root = this.createShadowRoot();
-            var template = doc.querySelector("template");
-            root.appendChild(document.importNode(template.content, true));
-            //this.attributeChangedCallback('type', '', this.getAttribute('type'));
-          }
-        },
-        attributeChangedCallback: {
-          value(name, oldValue, value) {
 
-          }
-        }
-      })
+    var doc = document.currentScript.ownerDocument;
+
+    var titlebar = class extends HTMLElement {
+      createdCallback() {
+        var root = this.createShadowRoot();
+        var template = doc.querySelector("template");
+        root.appendChild(document.importNode(template.content, true));
+      }
+    };
+
+    window.JikkyoTitlebar = document.registerElement("jikkyo-titlebar", {
+      prototype: titlebar.prototype
     });
+
   })();
 </script>
