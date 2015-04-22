@@ -7,16 +7,12 @@ body {
   overflow: hidden;
 }
 
-.container,
-.viwer {
+.container {
   position: absolute;
   left: 0;
   top: 0;
   right: 0;
   bottom: 0;
-}
-
-.container {
   border: 1px solid #aaa;
   border-radius: 5px;
   overflow: hidden;
