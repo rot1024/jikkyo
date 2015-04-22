@@ -21,10 +21,12 @@
     .container {
       bottom: auto;
       height: 28px;
-      background: #333;
+      background: #444;
       color: #aaa;
+      border-bottom: 1px solid #555;
       line-height: 28px;
       transition: top .2s ease-in-out;
+      box-sizing: border-box;
       -webkit-app-region: drag;
     }
 
@@ -38,21 +40,85 @@
     }
 
     .btns {
-      text-align: right;
+      display: flex;
+      padding-right: 6px;
+      vertical-align: middle;
+      box-sizing: border-box;
+      justify-content: flex-end;
+      align-items: center;
     }
 
     .btn {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      margin-left: 6px;
+      transition: background-color .1s ease-in-out;
       -webkit-app-region: no-drag;
     }
 
-    .btn-close { background: red; }
-    .btn-maximize { background: yellow; }
-    .btn-minimize { background: green; }
+    /* Windows/Linux */
+
+    .win .btns {
+      flex-direction: row;
+    }
+
+    .win .btn, .linux .btn {
+      width: 16px;
+      height: 16px;
+      padding: 2px 6px;
+      border-radius: 2px;
+    }
+
+    .win .btn:hover, .linux .btn:hover {
+      background-color: #222;
+    }
+
+    .win .btn:active, .linux .btn:active {
+      background-color: #000;
+    }
+
+    .win .btn-close, .linux .btn-close {
+      background: transparent url("images/close.svg") no-repeat center center;
+      background-size: 13px 13px;
+    }
+
+    .win .btn-maximize, .linux .btn-maximize {
+      background: transparent url("images/maximize.svg") no-repeat center center;
+      background-size: 13px 13px;
+    }
+
+    .win .btn-unmaximize, .linux .btn-unmaximize {
+      background: transparent url("images/unmaximize.svg") no-repeat center center;
+      background-size: 13px 13px;
+    }
+
+    .win .btn-minimize, .linux .btn-minimize {
+      background: transparent url("images/minimize.svg") no-repeat center center;
+      background-size: 13px 13px;
+    }
+
+    /* Mac */
+
+    .mac .btns {
+      flex-direction: row-reverse;
+    }
+
+    .mac .btn {
+      width: 14px;
+      height: 14px;
+      margin-left: 10px;
+      border-radius: 50%;
+    }
+
+    .mac .btn-close { background: #f73a4e; }
+    .mac .btn-maximize,
+    .mac .btn-unmaximize { background: #fdb122; }
+    .mac .btn-minimize { background: #75d668; }
+
+    .mac .btn-close:hover { background: #ef5666; }
+    .mac .btn-maximize:hover { background: #ffc455; }
+    .mac .btn-minimize:hover { background: #85e579; }
+
+    .mac .btn-close:active { background: #c32e3e; }
+    .mac .btn-maximize:active { background: #c68a19; }
+    .mac .btn-minimize:active { background: #64be58; }
 
   </style>
 
@@ -72,9 +138,27 @@
     "use strict";
 
     var win = require("nw.gui").Window.get();
+    var os = require("./util/os");
     var doc = document.currentScript.ownerDocument;
 
     var titlebar = class extends HTMLElement {
+
+      get maximized() {
+        return this._maximized;
+      }
+
+      set maximized(v) {
+        this._maximized = !!v;
+        var btn = this.shadowRoot.getElementById("maximize");
+        if (os === "mac") return;
+        if (v) {
+          btn.classList.add("btn-unmaximize");
+          btn.classList.remove("btn-maximize");
+        } else {
+          btn.classList.add("btn-maximize");
+          btn.classList.remove("btn-unmaximize");
+        }
+      }
 
       hideTitlebar() {
         this.shadowRoot.getElementById("container").classList.add("hidden");
@@ -94,26 +178,42 @@
       }
 
       createdCallback() {
+        this._maximized = false;
+
         var root = this.createShadowRoot();
         var template = doc.querySelector("template");
-        this._maximized = false;
-        win.on("maximized", () => {
-          this._maximized = true;
-        });
-        win.on("unmaximized", () => {
-          this._maximized = false;
-        });
+
+        win.on("maximized", (() => {
+          this.maximized = true;
+        }).bind(this));
+        win.on("unmaximized", (() => {
+          this.maximized = false;
+        }).bind(this));
+
         root.appendChild(document.importNode(template.content, true));
+
+        this.shadowRoot.getElementById("container").classList.add(os);
+
         root.getElementById("minimize").addEventListener("click", e => {
-          win.minimize();
+          if (os === "mac") {
+            if (this.maximized) win.unmaximize();
+            else win.maximize();
+            this.maximized = !this.maximized;
+            return;
+          } else {
+            win.minimize();
+          }
           e.stopPropagation();
         });
-        root.getElementById("maximize").addEventListener("click", e => {
-          if (this._maximized) win.unmaximize();
+
+        root.getElementById("maximize").addEventListener("click", (e => {
+          if (os === "mac") return win.minimize();
+          if (this.maximized) win.unmaximize();
           else win.maximize();
-          this._maximized = !this._maximized;
+          this.maximized = !this.maximized;
           e.stopPropagation();
-        });
+        }).bind(this));
+
         root.getElementById("close").addEventListener("click", e => {
           win.close();
           e.stopPropagation();
