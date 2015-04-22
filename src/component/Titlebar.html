@@ -1,0 +1,77 @@
+<template>
+  <style>
+
+    :host {
+      position: absolute;
+      left: 0;
+      top: 0;
+      right: 0;
+      height: 24px;
+      background: #333;
+      color: #aaa;
+      line-height: 24px;
+      -webkit-app-region: drag;
+    }
+
+    .title, .btns {
+      position: absolute;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+    }
+
+    .title {
+      text-align: center;
+    }
+
+    .btns {
+      text-align: right;
+    }
+
+    .btn {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      margin-left: 6px;
+      -webkit-app-region: no-drag;
+    }
+
+    .btn-close { background: red; }
+    .btn-maximize { background: yellow; }
+    .btn-minimize { background: green; }
+
+  </style>
+
+  <div class="title">Jikkyo</div>
+  <div class="btns">
+    <div class="btn btn-minimize"></div>
+    <div class="btn btn-maximize"></div>
+    <div class="btn btn-close"></div>
+  </div>
+</template>
+
+<script>
+  (() => {
+    "use strict";
+    var doc = document.currentScript.ownerDocument;
+    window.JikkyoTitlebar = document.registerElement("jikkyo-titlebar", {
+      prototype: Object.create(HTMLElement.prototype, {
+        createdCallback: {
+          value() {
+            var root = this.createShadowRoot();
+            var template = doc.querySelector("template");
+            root.appendChild(document.importNode(template.content, true));
+            //this.attributeChangedCallback('type', '', this.getAttribute('type'));
+          }
+        },
+        attributeChangedCallback: {
+          value(name, oldValue, value) {
+
+          }
+        }
+      })
+    });
+  })();
+</script>
