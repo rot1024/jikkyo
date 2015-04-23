@@ -1,0 +1,172 @@
+<template>
+
+  <style>
+
+    :host {
+      position: absolute;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+    }
+
+    .grip {
+      position: absolute;
+      pointer-events: auto;
+    }
+
+    .w, .e {
+      top: 0;
+      bottom: 0;
+      width: 10px;
+    }
+
+    .n, .s {
+      left: 0;
+      right: 0;
+      height: 10px;
+    }
+
+    .nw, .ne, .sw, .se {
+      width: 10px;
+      height: 10px;
+    }
+
+    .w { left: 0; }
+    .n { top: 0; }
+    .e { right: 0; }
+    .s { bottom: 0; }
+
+    .nw { left: 0; top: 0; }
+    .ne { right: 0; top: 0; }
+    .sw { left: 0; bottom: 0; }
+    .se { right: 0; bottom: 0; }
+
+  </style>
+
+  <div id="w" class="grip w"></div>
+  <div id="n" class="grip n"></div>
+  <div id="e" class="grip e"></div>
+  <div id="s" class="grip s"></div>
+  <div id="nw" class="grip nw"></div>
+  <div id="ne" class="grip ne"></div>
+  <div id="sw" class="grip sw"></div>
+  <div id="se" class="grip se"></div>
+
+</template>
+
+<script>
+  (() => {
+    "use strict";
+
+    var win = require("nw.gui").Window.get();
+    var maximized = require("./util/maximized")(win).maximized;
+    var doc = document.currentScript.ownerDocument;
+
+    var resizer = class extends HTMLElement {
+
+      createdCallback() {
+        var root = this.createShadowRoot();
+        var template = doc.querySelector("template");
+        root.appendChild(document.importNode(template.content, true));
+
+        var drag = {
+          dragging: false,
+          x: 0,
+          y: 0,
+          oldX: 0,
+          oldY: 0,
+          horizontal: 0, // 0: west,  1: middle, 2: east
+          vertical: 0    // 0: north, 1: middle, 2: south
+        };
+
+        var mousemove = e => {
+          if (!drag.dragging) {
+            window.removeEventListener("mousemove", mousemove);
+            return;
+          }
+
+          drag.x = e.clientX;
+          drag.y = e.clientY;
+        };
+
+        var mouseup = () => {
+          drag.dragging = false;
+          window.removeEventListener("mousemove", mousemove);
+          window.removeEventListener("mouseup", mouseup);
+          window.document.body.style.cursor = null;
+        };
+
+        var tick = () => {
+          if (!drag.dragging) return;
+
+          var diffX = drag.x - drag.oldX,
+              diffY = drag.y - drag.oldY,
+              width = 0, height = 0, x = 0, y = 0;
+
+          if (drag.horizontal !== 1)
+            width = diffX * (drag.horizontal === 0 ? -1 : 1);
+          if (drag.vertical !== 1)
+            height = diffY * (drag.vertical === 0 ? -1 : 1);
+
+          if (drag.horizontal === 0)
+            x = diffX;
+          if (drag.vertical === 0)
+            y = diffY;
+
+          if (x || y) win.moveBy(x, y);
+          if (width || height)
+            win.resizeTo(
+              Math.max(100, win.width + width),
+              Math.max(100, win.height + height)
+            );
+
+          drag.oldX = drag.x - (drag.horizontal === 0 ? diffX : 0);
+          drag.oldY = drag.y - (drag.vertical === 0 ? diffY : 0);
+
+          window.requestAnimationFrame(tick);
+        };
+
+        var on = (t, hor, ver, str) => {
+          if (t === null) return;
+
+          t.addEventListener("mousedown", e => {
+            if (maximized()) return;
+            drag.x = drag.oldX = e.clientX;
+            drag.y = drag.oldY = e.clientY;
+            drag.horizontal = hor;
+            drag.vertical = ver;
+            window.addEventListener("mousemove", mousemove);
+            window.addEventListener("mouseup", mouseup);
+            drag.dragging = true;
+            window.document.body.style.cursor = str + "-resize";
+            window.requestAnimationFrame(tick);
+            e.stopPropagation();
+          });
+
+          t.addEventListener("click", e => e.stopPropagation());
+
+          t.addEventListener("mouseenter", e => {
+            window.document.body.style.cursor =
+              maximized() ? null : str + "-resize";
+          });
+
+          t.addEventListener("mouseleave", e => {
+            window.document.body.style.cursor = null;
+          });
+        };
+
+        [["nw", "n", "ne"], ["w", null, "e"], ["sw", "s", "se"]]
+        .forEach((e, i) => e.forEach((e, j) => on(root.getElementById(e), j, i, e)));
+
+      }
+
+    };
+
+    window.JikkyoResizer = document.registerElement("jikkyo-resizer", {
+      prototype: resizer.prototype
+    });
+
+  })();
+</script>
