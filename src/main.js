@@ -4,8 +4,9 @@
   var gui = require("nw.gui");
   var win = gui.Window.get();
 
-  window.document.body.setAttribute("data-platform", process.platform);
-  window.addEventListener("DOMContentLoaded", () => {
+  require("./util/maximized")(win).inspect();
+
+  window.addEventListener("load", () => {
 
     window.addEventListener("keydown", e => {
       if (e.keyCode === 123) win.showDevTools();
