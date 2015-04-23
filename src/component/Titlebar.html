@@ -138,27 +138,11 @@
     "use strict";
 
     var win = require("nw.gui").Window.get();
+    var maximized = require("./util/maximized")(win);
     var os = require("./util/os");
     var doc = document.currentScript.ownerDocument;
 
     var titlebar = class extends HTMLElement {
-
-      get maximized() {
-        return this._maximized;
-      }
-
-      set maximized(v) {
-        this._maximized = !!v;
-        var btn = this.shadowRoot.getElementById("maximize");
-        if (os === "mac") return;
-        if (v) {
-          btn.classList.add("btn-unmaximize");
-          btn.classList.remove("btn-maximize");
-        } else {
-          btn.classList.add("btn-maximize");
-          btn.classList.remove("btn-unmaximize");
-        }
-      }
 
       hideTitlebar() {
         this.shadowRoot.getElementById("container").classList.add("hidden");
@@ -178,17 +162,8 @@
       }
 
       createdCallback() {
-        this._maximized = false;
-
         var root = this.createShadowRoot();
         var template = doc.querySelector("template");
-
-        win.on("maximized", (() => {
-          this.maximized = true;
-        }).bind(this));
-        win.on("unmaximized", (() => {
-          this.maximized = false;
-        }).bind(this));
 
         root.appendChild(document.importNode(template.content, true));
 
@@ -196,9 +171,8 @@
 
         root.getElementById("minimize").addEventListener("click", e => {
           if (os === "mac") {
-            if (this.maximized) win.unmaximize();
+            if (maximized.maximized()) win.unmaximize();
             else win.maximize();
-            this.maximized = !this.maximized;
             return;
           } else {
             win.minimize();
@@ -208,9 +182,8 @@
 
         root.getElementById("maximize").addEventListener("click", (e => {
           if (os === "mac") return win.minimize();
-          if (this.maximized) win.unmaximize();
+          if (maximized.maximized()) win.unmaximize();
           else win.maximize();
-          this.maximized = !this.maximized;
           e.stopPropagation();
         }).bind(this));
 
@@ -218,6 +191,19 @@
           win.close();
           e.stopPropagation();
         });
+
+        this._maximizedChangedCb = (v => {
+          if (os === "mac") return;
+          var btn = this.shadowRoot.getElementById("maximize");
+          if (v) {
+            btn.classList.add("btn-unmaximize");
+            btn.classList.remove("btn-maximize");
+          } else {
+            btn.classList.add("btn-maximize");
+            btn.classList.remove("btn-unmaximize");
+          }
+        }).bind(this);
+        maximized.on(this._maximizedChangedCb);
       }
 
     };
