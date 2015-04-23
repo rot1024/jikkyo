@@ -1,0 +1,75 @@
+<template>
+  <style>
+
+    :host {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 56px;
+      overflow: hidden;
+    }
+
+    .container {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 56px;
+      background: rgba(30, 30, 30, .75);
+      color: #aaa;
+      border-top: 1px solid #555;
+      transition: bottom .2s ease-in-out;
+      box-sizing: border-box;
+    }
+
+    .container.hidden {
+      bottom: -56px;
+    }
+
+  </style>
+
+  <div id="container" class="container">
+  </div>
+
+</template>
+
+<script>
+  (() => {
+    "use strict";
+
+    var doc = document.currentScript.ownerDocument;
+
+    var controller = class extends HTMLElement {
+
+      hide() {
+        this.shadowRoot.getElementById("container").classList.add("hidden");
+      }
+
+      show() {
+        this.shadowRoot.getElementById("container").classList.remove("hidden");
+      }
+
+      toggle() {
+        if (this.isShown) this.hide();
+        else this.show();
+      }
+
+      get isShown() {
+        return !this.shadowRoot.getElementById("container").classList.contains("hidden");
+      }
+
+      createdCallback() {
+        var root = this.createShadowRoot();
+        var template = doc.querySelector("template");
+        root.appendChild(document.importNode(template.content, true));
+      }
+
+    };
+
+    window.JikkyoController = document.registerElement("jikkyo-controller", {
+      prototype: controller.prototype
+    });
+
+  })();
+</script>

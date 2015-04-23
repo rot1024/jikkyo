@@ -12,9 +12,11 @@
       if (e.keyCode === 123) win.showDevTools();
     });
 
-    var titlebar = document.querySelector("jikkyo-titlebar");
+    var titlebar = document.querySelector("jikkyo-titlebar"),
+        controller = document.querySelector("jikkyo-controller");
     window.addEventListener("click", () => {
       titlebar.toggleTitlebar();
+      controller.toggle();
     });
 
     win.setTransparent(true);
