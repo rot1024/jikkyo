@@ -6,15 +6,22 @@
   module.exports = win => {
 
     var load = () => {
-      var data;
       if (!store.has(win)) {
-        data = {
-          w: 0, h: 0, maximized: false
-        };
-      } else {
-        data = store.get(win);
+        store.set(win, {
+          w: 0,
+          h: 0,
+          set maximized(v) {
+            this._maximized = v;
+            this.callback.forEach(cb => cb(v));
+          },
+          get maximized() {
+            return this._maximized;
+          },
+          _maximized: false,
+          callback: []
+        });
       }
-      return data;
+      return store.get(win);
     };
 
     var check = (w, h) => {
@@ -27,19 +34,16 @@
           ah = data.h || win.window.screen.availHeight;
 
       data.maximized = w === aw && h === ah;
-      store.set(win, data);
     };
 
     win.on("maximized", () => {
       var data = load();
       data.maximized = true;
-      store.set(win, data);
     });
 
     win.on("unmaximized", () => {
       var data = load();
       data.maximized = false;
-      store.set(win, data);
     });
 
     win.on("resize", (w, h) => {
@@ -62,7 +66,16 @@
         data.w = win.width;
         data.h = win.height;
         win.unmaximize();
-        store.set(win, data);
+      },
+      on(fn) {
+        var data = load();
+        data.callback.push(fn);
+        fn(data.maximized);
+      },
+      off(fn) {
+        var callback = load().Callback,
+            i = callback.indexOf(fn);
+        if (i >= 0) callback.splice(i, 1);
       }
     };
   };
