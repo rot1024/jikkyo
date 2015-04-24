@@ -1,4 +1,4 @@
-<template>
+<template id="viewer">
 
   <style>
 
@@ -10,86 +10,55 @@
       bottom: 0;
     }
 
+    .comment {
+      position: absolute;
+      top: 0;
+      display: inline-block;
+      color: #fff;
+      font-size: 32px;
+      font-weight: bold;
+      text-shadow: 0 0 5px #000;
+    }
+
+    .admin, .enquete { display: none; }
+
+    .red { color: #f00; }
+    .pink { color: #ff8080; }
+    .orange { color: #ffc000; }
+    .yellow { color: #ff0; }
+    .green { color: #0f0; }
+    .cyan { color: #0ff; }
+    .blue { color: #00f; }
+    .purple { color: #c000ff; }
+    .black { color: #000; }
+    .white2, .niconicowhite { color: #cccc99; }
+    .red2, .truered { color: #cc0033; }
+    .pink2 { color: #f3c; }
+    .orange2, .passionorange { color: #f60; }
+    .yellow2, .madyellow { color: #990; }
+    .green2, .elementalgreen { color: #0c6; }
+    .cyan2 { color: #0cc; }
+    .blue2, .marineblue { color: #39f; }
+    .purple2, .nobleviolet { color: #63c; }
+    .black2 { color: #666; }
+
+    .ue { }
+    .shita { }
+
+    .big { font-size: 50px; }
+    .small { font-size: 16px; }
+
   </style>
 
-  <canvas></canvas>
+  <div id="admin"></div>
+  <div id="enquete">
+    <div id="enquete1"></div>
+    <div id="enquete2"></div>
+    <div id="enquete3"></div>
+    <div id="enquete4"></div>
+    <div id="enquete5"></div>
+  </div>
+
 </template>
 
-<script>
-  (() => {
-    "use strict";
-
-    var doc = document.currentScript.ownerDocument;
-
-    var viewer = class extends HTMLElement {
-
-      get _width() {
-        return this._canvas.getAttribute("width") || 0;
-      }
-
-      set _width(v) {
-        this._canvas.setAttribute("width", v);
-      }
-
-      get _height() {
-        return this._canvas.getAttribute("height") || 0;
-      }
-
-      set _height(v) {
-        this._canvas.setAttribute("height", v);
-      }
-
-      _resize() {
-        this._width = window.innerWidth;
-        this._height = window.innerHeight;
-      }
-
-      _draw() {
-        if (!this.drawer) {
-          this._running = false;
-          return;
-        }
-        this.drawer.update(this._canvas, this._ctx);
-        window.requestAnimationFrame(this._drawCallback);
-      }
-
-      start() {
-        this._running = true;
-        this._draw();
-      }
-
-      stop() {
-        this._running = false;
-      }
-
-      createdCallback() {
-        this._resizeCallback = this._resize.bind(this);
-        this._drawCallback = this._draw.bind(this);
-        this._running = false;
-
-        var root = this.createShadowRoot();
-        var template = doc.querySelector("template");
-        root.appendChild(document.importNode(template.content, true));
-      }
-
-      attachedCallback() {
-        this._canvas = this.shadowRoot.querySelector("canvas");
-        this._ctx = this._canvas.getContext("2d");
-        window.addEventListener("resize", this._resizeCallback);
-        this._resize();
-      }
-
-      detachedCallback() {
-        this._running = false;
-        window.removeEventListener("resize", this._resizeCallback);
-        this._canvas = this._ctx = null;
-      }
-
-    };
-
-    window.JikkyoViewer = document.registerElement("jikkyo-viewer", {
-      prototype: viewer.prototype
-    });
-
-  })();
-</script>
+<script src="Viewer.js"></script>
