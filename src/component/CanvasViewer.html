@@ -1,0 +1,95 @@
+<template>
+
+  <style>
+
+    :host {
+      position: absolute;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+    }
+
+  </style>
+
+  <canvas></canvas>
+</template>
+
+<script>
+  (() => {
+    "use strict";
+
+    var doc = document.currentScript.ownerDocument;
+
+    var viewer = class extends HTMLElement {
+
+      get _width() {
+        return this._canvas.getAttribute("width") || 0;
+      }
+
+      set _width(v) {
+        this._canvas.setAttribute("width", v);
+      }
+
+      get _height() {
+        return this._canvas.getAttribute("height") || 0;
+      }
+
+      set _height(v) {
+        this._canvas.setAttribute("height", v);
+      }
+
+      _resize() {
+        this._width = window.innerWidth;
+        this._height = window.innerHeight;
+      }
+
+      _draw() {
+        if (!this.drawer) {
+          this._running = false;
+          return;
+        }
+        this.drawer.update(this._canvas, this._ctx);
+        window.requestAnimationFrame(this._drawCallback);
+      }
+
+      start() {
+        this._running = true;
+        this._draw();
+      }
+
+      stop() {
+        this._running = false;
+      }
+
+      createdCallback() {
+        this._resizeCallback = this._resize.bind(this);
+        this._drawCallback = this._draw.bind(this);
+        this._running = false;
+
+        var root = this.createShadowRoot();
+        var template = doc.querySelector("template");
+        root.appendChild(document.importNode(template.content, true));
+      }
+
+      attachedCallback() {
+        this._canvas = this.shadowRoot.querySelector("canvas");
+        this._ctx = this._canvas.getContext("2d");
+        window.addEventListener("resize", this._resizeCallback);
+        this._resize();
+      }
+
+      detachedCallback() {
+        this._running = false;
+        window.removeEventListener("resize", this._resizeCallback);
+        this._canvas = this._ctx = null;
+      }
+
+    };
+
+    window.JikkyoCanvasViewer = document.registerElement("jikkyo-canvas-viewer", {
+      prototype: viewer.prototype
+    });
+
+  })();
+</script>
