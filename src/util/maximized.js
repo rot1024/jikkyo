@@ -1,6 +1,7 @@
 (() => {
   "use strict";
 
+  var EventEmitter = require('events').EventEmitter;
   var store = new WeakMap();
 
   module.exports = win => {
@@ -12,13 +13,13 @@
           h: 0,
           set maximized(v) {
             this._maximized = v;
-            this.callback.forEach(cb => cb(v));
+            this.event.emit("maximized", v);
           },
           get maximized() {
             return this._maximized;
           },
           _maximized: false,
-          callback: []
+          event: new EventEmitter()
         });
       }
       return store.get(win);
@@ -38,6 +39,8 @@
 
     win.on("maximized", () => {
       var data = load();
+      data.w = win.width;
+      data.h = win.height;
       data.maximized = true;
     });
 
@@ -68,14 +71,14 @@
         win.unmaximize();
       },
       on(fn) {
-        var data = load();
-        data.callback.push(fn);
-        fn(data.maximized);
+        load().event.on("maximized", fn);
       },
       off(fn) {
-        var callback = load().Callback,
-            i = callback.indexOf(fn);
-        if (i >= 0) callback.splice(i, 1);
+        load().event.off("maximized", fn);
+      },
+      emit() {
+        var data = load();
+        data.event.emit("maximized", data.maximized);
       }
     };
   };
