@@ -10,7 +10,7 @@
       overflow: hidden;
     }
 
-    .container, .title, .btns {
+    .container, .draggable, .title, .btns {
       position: absolute;
       left: 0;
       top: 0;
@@ -27,6 +27,10 @@
       line-height: 28px;
       transition: top .2s ease-in-out;
       box-sizing: border-box;
+    }
+
+    .draggable {
+      top: 10px;
       -webkit-app-region: drag;
     }
 
@@ -123,6 +127,7 @@
   </style>
 
   <div id="container" class="container">
+    <div class="draggable"></div>
     <div class="title">Jikkyo</div>
     <div class="btns">
       <div id="minimize" class="btn btn-minimize"></div>
