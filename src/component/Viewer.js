@@ -120,22 +120,11 @@
 
   var viewer = class extends HTMLElement {
 
-    get adapter() {
-      return this._adapter;
-    }
-
-    set adapter(v) {
-      if (!(v instanceof ViewerAdapter)) return;
-      v.view = this;
-      this._adapter = v;
-    }
-
     get comments() {
       return this._comments;
     }
 
     createdCallback() {
-      this._adapter = null;
       this._comments = [];
 
       var root = this.createShadowRoot();
