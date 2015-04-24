@@ -124,6 +124,10 @@
       return this._comments;
     }
 
+    clear() {
+      this._comments.forEach(c => c.clear());
+    }
+
     createdCallback() {
       this._comments = [];
 
