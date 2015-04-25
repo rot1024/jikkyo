@@ -149,20 +149,20 @@
 
     var titlebar = class extends HTMLElement {
 
-      hideTitlebar() {
-        this.shadowRoot.getElementById("container").classList.add("hidden");
-      }
-
-      showTitlebar() {
+      show() {
         this.shadowRoot.getElementById("container").classList.remove("hidden");
       }
 
-      toggleTitlebar() {
-        if (this.isTitlebarShown) this.hideTitlebar();
-        else this.showTitlebar();
+      hide() {
+        this.shadowRoot.getElementById("container").classList.add("hidden");
       }
 
-      get isTitlebarShown() {
+      toggle() {
+        if (this.isShown) this.hide();
+        else this.show();
+      }
+
+      get isShown() {
         return !this.shadowRoot.getElementById("container").classList.contains("hidden");
       }
 
