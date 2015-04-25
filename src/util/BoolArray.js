@@ -24,14 +24,12 @@ module.exports = (() => {
     }
 
     clear() {
-      for (let i = 0; i < this._buf.length; ++i)
-        this._buf.push(false);
+      this._buf.fill(false);
     }
 
     fill(val, start, end) {
       var v = !!val;
-      for (let i = start; i <= end; ++i)
-        this._buf[i] = v;
+      this._buf.fill(val, start, end);
     }
 
     vacant(start, end) {

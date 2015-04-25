@@ -9,7 +9,7 @@
   "author": "rot1024",
   "license": "MIT",
   "main": "index.html",
-  "js-flags": "--es_staging --harmony_arrow_functions",
+  "js-flags": "--es_staging --harmony_arrow_functions --harmony_arrays",
   "window": {
     "frame": false,
     "resizable": false,
