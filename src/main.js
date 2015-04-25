@@ -13,10 +13,20 @@
     });
 
     var titlebar = document.querySelector("jikkyo-titlebar"),
-        controller = document.querySelector("jikkyo-controller");
+        controller = document.querySelector("jikkyo-controller"),
+        viewer = document.querySelector("jikkyo-viewer"),
+        draggable = document.querySelector("jikkyo-draggable");
+
+    draggable.hide();
     window.addEventListener("click", () => {
-      titlebar.toggleTitlebar();
-      controller.toggle();
+      titlebar.toggle();
+      if (titlebar.isShown) {
+        controller.show();
+        draggable.hide();
+      } else {
+        controller.hide();
+        draggable.show();
+      }
     });
 
     win.setTransparent(true);
