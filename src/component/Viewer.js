@@ -1,7 +1,6 @@
 (() => {
   "use strict";
 
-  var ViewerAdapter = require("./component/ViewerAdapter")(window);
   var doc = document.currentScript.ownerDocument;
 
   var colorList = [
@@ -18,6 +17,7 @@
     constructor(view, el) {
       this._view = view;
       this._el = el;
+      this.tag = null;
       this.clear();
     }
 
@@ -26,6 +26,7 @@
     }
 
     set text(v) {
+      if (this._text === v) return;
       if (typeof v !== "string") v = "";
       this._el.textContent = v;
       this._text = v;
@@ -55,7 +56,11 @@
     }
 
     set size(v) {
+      if (this._size > 0)
+        this._el.classList.remove(sizeList[this._size - 1]);
       this._size = sizeList.indexOf(v) + 1;
+      if (this._size > 0)
+        this._el.classList.add(sizeList[this._size - 1]);
     }
 
     get x() {
@@ -93,7 +98,16 @@
       return this._el.clientHeight;
     }
 
+    get right() {
+      return this._el.clientWidth + this._x;
+    }
+
+    get bottom() {
+      return this._el.clientHeight + this._y;
+    }
+
     clear() {
+      this.tag = null;
       this.clearColor();
       this.clearSize();
       this.text = "";
@@ -128,6 +142,14 @@
       this._comments.forEach(c => c.clear());
     }
 
+    get width() {
+      return window.innerWidth;
+    }
+
+    get height() {
+      return window.innerHeight;
+    }
+
     createdCallback() {
       this._comments = [];
 
@@ -149,7 +171,5 @@
   window.JikkyoViewer = document.registerElement("jikkyo-viewer", {
     prototype: viewer.prototype
   });
-
-  window.JikkyoViewerAdapter = ViewerAdapter;
 
 })();

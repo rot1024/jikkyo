@@ -29,6 +29,10 @@
       }
     });
 
+    var adapter = new window.JikkyoViewer.Adapter();
+    adapter.view = viewer;
+    controller.adapter = adapter;
+
     win.setTransparent(true);
     win.show();
   });

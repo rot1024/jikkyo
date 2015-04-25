@@ -1,21 +1,21 @@
 <template id="viewer">
 
   <style>
-
     :host {
       position: absolute;
       left: 0;
       top: 0;
       right: 0;
       bottom: 0;
+      font-size: 32px;
     }
 
     .comment {
       position: absolute;
       display: inline-block;
       color: #fff;
-      font-size: 32px;
       font-weight: bold;
+      white-space: nowrap;
       text-shadow: 0 0 5px #000;
     }
 
@@ -44,11 +44,12 @@
     .ue { }
     .shita { }
 
-    .big { font-size: 156%; /* 50px */ }
-    .small { font-size: 50%; /* 16px */ }
+    .big { font-size: 150%; }
+    .small { font-size: 50%; }
 
   </style>
 
 </template>
 
 <script src="Viewer.js"></script>
+<script src="ViewerAdapter.js"></script>
