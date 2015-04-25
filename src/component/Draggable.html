@@ -34,7 +34,11 @@
       -webkit-app-region: drag;
     }
 
-    .hidden {
+    .hidden.outer, .hidden.outer:hover {
+      opacity: 0;
+    }
+
+    .hidden.outer .inner {
       display: none;
     }
   </style>
@@ -61,6 +65,8 @@
         var template = doc.querySelector("template");
         root.appendChild(document.importNode(template.content, true));
 
+        this._hidden = false;
+
         var div = root.querySelector(".outer");
 
         this.addEventListener("contextmenu", e => {
@@ -68,12 +74,26 @@
           return false;
         });
 
-        maximized.on(v => {
-          if (v) div.classList.add("hidden");
-          else div.classList.remove("hidden");
+        this.addEventListener("click", e => {
+          if (this._hidden) e.stopPropagation();
         });
 
+        maximized.on((v => {
+          if (v) this.hide();
+          else if (!this._hidden) this.show();
+        }).bind(this));
+
         maximized.emit();
+      }
+
+      show() {
+        this._hidden = false;
+        this.shadowRoot.querySelector(".outer").classList.remove("hidden");
+      }
+
+      hide() {
+        this._hidden = true;
+        this.shadowRoot.querySelector(".outer").classList.add("hidden");
       }
 
     };
