@@ -213,10 +213,11 @@
 
       set adapter(v) {
         if (this._adapter === v) return;
-        if (this._adapter)
-          this._adapter.off("position", this._posCb);
+        if (this._adapter) {
+          this._adapter.off(this._adapterCb);
+        }
         this._adapter = v;
-        this._adapter.on("position", this._posCb);
+        this._adapter.on(this._adapterCb);
         this.refresh();
       }
 
@@ -242,12 +243,16 @@
 
         this._time = new Time();
 
-        this._posCb = (pos => {
-          this._range.value = pos;
-          this._time.millisecond = pos;
-          this._pos.textContent = this._time.toString();
-          if (this._adapter.length === pos) {
-            this._btn.classList.remove("pause");
+        this._adapterCb = ((name, val) => {
+          if (name === "position") {
+            this._range.value = val;
+            this._time.millisecond = val;
+            this._pos.textContent = this._time.toString();
+            if (this._adapter.length === val) {
+              this._btn.classList.remove("pause");
+            }
+          } else if (name === "length") {
+            this._range.max = val;
           }
         }).bind(this);
 

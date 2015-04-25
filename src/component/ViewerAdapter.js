@@ -40,18 +40,20 @@
     set length(v) {
       this._length = v;
       this._pos = Math.min(this._pos, v);
+      this._event.emit("observe", "length", this._length);
+      this._event.emit("observe", "position", this._pos);
     }
 
     get playing() {
       return this._playing;
     }
 
-    on(event, listener) {
-      this._event.on(event, listener);
+    on(listener) {
+      this._event.on("observe", listener);
     }
 
-    off(event, listener) {
-      this._event.removeEventListener(event, listener);
+    off(listener) {
+      this._event.removeEventListener("observe", listener);
     }
 
     constructor() {
@@ -67,7 +69,7 @@
         if (!this._playing) return;
         var now = Date.now();
         this._pos = Math.min(this._length, this._pos + now - this._oldDate);
-        this._event.emit("position", this._pos);
+        this._event.emit("observe", "position", this._pos);
         this.draw();
         this._oldDate = now;
         if (this._pos >= this._length) {
@@ -113,6 +115,8 @@
     }
 
     draw() {
+      // コメントの位置決定ロジック
+
       const comments = this._comments,
             el = this._el,
             views = el.comments,
@@ -130,20 +134,43 @@
 
       comments.some(c => {
         var v;
+
+        // コメントデータに関連付けられているビューを探す
+
         if ((v = map.get(c))) {
+
+          // 既にビューに関連付けられている
+
           if (c.visible) {
+
+            // 引き続き表示されるのでnakaに限り動かすだけでOK
+
             if (!c.position) x(c, v);
+
           } else {
+
+            // コメントが表示されなくなったので関連付けを解除
+
             map.delete(c);
             let i = queue.indexOf(v);
             if (i >= 0) queue.splice(i, 1);
             v.clear();
+
+            console.log("cleared");
+
           }
+
         } else if (c.visible) {
+
+          // 新しく表示されるコメント
+
+          // 空いているビューを探す
           views.some(view => {
             return !view.tag && (v = view);
           });
+
           if (!v) {
+            // 空いているビューが無ければ表示中の最古のコメントを消す
             v = queue.pop(v);
             v.clear();
           }
@@ -154,6 +181,7 @@
           v.color = c.color;
           v.size = c.size;
           v.visible = true;
+          // ビューが使用中であることを示すフラグ
           v.tag = true;
 
           v.y = y();
