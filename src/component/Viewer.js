@@ -27,9 +27,11 @@
 
     set text(v) {
       if (this._text === v) return;
-      if (typeof v !== "string") v = "";
+      if (typeof v !== "string") v = v + "";
       this._el.textContent = v;
       this._text = v;
+      this._width = this._el.clientWidth;
+      this._height = this._el.clientHeight;
     }
 
     get color() {
@@ -91,11 +93,11 @@
     }
 
     get width() {
-      return this._el.clientWidth;
+      return this._width;
     }
 
     get height() {
-      return this._el.clientHeight;
+      return this._height;
     }
 
     get right() {
@@ -150,20 +152,46 @@
       return window.innerHeight;
     }
 
+    get number() {
+      return this._number;
+    }
+
+    set number(v) {
+      const d = v - this._number;
+
+      if (d === 0) return;
+
+      if (d < 0) {
+
+        this._comments.splice(d);
+        for (let i = 0; i < -d; ++i) {
+          this._container.removeChild(this._container.lastChild);
+        }
+
+      } else {
+
+        for (let i = 0; i < d; ++i) {
+          let el = document.createElement("div");
+          el.classList.add("comment");
+          this._container.appendChild(el);
+          this._comments.push(new Comment(this, el));
+        }
+
+      }
+
+      this._number = v;
+    }
+
     createdCallback() {
       this._comments = [];
+      this._number = 0;
 
       var root = this.createShadowRoot();
       var template = doc.getElementById("viewer");
       root.appendChild(document.importNode(template.content, true));
 
-      for (let i = 0; i < 50; ++i) {
-        let el = document.createElement("div");
-        el.classList.add("comment");
-        root.appendChild(el);
-
-        this._comments.push(new Comment(this, el));
-      }
+      this._container = root.querySelector(".container");
+      this.number = 50;
     }
 
   };
