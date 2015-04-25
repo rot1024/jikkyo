@@ -13,6 +13,7 @@
   </style>
 
   <canvas></canvas>
+
 </template>
 
 <script>
@@ -23,60 +24,45 @@
 
     var viewer = class extends HTMLElement {
 
-      get _width() {
+      get width() {
         return this._canvas.getAttribute("width") || 0;
       }
 
-      set _width(v) {
+      set width(v) {
         this._canvas.setAttribute("width", v);
       }
 
-      get _height() {
+      get height() {
         return this._canvas.getAttribute("height") || 0;
       }
 
-      set _height(v) {
+      set height(v) {
         this._canvas.setAttribute("height", v);
       }
 
-      _resize() {
-        this._width = window.innerWidth;
-        this._height = window.innerHeight;
-      }
-
-      _draw() {
-        if (!this.drawer) {
-          this._running = false;
-          return;
-        }
-        this.drawer.update(this._canvas, this._ctx);
-        window.requestAnimationFrame(this._drawCallback);
-      }
-
-      start() {
-        this._running = true;
-        this._draw();
-      }
-
-      stop() {
-        this._running = false;
+      resize() {
+        this.width = window.innerWidth;
+        this.height = window.innerHeight;
       }
 
       createdCallback() {
-        this._resizeCallback = this._resize.bind(this);
-        this._drawCallback = this._draw.bind(this);
-        this._running = false;
+        this._resizeCallback = this.resize.bind(this);
 
         var root = this.createShadowRoot();
         var template = doc.querySelector("template");
         root.appendChild(document.importNode(template.content, true));
+
+        this.canvas = root.querySelector("canvas");
+        this.hiddenCanvas = document.createElement("canvas");
+        this.hiddenCanvas.setAttribute("width", 1920);
+        this.hiddenCanvas.setAttribute("height", 500);
       }
 
       attachedCallback() {
         this._canvas = this.shadowRoot.querySelector("canvas");
         this._ctx = this._canvas.getContext("2d");
         window.addEventListener("resize", this._resizeCallback);
-        this._resize();
+        this._resizeCallback();
       }
 
       detachedCallback() {
@@ -93,3 +79,4 @@
 
   })();
 </script>
+<script src="CanvasViewerAdapter.js"></script>
