@@ -66,18 +66,23 @@
       this._oldDate = 0;
       this._event = new EventEmitter();
       this._drawCb = (() => {
-        if (!this._playing) return;
-        var now = Date.now();
-        this._pos = Math.min(this._length, this._pos + now - this._oldDate);
-        this._event.emit("observe", "position", this._pos);
-        this.draw();
-        this._oldDate = now;
-        if (this._pos >= this._length) {
-          this.stop();
+        if (this._playing) {
+          var now = Date.now();
+          this._pos = Math.min(this._length, this._pos + now - this._oldDate);
+          this._event.emit("observe", "position", this._pos);
+          this.draw();
+          this._oldDate = now;
+          if (this._pos >= this._length) {
+            this.stop();
+          } else {
+            window.requestAnimationFrame(this._drawCb);
+          }
         } else {
-          window.requestAnimationFrame(this._drawCb);
+          this.draw();
         }
       }).bind(this);
+
+      window.addEventListener("resize", this._drawCb);
 
       // draw関連
       this._delay = 4000;
@@ -125,27 +130,27 @@
             queue = this._queue;
 
       const x = (c, v) => {
-        v.x = (width + v.width) * (1 - c.ratio) - v.width;
+        return (width + v.width) * (1 - c.ratio) - v.width;
       };
 
       const y = () => {
-        return Math.random() * 300;
+        return 100; // WIP
       };
 
       comments.some(c => {
-        var v;
+        var v = map.get(c);
 
         // コメントデータに関連付けられているビューを探す
 
-        if ((v = map.get(c))) {
+        if (v && v.tag) {
 
           // 既にビューに関連付けられている
 
           if (c.visible) {
 
-            // 引き続き表示されるのでnakaに限り動かすだけでOK
+            // 引き続き表示されるので動かすだけでOK
 
-            if (!c.position) x(c, v);
+            v.x = x(c, v);
 
           } else {
 
@@ -155,8 +160,6 @@
             let i = queue.indexOf(v);
             if (i >= 0) queue.splice(i, 1);
             v.clear();
-
-            console.log("cleared");
 
           }
 
@@ -172,20 +175,22 @@
           if (!v) {
             // 空いているビューが無ければ表示中の最古のコメントを消す
             v = queue.pop(v);
-            v.clear();
+            if (v) {
+              map.delete(v.tag);
+              v.clear();
+            }
           }
+
           map.set(c, v);
           queue.unshift(v);
-
           v.text = c.text;
           v.color = c.color;
           v.size = c.size;
           v.visible = true;
-          // ビューが使用中であることを示すフラグ
-          v.tag = true;
+          v.tag = c;
 
+          v.x = x(c, v);
           v.y = y();
-          x(c, v);
         }
       });
     }
