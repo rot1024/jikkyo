@@ -240,6 +240,7 @@
         this._btn = root.querySelector(".play");
         this._range = root.querySelector("input[type=range]");
         this._pos = root.querySelector(".pos");
+        this._rangeBg = root.querySelector(".range-bg");
 
         this._time = new Time();
 
@@ -291,6 +292,13 @@
             this._btn.classList.remove("pause");
             this._adapter.stop();
           }
+        }).bind(this));
+
+        this._rangeBg.addEventListener("click", (e => {
+          var pos = (e.clientX - this._rangeBg.offsetLeft) / this._rangeBg.offsetWidth;
+          this._adapter.position = ~~(pos * this._adapter.length);
+          this.refresh();
+          if (!this._adapter.playing) this._adapter.draw();
         }).bind(this));
       }
 
