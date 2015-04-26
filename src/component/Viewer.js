@@ -17,7 +17,6 @@
     constructor(view, el) {
       this._view = view;
       this._el = el;
-      this.tag = null;
       this.clear();
     }
 
@@ -190,8 +189,19 @@
       var template = doc.getElementById("viewer");
       root.appendChild(document.importNode(template.content, true));
 
+      this._dummy = new Comment(this, root.getElementById("dummy"));
       this._container = root.querySelector(".container");
       this.number = 50;
+    }
+
+    calcCommentSize(comment) {
+      this._dummy.text = comment.text;
+      this._dummy.color = comment.color;
+      this._dummy.size = comment.size;
+      var w = this._dummy.width;
+      var h = this._dummy.height;
+      this._dummy.clear();
+      return { width: w, height: h };
     }
 
   };

@@ -66,6 +66,7 @@
       this._oldDate = 0;
       this._event = new EventEmitter();
       this._drawCb = (() => {
+        if (!this._el) return;
         if (this._playing) {
           var now = Date.now();
           this._pos = Math.min(this._length, this._pos + now - this._oldDate);
@@ -90,9 +91,9 @@
       this._queue = [];
     }
 
-    add(c) {
-      var self = this;
-      this._comments.push({
+    add(comment) {
+      const self = this;
+      const convert = c => ({
         text: c.text,
         vpos: c.vpos,
         color: c.color,
@@ -105,6 +106,16 @@
           return (self._pos - this.vpos) / self._delay;
         }
       });
+
+      if (Array.isArray(comment)) {
+        comment.forEach((c => {
+          this._comments.push(convert(c));
+        }).bind(this));
+      } else {
+        this._comments.push(convert(comment));
+      }
+      this._comments.sort((a, b) => a.vpos > b.vpos ? 1 : -1);
+      this.refresh();
     }
 
     start() {
@@ -120,6 +131,7 @@
     }
 
     draw() {
+      if (!this._el) return;
       // コメントの位置決定ロジック
 
       const comments = this._comments,
@@ -131,10 +143,6 @@
 
       const x = (c, v) => {
         return (width + v.width) * (1 - c.ratio) - v.width;
-      };
-
-      const y = () => {
-        return 100; // WIP
       };
 
       comments.some(c => {
@@ -190,13 +198,98 @@
           v.tag = c;
 
           v.x = x(c, v);
-          v.y = y();
+          v.y = c.y;
         }
       });
     }
 
+    refresh() {
+      this._comments.forEach((c => {
+        this._calcSize(c);
+      }).bind(this));
+      this._comments.forEach((c => {
+        c.y = this._calcY(c);
+        if (c.bullet) c.color = "red";
+      }).bind(this));
+    }
+
     _getFontSize() {
       return 36;
+    }
+
+    _calcX() {
+
+    }
+
+    _calcY(comment) {
+
+      var delay = this._delay,
+          width = this._el.width,
+          height = this._el.height,
+          bullet = false,
+          y = 0;
+
+      const x = ((c, pos) => {
+        var r = (pos - c.vpos) / delay;
+        return (width + c.width) * (1 - r) - c.width;
+      }).bind(this);
+
+      this._comments.some(c => {
+
+        if (comment.vpos < c.vpos) return true;
+
+        if (c === comment || c.position !== comment.position ||
+            comment.vpos - c.vpos >= delay ||
+            c.y + c.height < comment.y && comment.y + comment.height < c.y)
+          return false;
+
+        //if (this.position == consts.position.center) {
+
+        //       2つのコメントが同時に表示される時間の開始時刻
+        const vstart = Math.max(comment.vpos, c.vpos),
+              // 2つのコメントが同時に表示される時間の終了時刻
+              vend = Math.min(comment.vpos + delay, c.vpos + delay),
+              // 2つのコメントが同時に表示され始まるときのthisのX
+              commentStartX = x(comment, vstart),
+              // 2つのコメントが同時に表示されるのが終わるときのthisのX
+              commentEndX = x(comment, vend),
+              // 2つのコメントが同時に表示され始まるときのcのX
+              cStartX = x(c, vstart),
+              // 2つのコメントが同時に表示されるのが終わるときのcのX
+              cEndX = x(c, vend);
+
+        if (
+          commentStartX <= cStartX + c.width && cStartX <= commentStartX + comment.width ||
+          commentEndX <= cEndX + c.width && cEndX <= commentEndX + comment.width
+        ) {
+          y += c.height + 1;
+          if (y > height - comment.height) {
+            // 弾幕モード
+            y = Math.ceil(Math.random() * height - comment.height);
+            bullet = true;
+            return true;
+          }
+        }
+
+        /*
+        } else if (this.vstart - c.vstart <= consts.duration) {
+          this.y += c.height + 1;
+          if (this.y > screen.height - this.height) {
+            // 弾幕モード（ue/shita/nakaに関係なく適用される）
+            this.y = Math.ceil(Math.random() * screen.height - this.height);
+            break;
+          }
+        }
+        */
+      });
+      comment.bullet = bullet;
+      return Math.floor(y);
+    }
+
+    _calcSize(comment) {
+      var size = this._el.calcCommentSize(comment);
+      comment.width = size.width;
+      comment.height = size.height;
     }
 
   };
