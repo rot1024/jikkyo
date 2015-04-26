@@ -246,7 +246,7 @@
 
         if (c === comment || c.position !== comment.position ||
             comment.vpos - c.vpos >= delay || c.bullet ||
-            c.y + c.height < comment.y && comment.y + comment.height < c.y)
+            c.y + c.height < comment.y || comment.y + comment.height < c.y)
           return false;
 
         if (comment.position === "ue" || comment.position === "shita") {
