@@ -4,9 +4,7 @@
   var gui = require("nw.gui");
   var win = gui.Window.get();
 
-  require("./util/maximized")(win).inspect();
-
-  window.addEventListener("load", () => {
+  win.on("loaded", () => {
 
     window.addEventListener("keydown", e => {
       if (e.keyCode === 123) win.showDevTools();
@@ -35,6 +33,7 @@
 
     win.setTransparent(true);
     win.show();
+
   });
 
 })();
