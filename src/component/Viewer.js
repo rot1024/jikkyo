@@ -12,6 +12,17 @@
   // var positionList = ["ue", "shita"];
   var sizeList = ["big", "small"];
 
+  var escape = (content) => {
+    const t = {
+      "&": "&amp;",
+      "\"": "&quot;",
+      "<": "&lt;",
+      ">": "&gt;",
+      "\n": "<br>"
+    };
+    return content.replace(/[&"<>\n]/g, m => t[m]);
+  };
+
   var Comment = class {
 
     constructor(view, el) {
@@ -27,7 +38,7 @@
     set text(v) {
       if (this._text === v) return;
       if (typeof v !== "string") v = v + "";
-      this._el.textContent = v;
+      this._el.innerHTML = escape(v.trim());
       this._text = v;
       this._width = this._el.clientWidth;
       this._height = this._el.clientHeight;
@@ -195,9 +206,9 @@
     }
 
     calcCommentSize(comment) {
-      this._dummy.text = comment.text;
       this._dummy.color = comment.color;
       this._dummy.size = comment.size;
+      this._dummy.text = comment.text;
       var w = this._dummy.width;
       var h = this._dummy.height;
       this._dummy.clear();

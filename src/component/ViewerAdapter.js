@@ -17,6 +17,14 @@
       this._el = v;
     }
 
+    get comments() {
+      return this._comments;
+    }
+
+    set comments(v) {
+      this._comments = v;
+    }
+
     get rows() {
       return this._rows;
     }
@@ -53,7 +61,7 @@
     }
 
     off(listener) {
-      this._event.removeEventListener("observe", listener);
+      this._event.removeListener("observe", listener);
     }
 
     constructor() {
@@ -92,19 +100,15 @@
     }
 
     add(comment) {
-      const self = this;
       const convert = c => ({
         text: c.text,
         vpos: c.vpos,
         color: c.color,
         size: c.size,
         position: c.position,
-        get visible() {
-          return this.vpos <= self._pos && self._pos <= this.vpos + self._delay;
-        },
-        get ratio() {
-          return (self._pos - this.vpos) / self._delay;
-        }
+        bullet: false,
+        width: 0,
+        height: 0
       });
 
       if (Array.isArray(comment)) {
@@ -114,7 +118,6 @@
       } else {
         this._comments.push(convert(comment));
       }
-      this._comments.sort((a, b) => a.vpos > b.vpos ? 1 : -1);
       this.refresh();
     }
 
@@ -137,13 +140,10 @@
       const comments = this._comments,
             el = this._el,
             views = el.comments,
-            width = el.width,
             map = this._map,
-            queue = this._queue;
-
-      const x = (c, v) => {
-        return (width + v.width) * (1 - c.ratio) - v.width;
-      };
+            queue = this._queue,
+            calcX = this._calcX.bind(this),
+            visible = this._visible.bind(this);
 
       comments.some(c => {
         var v = map.get(c);
@@ -154,11 +154,10 @@
 
           // 既にビューに関連付けられている
 
-          if (c.visible) {
+          if (visible(c)) {
 
             // 引き続き表示されるので動かすだけでOK
-
-            v.x = x(c, v);
+            v.x = calcX(c);
 
           } else {
 
@@ -171,7 +170,7 @@
 
           }
 
-        } else if (c.visible) {
+        } else if (visible(c)) {
 
           // 新しく表示されるコメント
 
@@ -196,19 +195,19 @@
           v.size = c.size;
           v.visible = true;
           v.tag = c;
-
-          v.x = x(c, v);
+          v.x = calcX(c);
           v.y = c.y;
         }
       });
     }
 
     refresh() {
+      this._comments.sort((a, b) => a.vpos > b.vpos ? 1 : -1);
       this._comments.forEach((c => {
         this._calcSize(c);
       }).bind(this));
       this._comments.forEach((c => {
-        c.y = this._calcY(c);
+        this._calcY(c);
         if (c.bullet) c.color = "red";
       }).bind(this));
     }
@@ -217,73 +216,86 @@
       return 36;
     }
 
-    _calcX() {
+    _visible(c, pos) {
+      const delay = c.position === "ue" || c.position === "shita" ? 3000 : 4000;
+      if (pos === void 0) pos = this._pos;
+      return c.vpos <= pos && pos <= c.vpos + delay;
+    }
 
+    _calcX(c, pos) {
+      if (c.position === "ue" || c.position === "shita") {
+        console.log(c.width);
+        return (this._el.width - c.width) / 2;
+      } else {
+        if (pos === void 0) pos = this._pos;
+        let r = (pos - c.vpos) / this._delay;
+        return (this._el.width + c.width) * (1 - r) - c.width;
+      }
     }
 
     _calcY(comment) {
-
-      var delay = this._delay,
-          width = this._el.width,
-          height = this._el.height,
-          bullet = false,
+      const delay = comment.position === "ue" || comment.position === "shita" ? 3000 : this._delay,
+            height = this._el.height,
+            calcX = this._calcX.bind(this);
+      var bullet = false,
           y = 0;
-
-      const x = ((c, pos) => {
-        var r = (pos - c.vpos) / delay;
-        return (width + c.width) * (1 - r) - c.width;
-      }).bind(this);
 
       this._comments.some(c => {
 
         if (comment.vpos < c.vpos) return true;
 
         if (c === comment || c.position !== comment.position ||
-            comment.vpos - c.vpos >= delay ||
+            comment.vpos - c.vpos >= delay || c.bullet ||
             c.y + c.height < comment.y && comment.y + comment.height < c.y)
           return false;
 
-        //if (this.position == consts.position.center) {
+        if (comment.position === "ue" || comment.position === "shita") {
 
-        //       2つのコメントが同時に表示される時間の開始時刻
-        const vstart = Math.max(comment.vpos, c.vpos),
-              // 2つのコメントが同時に表示される時間の終了時刻
-              vend = Math.min(comment.vpos + delay, c.vpos + delay),
-              // 2つのコメントが同時に表示され始まるときのthisのX
-              commentStartX = x(comment, vstart),
-              // 2つのコメントが同時に表示されるのが終わるときのthisのX
-              commentEndX = x(comment, vend),
-              // 2つのコメントが同時に表示され始まるときのcのX
-              cStartX = x(c, vstart),
-              // 2つのコメントが同時に表示されるのが終わるときのcのX
-              cEndX = x(c, vend);
-
-        if (
-          commentStartX <= cStartX + c.width && cStartX <= commentStartX + comment.width ||
-          commentEndX <= cEndX + c.width && cEndX <= commentEndX + comment.width
-        ) {
           y += c.height + 1;
+
           if (y > height - comment.height) {
             // 弾幕モード
-            y = Math.ceil(Math.random() * height - comment.height);
+            y = Math.ceil(Math.random() * (height - comment.height));
             bullet = true;
             return true;
           }
-        }
 
-        /*
-        } else if (this.vstart - c.vstart <= consts.duration) {
-          this.y += c.height + 1;
-          if (this.y > screen.height - this.height) {
-            // 弾幕モード（ue/shita/nakaに関係なく適用される）
-            this.y = Math.ceil(Math.random() * screen.height - this.height);
-            break;
+        } else {
+
+          //       2つのコメントが同時に表示される時間の開始時刻
+          const vstart = Math.max(comment.vpos, c.vpos),
+                // 2つのコメントが同時に表示される時間の終了時刻
+                vend = Math.min(comment.vpos + delay, c.vpos + delay),
+                // 2つのコメントが同時に表示され始まるときのthisのX
+                commentStartX = calcX(comment, vstart),
+                // 2つのコメントが同時に表示されるのが終わるときのthisのX
+                commentEndX = calcX(comment, vend),
+                // 2つのコメントが同時に表示され始まるときのcのX
+                cStartX = calcX(c, vstart),
+                // 2つのコメントが同時に表示されるのが終わるときのcのX
+                cEndX = calcX(c, vend);
+
+          if (
+            //width + c.width < (1 - (c.vpos - comment.vpos) / delay) * (width + comment.width)
+            //commentStartX <= cStartX + c.width || commentEndX <= cEndX + c.width
+            commentStartX <= cStartX + c.width && cStartX <= commentStartX + comment.width ||
+            commentEndX <= cEndX + c.width && cEndX <= commentEndX + comment.width
+          ) {
+            y += c.height + 1;
+            if (y > height - comment.height) {
+              // 弾幕モード
+              y = Math.ceil(Math.random() * (height - comment.height));
+              bullet = true;
+              return true;
+            }
           }
+
         }
-        */
       });
       comment.bullet = bullet;
-      return Math.floor(y);
+      y = Math.floor(y);
+
+      comment.y = comment.position === "shita" && !bullet ? height - y : y;
     }
 
     _calcSize(comment) {
