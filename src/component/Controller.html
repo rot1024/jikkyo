@@ -16,10 +16,22 @@
       right: 0;
       bottom: 0;
       height: 56px;
+      display: flex;
+      padding: 0 10px;
       background: rgba(30, 30, 30, .75);
       color: #aaa;
       transition: bottom .2s ease-in-out;
       box-sizing: border-box;
+      align-items: center;
+    }
+
+    .item {
+      position: relative;
+      margin: 0 10px;
+    }
+
+    .item-slider {
+      flex-grow: 1;
     }
 
     .container.hidden {
@@ -28,9 +40,8 @@
 
     input[type=range] {
       position: absolute;
-      left: 72px;
-      top: 20px;
-      width: calc(100% - 238px);
+      width: 100%;
+      top: -7px;
       -webkit-appearance: none;
     }
 
@@ -66,10 +77,11 @@
 
     .range-bg {
       position: absolute;
-      left: 79px;
-      top: 22px;
-      width: calc(100% - 250px);
+      top: 50%;
+      width: calc(100% - 18px);
       height: 10px;
+      margin: 0 10px;
+      margin-top: -5px;
       background: #000;
       border-radius: 10px;
     }
@@ -95,9 +107,6 @@
     }
 
     .play {
-      position: absolute;
-      left: 10px;
-      top: 12px;
       width: 50px;
       height: 30px;
       background-image: url("images/play.svg");
@@ -108,9 +117,6 @@
     }
 
     .menu {
-      position: absolute;
-      right: 26px;
-      top: 12px;
       width: 30px;
       height: 30px;
       background-image: url("images/menu.svg");
@@ -121,9 +127,6 @@
     }
 
     .pos {
-      position: absolute;
-      right: 80px;
-      top: 12px;
       width: 70px;
       height: 30px;
       color: #aaa;
@@ -136,11 +139,13 @@
 
   <div id="container" class="container">
 
-    <div class="btn play" title="再生"></div>
-    <div class="btn menu" title="メニュー"></div>
-    <div class="pos">00:00:00</div>
-    <canvas class="range-bg"></canvas>
-    <input type="range" min="0" max="100" value="0" />
+    <div class="item"><div class="btn play" title="再生"></div></div>
+    <div class="item item-slider">
+      <canvas class="range-bg"></canvas>
+      <input type="range" min="0" max="100" value="0" />
+    </div>
+    <div class="item"><div class="pos">00:00:00</div></div>
+    <div class="item"><div class="btn menu" title="メニュー"></div></div>
 
   </div>
 
