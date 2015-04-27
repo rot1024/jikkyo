@@ -3,222 +3,272 @@
 
   var doc = document.currentScript.ownerDocument;
 
-  var colorList = [
-    "red", "pink", "orange", "yellow", "green", "cyan", "blue", "purple", "black",
-    "white2", "niconicowhite", "red2", "truered", "pink2", "orange2",
-    "passionorange", "yellow2", "madyellow", "green2", "elementalgreen",
-    "cyan2", "blue2", "marineblue", "purple2", "nobleviolet", "black2"
-  ];
-  // var positionList = ["ue", "shita"];
-  var sizeList = ["big", "small"];
+  var colorList = {
+    white:          "#FFFFFF",
+    red:            "#FF0000",
+    pink:           "#FF8080",
+    orange:         "#FFC000",
+    yellow:         "#FFFF00",
+    green:          "#00FF00",
+    cyan:           "#00FFFF",
+    blue:           "#0000FF",
+    purple:         "#C000FF",
+    black:          "#000000",
+    white2:         "#CCCC99",
+    niconicowhite:  "#CCCC99",
+    red2:           "#CC0033",
+    truered:        "#CC0033",
+    pink2:          "#FF33CC",
+    orange2:        "#FF6600",
+    passionorange:  "#FF6600",
+    yellow2:        "#999900",
+    madyellow:      "#999900",
+    green2:         "#00CC66",
+    elementalgreen: "#00CC66",
+    cyan2:          "#00CCCC",
+    blue2:          "#3399FF",
+    marineblue:     "#3399FF",
+    purple2:        "#6633CC",
+    nobleviolet:    "#6633CC",
+    black2:         "#666666",
+  };
 
-  var escape = (content) => {
-    const t = {
-      "&": "&amp;",
-      "\"": "&quot;",
-      "<": "&lt;",
-      ">": "&gt;",
-      "\n": "<br>"
+  var sizeList = {
+    medium: "100%",
+    big:    "150%",
+    small:  "50%"
+  };
+
+  function escapeHTML(content) {
+    const table = {
+      '&': '&amp;',
+      '"': '&quot;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '\n': '<br />'
     };
-    return content.replace(/[&"<>\n]/g, m => t[m]);
-  };
+    return content.replace(/[&"<>\n]/g, m => table[m]);
+  }
 
-  var Comment = class {
-
-    constructor(view, el) {
-      this._view = view;
-      this._el = el;
-      this.clear();
-    }
-
-    get text() {
-      return this._text;
-    }
-
-    set text(v) {
-      if (this._text === v) return;
-      if (typeof v !== "string") v = v + "";
-      this._el.innerHTML = escape(v.trim());
-      this._text = v;
-      this._width = this._el.clientWidth;
-      this._height = this._el.clientHeight;
-    }
-
-    get color() {
-      return this._color;
-    }
-
-    set color(v) {
-      if (typeof v !== "string") return;
-      if (v[0] === "#" && v.length === 7) {
-        this.clearColor();
-        this._el.style.color = v;
-        this._colorType = 2;
-        this._color = v;
-      } else if (colorList.indexOf(v) >= 0) {
-        this.clearColor();
-        this._el.classList.add(v);
-        this._colorType = 1;
-        this._color = v;
-      }
-    }
-
-    get size() {
-      return sizeList[this._size];
-    }
-
-    set size(v) {
-      if (this._size > 0)
-        this._el.classList.remove(sizeList[this._size - 1]);
-      this._size = sizeList.indexOf(v) + 1;
-      if (this._size > 0)
-        this._el.classList.add(sizeList[this._size - 1]);
-    }
-
-    get x() {
-      return this._x;
-    }
-
-    set x(v) {
-      this._x = v;
-      this._el.style.left = v + "px";
-    }
-
-    get y() {
-      return this._y;
-    }
-
-    set y(v) {
-      this._y = v;
-      this._el.style.top = v + "px";
-    }
-
-    get visible() {
-      return this._visible;
-    }
-
-    set visible(v) {
-      this._visible = !!v;
-      this._el.style.visibility = v ? null : "hidden";
-    }
-
-    get width() {
-      return this._width;
-    }
-
-    get height() {
-      return this._height;
-    }
-
-    get right() {
-      return this._el.clientWidth + this._x;
-    }
-
-    get bottom() {
-      return this._el.clientHeight + this._y;
-    }
-
-    clear() {
-      this.tag = null;
-      this.clearColor();
-      this.clearSize();
-      this.text = "";
-      this.x = this.y = 0;
-      this.visible = false;
-    }
-
-    clearColor() {
-      if (this._colorType === 2)
-        this._el.style.color = null;
-      else if (this._colorType === 1)
-        this._el.classList.remove(this._color);
-      this._colorType = 0;
-      this._color = "";
-    }
-
-    clearSize() {
-      if (this._size <= 0) return;
-      this._el.classList.remove(sizeList[this._size - 1]);
-      this._size = 0;
-    }
-
-  };
-
-  var viewer = class extends HTMLElement {
-
-    get comments() {
-      return this._comments;
-    }
-
-    clear() {
-      this._comments.forEach(c => c.clear());
-    }
-
-    get width() {
-      return window.innerWidth;
-    }
-
-    get height() {
-      return window.innerHeight;
-    }
-
-    get number() {
-      return this._number;
-    }
-
-    set number(v) {
-      const d = v - this._number;
-
-      if (d === 0) return;
-
-      if (d < 0) {
-
-        this._comments.splice(d);
-        for (let i = 0; i < -d; ++i) {
-          this._container.removeChild(this._container.lastChild);
-        }
-
-      } else {
-
-        for (let i = 0; i < d; ++i) {
-          let el = document.createElement("div");
-          el.classList.add("comment");
-          this._container.appendChild(el);
-          this._comments.push(new Comment(this, el));
-        }
-
-      }
-
-      this._number = v;
-    }
+  class Comment extends HTMLElement {
 
     createdCallback() {
-      this._comments = [];
-      this._number = 0;
+      this._observer = this._observer.bind(this);
 
+      this.comment = {
+        text:       "",
+        color:      "white",
+        size:       "medium",
+        x:          0,
+        y:          0,
+        visibility: false
+      };
+    }
+
+    attachedCallback() {
+
+    }
+
+    detachedCallback() {
+      Object.unobserve(this._comment, this._observer);
+    }
+
+    get comment() {
+      return this._comment;
+    }
+
+    set comment(comment) {
+      if (typeof comment !== "object")
+        throw new TypeError("comment must be object: " + typeof comment);
+
+      if (this._comment !== void(0)) {
+        Object.unobserve(this._comment, this._observer);
+      }
+
+      Object.observe(comment, this._observer);
+
+      this._comment = comment;
+    }
+
+    _observer(changes) {
+      changes.forEach(change => {
+        switch(change.name) {
+          case "text":
+            this._observerText();
+            break;
+          case "color":
+            this._observerColor();
+            break;
+          case "size":
+            this._observerSize();
+            break;
+          case "x":
+            this._observerX();
+            break;
+          case "y":
+            this._observerY();
+            break;
+          case "visibility":
+            this._observerVisibility();
+            break;
+        }
+      }, this);
+    }
+
+    _observerText() {
+      var text = this._comment.text;
+
+      if (typeof text !== "string") {
+        console.log("Warning: text must be string: " + typeof text);
+        return;
+      }
+
+      text = text.toString().trim();
+
+      this.innerHTML = escapeHTML(text);
+    }
+
+    _observerColor() {
+      var color = this._comment.color;
+
+      if (typeof color !== "string") {
+        console.log("Warning: color must be string: " + typeof color);
+        return;
+      }
+
+      if (/^#[\dA-F]{6}$/.test(color)) {
+        this.style.color = color;
+      } else if (color in colorList) {
+        this.style.color = colorList[color];
+      } else {
+        this.style.color = colorList.white;
+      }
+    }
+
+    _observerSize() {
+      var size = this._comment.size;
+
+      if (typeof size !== "string") {
+        console.log("Warning: color must be string: " + typeof size);
+        return;
+      }
+
+      if (size in sizeList) {
+        this.style.fontSize = sizeList[size];
+      } else {
+        this.style.fontSize = sizeList.medium;
+      }
+    }
+
+    _observerX() {
+      var x = this._comment.x;
+
+      if (typeof x !== "number") {
+        console.log("Warning: x must be number: " + typeof x);
+        return;
+      }
+
+      this.style.left = x + "px";
+    }
+
+    _observerY() {
+      var y = this._comment.y;
+
+      if (typeof y !== "number") {
+        console.log("Warning: y must be number: " + typeof y);
+        return;
+      }
+
+      this.style.top = y + "px";
+    }
+
+    _observerVisible() {
+      var visibility = this._comment.visibility;
+
+      if (typeof visibility !== "boolean") {
+        console.log("Warning: visibility must be number: " + typeof visibility);
+        return;
+      }
+
+      this.style.visibility = visibility ? "" : "hidden";
+    }
+
+    render() {
+      this._observerText();
+      this._observerColor();
+      this._observerSize();
+      this._observerX();
+      this._observerY();
+      this._observerVisibility();
+    }
+
+  }
+
+  class Viewer extends HTMLElement {
+
+    createdCallback() {
+      this._comments = new Map();
+
+      // Shadow DOMのRoot
       var root = this.createShadowRoot();
+
+      // コンテナ
+      var container = root.querySelector(".container");
+      this._container = container;
+
+      // ダミーコメント(サイズ取得等)
+      var dummy = document.createElement("jikkyo-comment");
+      dummy.visibility = false;
+      container.appendChild(dummy);
+      this._dummy = dummy;
+
+      // インポート
       var template = doc.getElementById("viewer");
-      root.appendChild(document.importNode(template.content, true));
-
-      this._dummy = new Comment(this, root.getElementById("dummy"));
-      this._container = root.querySelector(".container");
-      this.number = 50;
+      var node = document.importNode(template.content, true);
+      root.appendChild(node);
     }
 
-    calcCommentSize(comment) {
-      this._dummy.color = comment.color;
-      this._dummy.size = comment.size;
-      this._dummy.text = comment.text;
-      var w = this._dummy.width;
-      var h = this._dummy.height;
-      this._dummy.clear();
-      return { width: w, height: h };
+    createComment(comment) {
+      if (typeof comment !== "object")
+        throw new TypeError("comment must be object: " + typeof comment);
+
+      if (this._comments.has(comment))
+        return this.comments.get(comment);
+
+      var elem = document.createElement("jikkyo-comment");
+      elem.comment = comment;
+      this._container.appendChild(elem);
+      this._comments.push(elem);
+
+      return elem;
     }
 
-  };
+    getComment(comment) {
+      if (!this._comments.has(comment)) return null;
 
+      return this.comments.get(comment);
+    }
+
+    removeComment(comment) {
+      if (!this._comments.has(comment)) return false;
+
+      var elem = this.comments.get(comment);
+      this._container.removeChild(elem);
+
+      return true;
+    }
+
+    getDummyComment() {
+      return this._dummy;
+    }
+
+  }
+
+  window.JikkyoComment = document.registerElement("jikkyo-comment", {
+    prototype: Comment.prototype
+  });
   window.JikkyoViewer = document.registerElement("jikkyo-viewer", {
-    prototype: viewer.prototype
+    prototype: Viewer.prototype
   });
 
 })();
