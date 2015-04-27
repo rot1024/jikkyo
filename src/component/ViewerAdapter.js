@@ -224,7 +224,6 @@
 
     _calcX(c, pos) {
       if (c.position === "ue" || c.position === "shita") {
-        console.log(c.width);
         return (this._el.width - c.width) / 2;
       } else {
         if (pos === void 0) pos = this._pos;
