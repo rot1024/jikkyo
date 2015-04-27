@@ -5,11 +5,11 @@
 
   var Adapter = class {
 
-    get view() {
+    get viewerView() {
       return this._el;
     }
 
-    set view(v) {
+    set viewerView(v) {
       if (v === this._el) return;
       if (v) {
         this.stop();
@@ -20,6 +20,16 @@
         this.refresh();
         this.draw();
       }).bind(this));
+    }
+
+    get controllerView() {
+      return this._controller;
+    }
+
+    set controllerView(v) {
+      if (v === this._controller) return;
+      this._controller = v;
+      if (v) this._controller.adapter = this;
     }
 
     get comments() {
@@ -71,6 +81,7 @@
 
     constructor() {
       this._el = null;
+      this._controller = null;
       this._comments = [];
       this._rows = 12;
       this._pos = 0;
