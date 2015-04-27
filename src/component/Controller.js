@@ -169,6 +169,22 @@
         else if (!on && cl.contains("on")) cl.remove("on");
         win.setAlwaysOnTop(on);
       }).bind(this));
+
+      var menu = document.createElement("jikkyo-menu");
+      menu.add({ label: "Twitter モード", checked: true });
+      menu.add({ label: "ファイル モード" });
+      menu.add({ type: "separator" });
+      menu.add({
+        label: "設定",
+        onclick() {
+          document.querySelector("jikkyo-preference-dialog").show();
+        }
+      });
+
+      this._menuBtn.addEventListener("click", (() => {
+        var rect = this._menuBtn.getBoundingClientRect();
+        menu.show(rect.right, rect.top);
+      }).bind(this));
     }
 
   };
