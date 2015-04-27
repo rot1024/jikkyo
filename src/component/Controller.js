@@ -44,7 +44,7 @@
 
   };
 
-  var controller = class extends HTMLElement {
+  var Controller = class extends HTMLElement {
 
     hide() {
       this.shadowRoot.getElementById("container").classList.add("hidden");
@@ -99,6 +99,7 @@
       this._pos = root.querySelector(".pos");
       this._rangeBg = root.querySelector(".range-bg");
       this._alwaysontopBtn = root.querySelector(".alwaysontop");
+      this._menuBtn = root.querySelector(".menu");
 
       this._time = new Time();
 
@@ -107,8 +108,8 @@
           this._range.value = val;
           this._time.totalMillisecond = val;
           this._pos.textContent = this._time.toString();
-          if (this._adapter.length === val) {
-            this._btn.classList.remove("pause");
+          if (this._adapter.length <= val) {
+            this._playBtn.classList.remove("pause");
           }
         } else if (name === "length") {
           this._range.max = val;
@@ -138,6 +139,14 @@
         this._pos.textContent = this._time.toString();
       }).bind(this));
 
+      this._rangeBg.addEventListener("click", (e => {
+        var rect = this._rangeBg.getBoundingClientRect();
+        var pos = (e.clientX - rect.left) / rect.width;
+        this._adapter.position = ~~(pos * this._adapter.length);
+        this.refresh();
+        if (!this._adapter.playing) this._adapter.draw();
+      }).bind(this));
+
       this._playBtn.addEventListener("click", (() => {
         if (!this._adapter.playing) {
           if (this._adapter.length === 0) return;
@@ -153,17 +162,9 @@
         }
       }).bind(this));
 
-      this._rangeBg.addEventListener("click", (e => {
-        var pos = (e.clientX - this._rangeBg.offsetLeft) / this._rangeBg.offsetWidth;
-        this._adapter.position = ~~(pos * this._adapter.length);
-        this.refresh();
-        if (!this._adapter.playing) this._adapter.draw();
-      }).bind(this));
-
       this._alwaysontopBtn.addEventListener("click", (() => {
         const on = this._alwaysontop = !this._alwaysontop;
         const cl = this._alwaysontopBtn.classList;
-        console.log(cl);
         if (on && !cl.contains("on")) cl.add("on");
         else if (!on && cl.contains("on")) cl.remove("on");
         win.setAlwaysOnTop(on);
@@ -173,7 +174,7 @@
   };
 
   window.JikkyoController = document.registerElement("jikkyo-controller", {
-    prototype: controller.prototype
+    prototype: Controller.prototype
   });
 
 })();

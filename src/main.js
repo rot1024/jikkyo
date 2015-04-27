@@ -28,8 +28,8 @@
     });
 
     var adapter = new window.JikkyoViewer.Adapter();
-    adapter.view = viewer;
-    controller.adapter = adapter;
+    adapter.viewerView = viewer;
+    adapter.controllerView = controller;
 
     win.setTransparent(true);
     win.show();
