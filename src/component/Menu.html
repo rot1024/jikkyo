@@ -1,0 +1,191 @@
+<template>
+
+  <style>
+
+    :host {
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+
+    ul {
+      margin: 0;
+      width: 200px;
+      padding: 0;
+      background: #434343;
+      color: #ccc;
+      list-style: none;
+      box-shadow: 3px 3px 10px rgba(0, 0, 0, .4);
+    }
+
+    li {
+      padding: 0;
+    }
+
+    li.item {
+      position: relative;
+      padding: 10px 10px 10px 30px;
+    }
+
+    li.item:hover {
+      background-color: #28a502;
+      color: #fff;
+    }
+
+    li.checked:before {
+      content: "";
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      display: block;
+      margin: -5px 0 0 0;
+      width: 8px;
+      height: 8px;
+      background-color: #ccc;
+      border-radius: 50%;
+    }
+
+    li.checked:hover:before {
+      background-color: #fff;
+    }
+
+    li.separator {
+      margin: 5px 0;
+      border-top: 1px solid #777;
+    }
+
+    .hidden {
+      visibility: hidden;
+    }
+
+  </style>
+
+  <ul class="hidden"></ul>
+
+</template>
+
+<script>
+(() => {
+  "use strict";
+
+  var doc = document.currentScript.ownerDocument;
+
+  var MenuItem = class {
+
+    constructor(item) {
+      this.el = document.createElement("li");
+      this._type = item.type;
+      if (this._type === "separator")
+        this.el.classList.add("separator");
+      else {
+        this.el.classList.add("item");
+        this.label = item.label;
+        this.checked = item.checked || false;
+        this.checkable = item.checkable || false;
+        this.disabled = item.disabled || false;
+        this.onclick = item.onclick;
+      }
+    }
+
+    get type() { return this._type; }
+
+    get label() { return this._label; }
+    set label(v) {
+      this.el.textContent = v;
+      this._label = v;
+    }
+
+    get checked() { return this._checked; }
+    set checked(v) {
+      if (v) this.el.classList.add("checked");
+      else this.el.classList.remove("checked");
+      this._checked = v;
+    }
+
+    get disabled() { return this._disabled; }
+    set disabled(v) {
+      if (v) this.el.classList.add("disabled");
+      else this.el.classList.remove("disabled");
+      this._disabled = v;
+    }
+  };
+
+  var Menu = class extends HTMLElement {
+
+    createdCallback() {
+      var root = this.createShadowRoot();
+      var template = doc.querySelector("template");
+      root.appendChild(document.importNode(template.content, true));
+
+      this._menu = root.querySelector("ul");
+      this._menu.addEventListener("click", e => e.stopPropagation());
+
+      this._items = [];
+      this._hidden = true;
+
+      this._menuCb = (e => {
+        if (this.inside(e.clientX, e.clientY))
+          return;
+        if (this.parentNode) this.hide();
+        e.stopPropagation();
+      }).bind(this);
+    }
+
+    get items() {
+      return this._items;
+    }
+
+    inside(x, y) {
+      var rect = this._menu.getBoundingClientRect();
+      return rect.left <= x && x <= rect.right &&
+        rect.top <= y && y <= rect.bottom;
+    }
+
+    add(item) {
+      var menuItem = new MenuItem(item);
+
+      menuItem.el.addEventListener("click", (e => {
+        if (!menuItem.disabled) {
+          if (menuItem.checkable)
+            menuItem.checked = !menuItem.checked;
+          if (typeof menuItem.onclick === "function")
+            menuItem.onclick(menuItem);
+          this.hide();
+        }
+        e.stopPropagation();
+      }).bind(this));
+
+      this._items.push(menuItem);
+      this._menu.appendChild(menuItem.el);
+    }
+
+    show(x, y) {
+      var left = x, top = y;
+      document.body.appendChild(this);
+      const rect = this._menu.getBoundingClientRect();
+      if (window.innerWidth < x + rect.width)
+        left -= rect.width;
+      if (window.innerHeight < y + rect.height)
+        top -= rect.height;
+      this.style.left = left + "px";
+      this.style.top = top + "px";
+      this._menu.classList.remove("hidden");
+      window.addEventListener("click", this._menuCb, true);
+    }
+
+    hide() {
+      this._menu.classList.add("hidden");
+      this.style.left = 0;
+      this.style.top = 0;
+      window.removeEventListener("click", this._menuCb, true);
+      if (this.parentNode) document.body.removeChild(this);
+    }
+
+  };
+
+  window.JikkyoMenu = document.registerElement("jikkyo-menu", {
+    prototype: Menu.prototype
+  });
+
+})();
+</script>
