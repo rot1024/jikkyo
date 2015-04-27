@@ -137,6 +137,7 @@
 
       this._btn.addEventListener("click", (() => {
         if (!this._adapter.playing) {
+          if (this._adapter.length === 0) return;
           if (this._adapter.position === this._adapter.length) {
             this._adapter.position = 0;
             this.refresh();
