@@ -98,12 +98,15 @@
     }
 
     .btn:hover {
-      background-color: rgba(200, 200, 200, .4);
       opacity: 1;
     }
 
     .btn:active {
-      background-color: rgba(200, 200, 200, .2);
+      opacity: .8;
+    }
+
+    .play.pause {
+      background-image: url("images/pause.svg");
     }
 
     .play {
@@ -112,18 +115,29 @@
       background-image: url("images/play.svg");
     }
 
-    .pause {
-      background-image: url("images/pause.svg");
+    .play:hover {
+      background-color: rgba(200, 200, 200, .4);
+    }
+
+    .play:active {
+      background-color: rgba(200, 200, 200, .2);
+    }
+
+    .alwaysontop {
+      width: 30px;
+      height: 30px;
+      background-image: url("images/alwaysontop.svg");
+    }
+
+    .alwaysontop.on {
+      background-image: url("images/alwaysontop-on.svg");
+      opacity: 1;
     }
 
     .menu {
       width: 30px;
       height: 30px;
       background-image: url("images/menu.svg");
-    }
-
-    .menu:hover, .menu:active {
-      background-color: transparent;
     }
 
     .pos {
@@ -145,6 +159,7 @@
       <input type="range" min="0" max="100" value="0" />
     </div>
     <div class="item"><div class="pos">00:00:00</div></div>
+    <div class="item"><div class="btn alwaysontop" title="常に最前面"></div></div>
     <div class="item"><div class="btn menu" title="メニュー"></div></div>
 
   </div>

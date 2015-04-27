@@ -1,6 +1,7 @@
 (() => {
   "use strict";
 
+  var win = require("nw.gui").Window.get();
   var doc = document.currentScript.ownerDocument;
 
   var Time = class {
@@ -91,11 +92,13 @@
       root.addEventListener("click", e => e.stopPropagation());
 
       this._adapter = null;
+      this._alwaysOnTop = false;
 
-      this._btn = root.querySelector(".play");
+      this._playBtn = root.querySelector(".play");
       this._range = root.querySelector("input[type=range]");
       this._pos = root.querySelector(".pos");
       this._rangeBg = root.querySelector(".range-bg");
+      this._alwaysontopBtn = root.querySelector(".alwaysontop");
 
       this._time = new Time();
 
@@ -135,17 +138,17 @@
         this._pos.textContent = this._time.toString();
       }).bind(this));
 
-      this._btn.addEventListener("click", (() => {
+      this._playBtn.addEventListener("click", (() => {
         if (!this._adapter.playing) {
           if (this._adapter.length === 0) return;
           if (this._adapter.position === this._adapter.length) {
             this._adapter.position = 0;
             this.refresh();
           }
-          this._btn.classList.add("pause");
+          this._playBtn.classList.add("pause");
           this._adapter.start();
         } else {
-          this._btn.classList.remove("pause");
+          this._playBtn.classList.remove("pause");
           this._adapter.stop();
         }
       }).bind(this));
@@ -155,6 +158,15 @@
         this._adapter.position = ~~(pos * this._adapter.length);
         this.refresh();
         if (!this._adapter.playing) this._adapter.draw();
+      }).bind(this));
+
+      this._alwaysontopBtn.addEventListener("click", (() => {
+        const on = this._alwaysontop = !this._alwaysontop;
+        const cl = this._alwaysontopBtn.classList;
+        console.log(cl);
+        if (on && !cl.contains("on")) cl.add("on");
+        else if (!on && cl.contains("on")) cl.remove("on");
+        win.setAlwaysOnTop(on);
       }).bind(this));
     }
 
