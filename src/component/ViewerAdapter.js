@@ -15,6 +15,11 @@
         this.stop();
       }
       this._el = v;
+
+      window.addEventListener("resize", (() => {
+        this.refresh();
+        this.draw();
+      }).bind(this));
     }
 
     get comments() {
@@ -107,6 +112,7 @@
         size: c.size,
         position: c.position,
         bullet: false,
+        y: 0,
         width: 0,
         height: 0
       });
@@ -158,6 +164,7 @@
 
             // 引き続き表示されるので動かすだけでOK
             v.x = calcX(c);
+            v.y = c.y;
 
           } else {
 
@@ -205,6 +212,8 @@
       this._comments.sort((a, b) => a.vpos > b.vpos ? 1 : -1);
       this._comments.forEach((c => {
         this._calcSize(c);
+        c.y = 0;
+        c.bullet = false;
       }).bind(this));
       this._comments.forEach((c => {
         this._calcY(c);
@@ -236,6 +245,7 @@
     _calcY(comment) {
       const delay = comment.position === "ue" || comment.position === "shita" ? 3000 : this._delay,
             height = this._el.height,
+            width = this._el.width,
             calcX = this._calcX.bind(this);
       var bullet = false,
           y = 0;
@@ -245,8 +255,7 @@
         if (comment.vpos < c.vpos) return true;
 
         if (c === comment || c.position !== comment.position ||
-            comment.vpos - c.vpos >= delay || c.bullet ||
-            c.y + c.height < comment.y || comment.y + comment.height < c.y)
+            comment.vpos - c.vpos >= delay || c.bullet)
           return false;
 
         if (comment.position === "ue" || comment.position === "shita") {
@@ -260,7 +269,7 @@
             return true;
           }
 
-        } else {
+        } else if (c.y + c.height >= y && y + comment.height >= c.y) {
 
           //       2つのコメントが同時に表示される時間の開始時刻
           const vstart = Math.max(comment.vpos, c.vpos),
