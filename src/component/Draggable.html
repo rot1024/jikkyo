@@ -89,11 +89,15 @@
       show() {
         this._hidden = false;
         this.shadowRoot.querySelector(".outer").classList.remove("hidden");
+        this.style.right = null;
+        this.style.top = null;
       }
 
       hide() {
         this._hidden = true;
         this.shadowRoot.querySelector(".outer").classList.add("hidden");
+        this.style.right = "-100px";
+        this.style.top = "-100px";
       }
 
     };
