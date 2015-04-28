@@ -10,11 +10,15 @@
       if (e.keyCode === 123) win.showDevTools();
     });
 
-    var titlebar = document.querySelector("jikkyo-titlebar"),
+    var container = document.getElementById("window"),
+        titlebar = document.querySelector("jikkyo-titlebar"),
         controller = document.querySelector("jikkyo-controller"),
         viewer = document.querySelector("jikkyo-viewer"),
         draggable = document.querySelector("jikkyo-draggable");
-
+    
+    win.on("maximize", () => container.classList.add("maximized"));
+    win.on("unmaximize", () => container.classList.remove("maximized"));
+    
     draggable.hide();
     window.addEventListener("click", () => {
       titlebar.toggle();
