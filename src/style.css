@@ -26,10 +26,12 @@ body, input {
   transition: border-color .3s ease-in-out, box-shadow .3s ease-in-out;
 }
 
-.container:hover {
+.container.hover {
   border-color: #aaa;
 }
 
 .container.maximized {
+  border: none;
   border-radius: 0;
+  box-shadow: none;
 }

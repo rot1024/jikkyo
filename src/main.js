@@ -18,6 +18,10 @@
     
     win.on("maximize", () => container.classList.add("maximized"));
     win.on("unmaximize", () => container.classList.remove("maximized"));
+    win.on("focus", () => container.classList.add("hover"));
+    win.on("blur", () => container.classList.remove("hover"));
+    container.addEventListener("mouseover", () => container.classList.add("hover"));
+    container.addEventListener("mouseout", () => container.classList.remove("hover"));
     
     draggable.hide();
     window.addEventListener("click", () => {
