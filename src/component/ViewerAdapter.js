@@ -14,6 +14,7 @@
       this._limit = 100;
 
       this._playing = false;
+      this._realtime = false;
       this._position = 0;
       this._length = 0;
       this._duration = 4000;
@@ -148,28 +149,6 @@
       if (!Array.isArray(comment))
         throw new TypeError("comment must be array: " + typeof comment);
 
-      var binarySearch = (chat, array) => {
-        if (array.length === 0) return 0;
-        if (array[array.length - 1].vpos <= chat.vpos) return array.length;
-
-        var search = (start, end) => {
-          var current = Math.floor((start + end) / 2);
-          var currentChat = array[current];
-
-          if (currentChat.vpos < chat.vpos) {
-            start = current + 1;
-          } else if (currentChat.vpos > chat.vpos) {
-            end = current - 1;
-          } else {
-            return ++current === array.length ? current : search(current, current);
-          }
-
-          return start > end ? start : search(start, end);
-        };
-
-        return search(0, array.length - 1);
-      };
-
       comment.forEach(obj => {
         var chat = {
           text: obj.text || "",
@@ -185,8 +164,21 @@
           bullet: false
         };
 
-        this._comment.splice(binarySearch(chat, this._comment), 0, chat);
+        this._comment.splice(this._binarySearch(chat, this._comment), 0, chat);
       }, this);
+
+      this.length = this._comment[this._comment.length - 1].vpos + Math.max(this._duration, this._durationAlt);
+      this.refresh();
+    }
+
+    clearComment() {
+      this._renderComment.forEach(chat => {
+        this._viewer.removeChat(chat);
+      }, this);
+
+      this._comment = [];
+      this._renderComment = [];
+      this.length = 0;
 
       this.refresh();
     }
@@ -194,10 +186,9 @@
     start() {
       if (this._playing || this._position === this._length) return;
 
-      // コールバックは非同期で呼ぶ
       setTimeout((() => {
         this._renderCb();
-      }).bind(this));
+      }).bind(this), 1);
 
       this._playing = true;
       this._renderDate = Date.now();
@@ -223,6 +214,8 @@
             chat.visibility = false;
             viewer.removeChat(chat);
             rComment.splice(rComment.indexOf(chat), 1);
+            if (this._realtime)
+              this._comment.splice(this._comment.indexOf(chat), 1);
           }
         } else if (this._isVisible(chat)) {
           chat.x = this._calcX(chat);
@@ -235,7 +228,7 @@
 
           chat.visibility = true;
           viewer.createChat(chat);
-          rComment.push(chat);
+          rComment.splice(this._binarySearch(chat, rComment), 0, chat);
         }
       }, this);
     }
@@ -249,15 +242,7 @@
 
       this._comment.forEach(chat => {
         chat.y = this._calcY(chat);
-        chat.color = chat.bullet ? "orange2" : "";
       }, this);
-    }
-    
-    refreshLength() {
-      if (this._comments.length === 0)
-        this._length = 0;
-      else
-        this._length = this._comments[this._comments.length - 1].vpos + this._delay;
     }
 
     _calcSize(chat) {
@@ -296,23 +281,25 @@
             duration = (isUe || isShita) ? this._durationAlt : this._duration,
             height = this._viewer.height;
 
-      var y = 0, bullet = false;
+      var y = 0,
+          bullet = false;
 
       var loop = (() => {
         var flag = false;
 
         this._comment.some(current => {
+          const currentY = (isShita ? height - current.y  : current.y);
+
           if (current === chat) return true;
           if (current.position !== chat.position) return false;
           if (chat.vpos - current.vpos > duration) return false;
-          if (current.bullet) return false;
+          if (y >= currentY + current.height || currentY >= y + chat.height) return false;
+          //if (current.bullet) return false;
 
           if (isUe || isShita) {
             y += current.height;
 
             if (y > height - chat.height) {
-              // 弾幕モード
-              // Math.ceil or Math.floor?
               y = Math.floor(Math.random() * (height - chat.height));
               bullet = true;
 
@@ -320,20 +307,13 @@
             }
 
             flag = true;
+            return true;
           } else {
-            if (y >= current.y + current.height || current.y >= y + chat.height) return;
-
-                  // 2つのコメントが同時に表示される時間の開始時刻
             const vstart = Math.max(chat.vpos, current.vpos),
-                  // 2つのコメントが同時に表示される時間の終了時刻
                   vend = Math.min(chat.vpos + duration, current.vpos + duration),
-                  // 2つのコメントが同時に表示され始まるときのchatのx
                   chatStartX = this._calcX(chat, vstart),
-                  // 2つのコメントが同時に表示されるのが終わるときのchatのx
                   chatEndX = this._calcX(chat, vend),
-                  // 2つのコメントが同時に表示され始まるときのcurrentのx
                   currentStartX = this._calcX(current, vstart),
-                  // 2つのコメントが同時に表示されるのが終わるときのcurrentのx
                   currentEndX = this._calcX(current, vend);
 
             if ((chatStartX >= currentStartX + current.width || currentStartX >= chatStartX + chat.width) &&
@@ -343,7 +323,6 @@
             y += current.height;
 
             if (y > height - chat.height) {
-              // 弾幕モード
               y = Math.floor(Math.random() * (height - chat.height));
               bullet = true;
 
@@ -351,6 +330,7 @@
             }
 
             flag = true;
+            return true;
           }
         }, this);
 
@@ -370,6 +350,28 @@
         position = this._position;
 
       return chat.vpos <= position && position <= chat.vpos + duration;
+    }
+
+    _binarySearch(chat, array) {
+      if (array.length === 0) return 0;
+      if (array[array.length - 1].vpos <= chat.vpos) return array.length;
+
+      var search = (start, end) => {
+        var current = Math.floor((start + end) / 2);
+        var currentChat = array[current];
+
+        if (currentChat.vpos < chat.vpos) {
+          start = current + 1;
+        } else if (currentChat.vpos > chat.vpos) {
+          end = current - 1;
+        } else {
+          return ++current === array.length ? current : search(current, current);
+        }
+
+        return start > end ? start : search(start, end);
+      };
+
+      return search(0, array.length - 1);
     }
 
   }

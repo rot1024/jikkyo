@@ -37,7 +37,7 @@ module.exports = (() => {
         }
         
         result.packet.chat.forEach((chat => {
-          this._comment.push(this._parseChat(chat))
+          this._comment.push(this._parseChat(chat));
         }).bind(this));
         
         deferred.resolve(this._comment);
@@ -85,7 +85,7 @@ module.exports = (() => {
       
       return {
         text: chat._,
-        vpos: chat.$.vpos,
+        vpos: chat.$.vpos * 10,
         color: color,
         size: size,
         position: position

@@ -231,8 +231,8 @@
           
           var nico = new NicoComment();
           nico.readFromFile(path).then(result => {
-            adapter.add(result);
-            adapter.refreshLength();
+            adapter.clearComment();
+            adapter.addComment(result);
           });
           
           fileInput.value = "";
