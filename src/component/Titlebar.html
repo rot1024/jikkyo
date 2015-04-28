@@ -29,13 +29,17 @@
       transition: top .2s ease-in-out;
     }
 
+    .container.hidden {
+      top: -28px;
+    }
+
     .draggable {
       top: 10px;
       -webkit-app-region: drag;
     }
 
-    .container.hidden {
-      top: -28px;
+    .container.maximized .draggable {
+      top: 0;
     }
 
     .title {
@@ -169,10 +173,10 @@
       createdCallback() {
         var root = this.createShadowRoot();
         var template = doc.querySelector("template");
-
         root.appendChild(document.importNode(template.content, true));
 
-        this.shadowRoot.getElementById("container").classList.add(os);
+        var container = root.getElementById("container");
+        container.classList.add(os);
 
         root.getElementById("minimize").addEventListener("click", e => {
           if (os === "mac") {
@@ -198,7 +202,11 @@
         });
 
         this._maximizedChangedCb = (v => {
+          if (v) container.classList.add("maximized");
+          else container.classList.remove("maximized");
+
           if (os === "mac") return;
+
           var btn = this.shadowRoot.getElementById("maximize");
           if (v) {
             btn.classList.add("btn-unmaximize");
