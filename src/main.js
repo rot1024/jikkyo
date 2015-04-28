@@ -10,11 +10,19 @@
       if (e.keyCode === 123) win.showDevTools();
     });
 
-    var titlebar = document.querySelector("jikkyo-titlebar"),
+    var container = document.getElementById("window"),
+        titlebar = document.querySelector("jikkyo-titlebar"),
         controller = document.querySelector("jikkyo-controller"),
         viewer = document.querySelector("jikkyo-viewer"),
         draggable = document.querySelector("jikkyo-draggable");
-
+    
+    win.on("maximize", () => container.classList.add("maximized"));
+    win.on("unmaximize", () => container.classList.remove("maximized"));
+    win.on("focus", () => container.classList.add("hover"));
+    win.on("blur", () => container.classList.remove("hover"));
+    container.addEventListener("mouseover", () => container.classList.add("hover"));
+    container.addEventListener("mouseout", () => container.classList.remove("hover"));
+    
     draggable.hide();
     window.addEventListener("click", () => {
       titlebar.toggle();
