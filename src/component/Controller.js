@@ -47,6 +47,7 @@
   var Controller = class extends HTMLElement {
 
     hide() {
+      if (this._isFixed) return;
       this.shadowRoot.getElementById("container").classList.add("hidden");
     }
 
@@ -61,6 +62,10 @@
 
     get isShown() {
       return !this.shadowRoot.getElementById("container").classList.contains("hidden");
+    }
+
+    get isFixed() {
+      return this._isFixed;
     }
 
     get adapter() {
@@ -93,12 +98,13 @@
 
       this._adapter = null;
       this._alwaysOnTop = false;
+      this._isFixed = false;
 
       this._playBtn = root.getElementById("file-play");
       this._range = root.querySelector("input[type=range]");
       this._rangeBg = root.querySelector(".range-bg");
       this._pos = root.getElementById("file-pos");
-      
+
       var alwaysontopBtn = root.getElementById("btn-alwaysontop");
       var menuBtn = root.getElementById("btn-menu");
 
@@ -172,20 +178,20 @@
       }).bind(this));
 
       // menu
-      
+
       var fileMode = root.getElementById("mode-file");
       var twitterMode = root.getElementById("mode-twitter");
       var menu = document.createElement("jikkyo-menu");
-      
+
       var item1 = new window.JikkyoMenu.Menuitem({
         label: "ファイル モード",
         checked: true
       });
-      
+
       var item2 = new window.JikkyoMenu.Menuitem({
         label: "Twitter モード"
       });
-      
+
       item1.click = () => {
         if (!item1.checked) {
           item1.checked = true;
@@ -194,16 +200,24 @@
           twitterMode.classList.add("hidden");
         }
       };
-      
+
       item2.click = () => {
         item1.checked = false;
         item2.checked = true;
           fileMode.classList.add("hidden");
           twitterMode.classList.remove("hidden");
       };
-      
+
       menu.add(item1);
       menu.add(item2);
+      menu.add({ type: "separator" });
+      menu.add({
+        label: "コントロールバーを固定",
+        checkable: true,
+        click: (item => {
+          this._isFixed = item.checked;
+        }).bind(this)
+      });
       menu.add({ type: "separator" });
       menu.add({
         label: "設定",
@@ -216,33 +230,33 @@
         var rect = menuBtn.getBoundingClientRect();
         menu.show(rect.right, rect.top);
       });
-      
+
       // file mode
-      
+
       var fileInput = root.getElementById("file"),
           fileOpenBtn = root.getElementById("file-open"),
           NicoComment = require("./util/NicoComment");
-      
+
       fileOpenBtn.addEventListener("click", (() => {
         var adapter = this._adapter;
         fileInput.addEventListener("change", () => {
           if (!this || !this.value) return;
           var path = this.value;
-          
+
           var nico = new NicoComment();
           nico.readFromFile(path).then(result => {
             adapter.clearComment();
             adapter.addComment(result);
           });
-          
+
           fileInput.value = "";
         });
         fileInput.click();
       }).bind(this));
-      
+
       // twitter mode
-      
-      
+
+
     }
 
   };

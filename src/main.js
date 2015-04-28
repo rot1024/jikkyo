@@ -15,25 +15,29 @@
         controller = document.querySelector("jikkyo-controller"),
         viewer = document.querySelector("jikkyo-viewer"),
         draggable = document.querySelector("jikkyo-draggable");
-    
+
     win.on("maximize", () => container.classList.add("maximized"));
     win.on("unmaximize", () => container.classList.remove("maximized"));
     win.on("focus", () => container.classList.add("hover"));
     win.on("blur", () => container.classList.remove("hover"));
     container.addEventListener("mouseover", () => container.classList.add("hover"));
     container.addEventListener("mouseout", () => container.classList.remove("hover"));
-    
-    draggable.hide();
-    window.addEventListener("click", () => {
-      titlebar.toggle();
-      if (titlebar.isShown) {
+    container.addEventListener("mousemove", e => {
+      if (e.clientY < 50)
+        titlebar.show();
+      else
+        titlebar.hide();
+
+      if (win.height - e.clientY < 100) {
         controller.show();
         draggable.hide();
-      } else {
+      } else if (!controller.isFixed) {
         controller.hide();
         draggable.show();
       }
     });
+
+    draggable.hide();
 
     var adapter = new window.JikkyoViewer.Adapter();
     adapter.viewer = viewer;

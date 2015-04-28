@@ -130,6 +130,8 @@
         if (this.parentNode) this.hide();
         e.stopPropagation();
       }).bind(this);
+
+      this._stopPropagationCb = e => e.stopPropagation();
     }
 
     get items() {
@@ -172,6 +174,7 @@
       this.style.top = top + "px";
       this._menu.classList.remove("hidden");
       window.addEventListener("click", this._menuCb, true);
+      window.addEventListener("mousemove", this._stopPropagationCb, true);
     }
 
     hide() {
@@ -179,6 +182,7 @@
       this.style.left = 0;
       this.style.top = 0;
       window.removeEventListener("click", this._menuCb, true);
+      window.removeEventListener("mousemove", this._stopPropagationCb, true);
       if (this.parentNode) document.body.removeChild(this);
     }
 
@@ -187,7 +191,7 @@
   window.JikkyoMenu = document.registerElement("jikkyo-menu", {
     prototype: Menu.prototype
   });
-  
+
   window.JikkyoMenu.Menuitem = MenuItem;
 
 })();
