@@ -3,155 +3,240 @@
 
   var doc = document.currentScript.ownerDocument;
 
-  var colorList = [
-    "red", "pink", "orange", "yellow", "green", "cyan", "blue", "purple", "black",
-    "white2", "niconicowhite", "red2", "truered", "pink2", "orange2",
-    "passionorange", "yellow2", "madyellow", "green2", "elementalgreen",
-    "cyan2", "blue2", "marineblue", "purple2", "nobleviolet", "black2"
-  ];
-  // var positionList = ["ue", "shita"];
-  var sizeList = ["big", "small"];
-
-  var escape = (content) => {
-    const t = {
-      "&": "&amp;",
-      "\"": "&quot;",
-      "<": "&lt;",
-      ">": "&gt;",
-      "\n": "<br>"
-    };
-    return content.replace(/[&"<>\n]/g, m => t[m]);
+  var colorList = {
+    white:          "#FFFFFF",
+    red:            "#FF0000",
+    pink:           "#FF8080",
+    orange:         "#FFC000",
+    yellow:         "#FFFF00",
+    green:          "#00FF00",
+    cyan:           "#00FFFF",
+    blue:           "#0000FF",
+    purple:         "#C000FF",
+    black:          "#000000",
+    white2:         "#CCCC99",
+    niconicowhite:  "#CCCC99",
+    red2:           "#CC0033",
+    truered:        "#CC0033",
+    pink2:          "#FF33CC",
+    orange2:        "#FF6600",
+    passionorange:  "#FF6600",
+    yellow2:        "#999900",
+    madyellow:      "#999900",
+    green2:         "#00CC66",
+    elementalgreen: "#00CC66",
+    cyan2:          "#00CCCC",
+    blue2:          "#3399FF",
+    marineblue:     "#3399FF",
+    purple2:        "#6633CC",
+    nobleviolet:    "#6633CC",
+    black2:         "#666666",
   };
 
-  var Comment = class {
+  var sizeList = {
+    medium: "100%",
+    big:    "150%",
+    small:  "50%"
+  };
 
-    constructor(view, el) {
-      this._view = view;
-      this._el = el;
-      this.clear();
+  function escapeHTML(content) {
+    const table = {
+      '&': '&amp;',
+      '"': '&quot;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '\n': '<br />'
+    };
+    return content.replace(/[&"<>\n]/g, m => table[m]);
+  }
+
+  class Chat extends HTMLElement {
+
+    createdCallback() {
+      this._observer = this._observer.bind(this);
+
+      this.chat = {
+        text:       "",
+        color:      "white",
+        size:       "medium",
+        x:          0,
+        y:          0,
+        visibility: false
+      };
     }
 
-    get text() {
-      return this._text;
+    detachedCallback() {
+      Object.unobserve(this._chat, this._observer);
     }
 
-    set text(v) {
-      if (this._text === v) return;
-      if (typeof v !== "string") v = v + "";
-      this._el.innerHTML = escape(v.trim());
-      this._text = v;
-      this._width = this._el.clientWidth;
-      this._height = this._el.clientHeight;
+    get chat() {
+      return this._chat;
     }
 
-    get color() {
-      return this._color;
-    }
+    set chat(chat) {
+      if (typeof chat !== "object")
+        throw new TypeError("chat must be object: " + typeof chat);
 
-    set color(v) {
-      if (typeof v !== "string") return;
-      if (v[0] === "#" && v.length === 7) {
-        this.clearColor();
-        this._el.style.color = v;
-        this._colorType = 2;
-        this._color = v;
-      } else if (colorList.indexOf(v) >= 0) {
-        this.clearColor();
-        this._el.classList.add(v);
-        this._colorType = 1;
-        this._color = v;
+      if (this._chat !== void(0)) {
+        Object.unobserve(this._chat, this._observer);
       }
-    }
+      Object.observe(chat, this._observer);
 
-    get size() {
-      return sizeList[this._size];
-    }
+      this._chat = chat;
 
-    set size(v) {
-      if (this._size > 0)
-        this._el.classList.remove(sizeList[this._size - 1]);
-      this._size = sizeList.indexOf(v) + 1;
-      if (this._size > 0)
-        this._el.classList.add(sizeList[this._size - 1]);
-    }
-
-    get x() {
-      return this._x;
-    }
-
-    set x(v) {
-      this._x = v;
-      this._el.style.left = v + "px";
-    }
-
-    get y() {
-      return this._y;
-    }
-
-    set y(v) {
-      this._y = v;
-      this._el.style.top = v + "px";
-    }
-
-    get visible() {
-      return this._visible;
-    }
-
-    set visible(v) {
-      this._visible = !!v;
-      this._el.style.visibility = v ? null : "hidden";
+      this.render();
     }
 
     get width() {
-      return this._width;
+      return this.clientWidth;
     }
 
     get height() {
-      return this._height;
+      return this.clientHeight;
     }
 
-    get right() {
-      return this._el.clientWidth + this._x;
+    _observer(changes) {
+      changes.forEach(change => {
+        switch(change.name) {
+          case "text":
+            this._observerText();
+            break;
+          case "color":
+            this._observerColor();
+            break;
+          case "size":
+            this._observerSize();
+            break;
+          case "x":
+            this._observerX();
+            break;
+          case "y":
+            this._observerY();
+            break;
+          case "visibility":
+            this._observerVisibility();
+            break;
+        }
+      }, this);
     }
 
-    get bottom() {
-      return this._el.clientHeight + this._y;
+    _observerText() {
+      var text = this._chat.text;
+
+      if (typeof text === "undefined") text = "";
+      if (typeof text !== "string") {
+        console.log("Warning: text must be string: " + typeof text);
+        return;
+      }
+
+      text = text.toString().trim();
+
+      this.innerHTML = escapeHTML(text);
     }
 
-    clear() {
-      this.tag = null;
-      this.clearColor();
-      this.clearSize();
-      this.text = "";
-      this.x = this.y = 0;
-      this.visible = false;
+    _observerColor() {
+      var color = this._chat.color;
+
+      if (typeof color === "undefined") color = colorList.white;
+      if (typeof color !== "string") {
+        console.log("Warning: color must be string: " + typeof color);
+        return;
+      }
+
+      if (/^#[\dA-F]{6}$/.test(color)) {
+        this.style.color = color;
+      } else if (color in colorList) {
+        this.style.color = colorList[color];
+      } else {
+        this.style.color = colorList.white;
+      }
     }
 
-    clearColor() {
-      if (this._colorType === 2)
-        this._el.style.color = null;
-      else if (this._colorType === 1)
-        this._el.classList.remove(this._color);
-      this._colorType = 0;
-      this._color = "";
+    _observerSize() {
+      var size = this._chat.size;
+
+      if (typeof size === "undefined") size = sizeList.medium;
+      if (typeof size !== "string") {
+        console.log("Warning: color must be string: " + typeof size);
+        return;
+      }
+
+      if (size in sizeList) {
+        this.style.fontSize = sizeList[size];
+      } else {
+        this.style.fontSize = sizeList.medium;
+      }
     }
 
-    clearSize() {
-      if (this._size <= 0) return;
-      this._el.classList.remove(sizeList[this._size - 1]);
-      this._size = 0;
+    _observerX() {
+      var x = this._chat.x;
+
+      if (typeof x === "undefined") x = 0;
+      if (typeof x !== "number") {
+        console.log("Warning: x must be number: " + typeof x);
+        return;
+      }
+
+      this.style.left = x + "px";
     }
 
-  };
+    _observerY() {
+      var y = this._chat.y;
 
-  var viewer = class extends HTMLElement {
+      if (typeof y === "undefined") y = 0;
+      if (typeof y !== "number") {
+        console.log("Warning: y must be number: " + typeof y);
+        return;
+      }
 
-    get comments() {
-      return this._comments;
+      this.style.top = y + "px";
     }
 
-    clear() {
-      this._comments.forEach(c => c.clear());
+    _observerVisibility() {
+      var visibility = this._chat.visibility;
+
+      if (typeof visibility === "undefined") visibility = false;
+      if (typeof visibility !== "boolean") {
+        console.log("Warning: visibility must be number: " + typeof visibility);
+        return;
+      }
+
+      this.style.visibility = visibility ? "" : "hidden";
+    }
+
+    render() {
+      this._observerText();
+      this._observerColor();
+      this._observerSize();
+      this._observerX();
+      this._observerY();
+      this._observerVisibility();
+    }
+
+  }
+
+  class Viewer extends HTMLElement {
+
+    createdCallback() {
+      this._comment = new Map();
+
+      // Shadow DOMのRoot
+      var root = this.createShadowRoot();
+
+      // インポート
+      var template = doc.getElementById("viewer");
+      var node = document.importNode(template.content, true);
+      root.appendChild(node);
+
+      // コンテナ
+      var container = root.querySelector(".container");
+      this._container = container;
+
+      // ダミーコメント(サイズ取得等)
+      var dummy = document.createElement("jikkyo-chat");
+      dummy.visibility = false;
+      container.appendChild(dummy);
+      this._dummy = dummy;
     }
 
     get width() {
@@ -162,63 +247,48 @@
       return window.innerHeight;
     }
 
-    get number() {
-      return this._number;
+    createChat(chat) {
+      if (typeof chat !== "object")
+        throw new TypeError("chat must be object: " + typeof chat);
+
+      if (this._comment.has(chat))
+        return this.comment.get(chat);
+
+      var elem = document.createElement("jikkyo-chat");
+      elem.chat = chat;
+      this._container.appendChild(elem);
+      this._comment.set(chat, elem);
+
+      return elem;
     }
 
-    set number(v) {
-      const d = v - this._number;
+    getChat(chat) {
+      if (!this._comment.has(chat)) return null;
 
-      if (d === 0) return;
-
-      if (d < 0) {
-
-        this._comments.splice(d);
-        for (let i = 0; i < -d; ++i) {
-          this._container.removeChild(this._container.lastChild);
-        }
-
-      } else {
-
-        for (let i = 0; i < d; ++i) {
-          let el = document.createElement("div");
-          el.classList.add("comment");
-          this._container.appendChild(el);
-          this._comments.push(new Comment(this, el));
-        }
-
-      }
-
-      this._number = v;
+      return this.comment.get(chat);
     }
 
-    createdCallback() {
-      this._comments = [];
-      this._number = 0;
+    removeChat(chat) {
+      if (!this._comment.has(chat)) return false;
 
-      var root = this.createShadowRoot();
-      var template = doc.getElementById("viewer");
-      root.appendChild(document.importNode(template.content, true));
+      var elem = this._comment.get(chat);
+      this._comment.delete(chat);
+      this._container.removeChild(elem);
 
-      this._dummy = new Comment(this, root.getElementById("dummy"));
-      this._container = root.querySelector(".container");
-      this.number = 50;
+      return true;
     }
 
-    calcCommentSize(comment) {
-      this._dummy.color = comment.color;
-      this._dummy.size = comment.size;
-      this._dummy.text = comment.text;
-      var w = this._dummy.width;
-      var h = this._dummy.height;
-      this._dummy.clear();
-      return { width: w, height: h };
+    getDummyChat() {
+      return this._dummy;
     }
 
-  };
+  }
 
+  window.JikkyoChat = document.registerElement("jikkyo-chat", {
+    prototype: Chat.prototype
+  });
   window.JikkyoViewer = document.registerElement("jikkyo-viewer", {
-    prototype: viewer.prototype
+    prototype: Viewer.prototype
   });
 
 })();

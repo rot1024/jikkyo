@@ -1,74 +1,136 @@
 (() => {
   "use strict";
 
-  var EventEmitter = require('events').EventEmitter;
+  var EventEmitter = require("events").EventEmitter;
 
-  var Adapter = class {
+  class Adapter {
 
-    get viewerView() {
-      return this._el;
-    }
+    constructor() {
+      this._viewer = null;
+      this._controller = null;
 
-    set viewerView(v) {
-      if (v === this._el) return;
-      if (v) {
-        this.stop();
-      }
-      this._el = v;
+      this._comment = [];
+      this._rows = 0;
+      this._limit = 100;
 
-      window.addEventListener("resize", (() => {
+      this._playing = false;
+      this._realtime = false;
+      this._position = 0;
+      this._length = 0;
+      this._duration = 4000;
+      this._durationAlt = 3000;
+
+      this._event = new EventEmitter();
+
+      this._renderComment = [];
+      this._renderDate = 0;
+      this._renderCb = (() => {
+        if (this._viewer === null) return;
+        if (!this._playing) return;
+
+        var prev = this._renderDate;
+        var current = this._renderDate = Date.now();
+
+        this._position = Math.min(this._length, this._position + current - prev);
+        this._event.emit("observe", "position", this._position);
+
+        this.render();
+
+        if (this._position === this._length) {
+          this.stop();
+        } else {
+          window.requestAnimationFrame(this._renderCb);
+        }
+      }).bind(this);
+
+      this._resizeCb = (() => {
+        if (this._viewer === null) return;
+
         this.refresh();
-        this.draw();
-      }).bind(this));
+        if (!this.praying) this.render();
+      }).bind(this);
+
+      window.addEventListener("resize", this._resizeCb);
     }
 
-    get controllerView() {
+    get viewer() {
+      return this._viewer;
+    }
+
+    set viewer(viewer) {
+      if (viewer === this._viewer) return;
+
+      if (viewer) this.stop();
+      this._viewer = viewer;
+    }
+
+    get controller() {
       return this._controller;
     }
 
-    set controllerView(v) {
-      if (v === this._controller) return;
-      this._controller = v;
-      if (v) this._controller.adapter = this;
-    }
+    set controller(controller) {
+      if (controller === this._controller) return;
 
-    get comments() {
-      return this._comments;
-    }
-
-    set comments(v) {
-      this._comments = v;
+      if (controller) controller.adapter = this;
+      this._controller = controller;
     }
 
     get rows() {
       return this._rows;
     }
 
-    set rows(v) {
-      this._rows = v;
+    set rows(rows) {
+      if (typeof rows !== "number")
+        throw new TypeError("rows must be number: " + typeof rows);
+
+      this._rows = rows;
+    }
+
+    get limit() {
+      return this._limit;
+    }
+
+    set limit(limit) {
+      if (typeof limit !== "number")
+        throw new TypeError("limit must be number: " + typeof limit);
+      if (limit < 1)
+        throw new RangeError("limit must be > 0: " + typeof limit);
+
+      this._limit = limit;
+    }
+
+    get playing() {
+      return this._playing;
     }
 
     get position() {
-      return this._pos;
+      return this._position;
     }
 
-    set position(v) {
-      this._pos = Math.min(this._length, v);
+    set position(position) {
+      if (typeof position !== "number")
+        throw new TypeError("position must be number: " + typeof position);
+      if (this._position === position) return;
+
+      this._position = Math.min(this._length, position);
+
+      this._event.emit("observe", "position", this._position);
     }
 
     get length() {
       return this._length;
     }
 
-    set length(v) {
-      this._length = v;
-      this._pos = Math.min(this._pos, v);
-      this._event.emit("observe", "length", this._length);
-      this._event.emit("observe", "position", this._pos);
-    }
+    set length(length) {
+      if (typeof length !== "number")
+        throw new TypeError("length must be number: " + typeof length);
+      if (this._length === length) return;
 
-    get playing() {
-      return this._playing;
+      this._length = length;
+      this._position = Math.min(this._position, length);
+
+      this._event.emit("observe", "length", this._length);
+      this._event.emit("observe", "position", this._position);
     }
 
     on(listener) {
@@ -79,258 +141,240 @@
       this._event.removeListener("observe", listener);
     }
 
-    constructor() {
-      this._el = null;
-      this._controller = null;
-      this._comments = [];
-      this._rows = 12;
-      this._pos = 0;
-      this._length = 0;
-      this._playing = false;
-      this._oldDate = 0;
-      this._event = new EventEmitter();
-      this._drawCb = (() => {
-        if (!this._el) return;
-        if (this._playing) {
-          var now = Date.now();
-          this._pos = Math.min(this._length, this._pos + now - this._oldDate);
-          this._event.emit("observe", "position", this._pos);
-          this.draw();
-          this._oldDate = now;
-          if (this._pos >= this._length) {
-            this.stop();
-          } else {
-            window.requestAnimationFrame(this._drawCb);
-          }
-        } else {
-          this.draw();
-        }
-      }).bind(this);
-
-      window.addEventListener("resize", this._drawCb);
-
-      // draw関連
-      this._delay = 4000;
-      this._map = new WeakMap();
-      this._queue = [];
+    addChat(chat) {
+      this.addComment([chat]);
     }
 
-    add(comment) {
-      const convert = c => ({
-        text: c.text,
-        vpos: c.vpos,
-        color: c.color,
-        size: c.size,
-        position: c.position,
-        bullet: false,
-        y: 0,
-        width: 0,
-        height: 0
-      });
+    addComment(comment) {
+      if (!Array.isArray(comment))
+        throw new TypeError("comment must be array: " + typeof comment);
 
-      if (Array.isArray(comment)) {
-        comment.forEach((c => {
-          this._comments.push(convert(c));
-        }).bind(this));
-      } else {
-        this._comments.push(convert(comment));
-      }
+      comment.forEach(obj => {
+        var chat = {
+          text: obj.text || "",
+          color: obj.color || "white",
+          size: obj.size || "medium",
+          x: 0,
+          y: 0,
+          visibility: false,
+          vpos: obj.vpos || 0,
+          position: obj.position || 0,
+          width: 0,
+          height: 0,
+          bullet: false
+        };
+
+        this._comment.splice(this._binarySearch(chat, this._comment), 0, chat);
+      }, this);
+
+      this.length = this._comment[this._comment.length - 1].vpos + Math.max(this._duration, this._durationAlt);
+      this.refresh();
+    }
+
+    clearComment() {
+      this._renderComment.forEach(chat => {
+        this._viewer.removeChat(chat);
+      }, this);
+
+      this._comment = [];
+      this._renderComment = [];
+      this.length = 0;
+
       this.refresh();
     }
 
     start() {
-      if (this._playing || this._pos >= this._length)
-        return;
+      if (this._playing || this._position === this._length) return;
+
+      setTimeout((() => {
+        this._renderCb();
+      }).bind(this), 1);
+
       this._playing = true;
-      this._oldDate = Date.now();
-      this._drawCb();
+      this._renderDate = Date.now();
     }
 
     stop() {
       this._playing = false;
     }
 
-    draw() {
-      if (!this._el) return;
-      // コメントの位置決定ロジック
+    render() {
+      if (this._viewer === null) return;
 
-      const comments = this._comments,
-            el = this._el,
-            views = el.comments,
-            map = this._map,
-            queue = this._queue,
-            calcX = this._calcX.bind(this),
-            visible = this._visible.bind(this);
+      var rComment = this._renderComment;
+      var viewer = this._viewer;
 
-      comments.some(c => {
-        var v = map.get(c);
-
-        // コメントデータに関連付けられているビューを探す
-
-        if (v && v.tag) {
-
-          // 既にビューに関連付けられている
-
-          if (visible(c)) {
-
-            // 引き続き表示されるので動かすだけでOK
-            v.x = calcX(c);
-            v.y = c.y;
-
+      this._comment.forEach(chat => {
+        // renderComment内にchatが存在するか
+        if (rComment.includes(chat)) {
+          // 表示されるか
+          if (this._isVisible(chat)) {
+            chat.x = this._calcX(chat);
           } else {
+            chat.visibility = false;
+            viewer.removeChat(chat);
+            rComment.splice(rComment.indexOf(chat), 1);
+            if (this._realtime)
+              this._comment.splice(this._comment.indexOf(chat), 1);
+          }
+        } else if (this._isVisible(chat)) {
+          chat.x = this._calcX(chat);
 
-            // コメントが表示されなくなったので関連付けを解除
-
-            map.delete(c);
-            let i = queue.indexOf(v);
-            if (i >= 0) queue.splice(i, 1);
-            v.clear();
-
+          // コメントが上限に達しているか
+          if (rComment.length === this._limit) {
+            viewer.removeChat(rComment[0]);
+            rComment.shift();
           }
 
-        } else if (visible(c)) {
-
-          // 新しく表示されるコメント
-
-          // 空いているビューを探す
-          views.some(view => {
-            return !view.tag && (v = view);
-          });
-
-          if (!v) {
-            // 空いているビューが無ければ表示中の最古のコメントを消す
-            v = queue.pop(v);
-            if (v) {
-              map.delete(v.tag);
-              v.clear();
-            }
-          }
-
-          map.set(c, v);
-          queue.unshift(v);
-          v.text = c.text;
-          v.color = c.color;
-          v.size = c.size;
-          v.visible = true;
-          v.tag = c;
-          v.x = calcX(c);
-          v.y = c.y;
+          chat.visibility = true;
+          viewer.createChat(chat);
+          rComment.splice(this._binarySearch(chat, rComment), 0, chat);
         }
-      });
+      }, this);
     }
 
     refresh() {
-      this._comments.sort((a, b) => a.vpos > b.vpos ? 1 : -1);
-      this._comments.forEach((c => {
-        this._calcSize(c);
-        c.y = 0;
-        c.bullet = false;
-      }).bind(this));
-      this._comments.forEach((c => {
-        this._calcY(c);
-        if (c.bullet) c.color = "red";
-      }).bind(this));
-    }
-    
-    refreshLength() {
-      if (this._comments.length === 0)
-        this._length = 0;
-      else
-        this._length = this._comments[this._comments.length - 1].vpos + this._delay;
+      this._comment.forEach(chat => {
+        var size = this._calcSize(chat);
+        chat.width = size.width;
+        chat.height = size.height;
+      }, this);
+
+      this._comment.forEach(chat => {
+        chat.y = this._calcY(chat);
+      }, this);
     }
 
-    _getFontSize() {
-      return 36;
+    _calcSize(chat) {
+      var dummy = this._viewer.getDummyChat(chat);
+
+      dummy.chat = {
+        text:       chat.text,
+        color:      chat.color,
+        size:       chat.size,
+        visibility: false
+      };
+      var size = {
+        width: dummy.width,
+        height: dummy.height
+      };
+      dummy.chat = {};
+
+      return size;
     }
 
-    _visible(c, pos) {
-      const delay = c.position === "ue" || c.position === "shita" ? 3000 : 4000;
-      if (pos === void 0) pos = this._pos;
-      return c.vpos <= pos && pos <= c.vpos + delay;
-    }
+    _calcX(chat, position) {
+      if (position === void(0))
+        position = this._position;
 
-    _calcX(c, pos) {
-      if (c.position === "ue" || c.position === "shita") {
-        return (this._el.width - c.width) / 2;
+      if (chat.position === "ue" || chat.position === "shita") {
+        return parseInt((this._viewer.width - chat.width) / 2);
       } else {
-        if (pos === void 0) pos = this._pos;
-        let r = (pos - c.vpos) / this._delay;
-        return (this._el.width + c.width) * (1 - r) - c.width;
+        let rate = (position - chat.vpos) / this._duration;
+        return parseInt(this._viewer.width - rate * (this._viewer.width + chat.width));
       }
     }
 
-    _calcY(comment) {
-      const delay = comment.position === "ue" || comment.position === "shita" ? 3000 : this._delay,
-            height = this._el.height,
-            width = this._el.width,
-            calcX = this._calcX.bind(this);
-      var bullet = false,
-          y = 0;
+    _calcY(chat) {
+      const isUe = chat.position === "ue",
+            isShita = chat.position === "shita",
+            duration = (isUe || isShita) ? this._durationAlt : this._duration,
+            height = this._viewer.height;
 
-      this._comments.some(c => {
+      var y = 0,
+          bullet = false;
 
-        if (comment.vpos < c.vpos) return true;
+      var loop = (() => {
+        var flag = false;
 
-        if (c === comment || c.position !== comment.position ||
-            comment.vpos - c.vpos >= delay || c.bullet)
-          return false;
+        this._comment.some(current => {
+          const currentY = (isShita ? height - current.y  : current.y);
 
-        if (comment.position === "ue" || comment.position === "shita") {
+          if (current === chat) return true;
+          if (current.position !== chat.position) return false;
+          if (chat.vpos - current.vpos > duration) return false;
+          if (y >= currentY + current.height || currentY >= y + chat.height) return false;
+          //if (current.bullet) return false;
 
-          y += c.height + 1;
+          if (isUe || isShita) {
+            y += current.height;
 
-          if (y > height - comment.height) {
-            // 弾幕モード
-            y = Math.ceil(Math.random() * (height - comment.height));
-            bullet = true;
-            return true;
-          }
-
-        } else if (c.y + c.height >= y && y + comment.height >= c.y) {
-
-          //       2つのコメントが同時に表示される時間の開始時刻
-          const vstart = Math.max(comment.vpos, c.vpos),
-                // 2つのコメントが同時に表示される時間の終了時刻
-                vend = Math.min(comment.vpos + delay, c.vpos + delay),
-                // 2つのコメントが同時に表示され始まるときのthisのX
-                commentStartX = calcX(comment, vstart),
-                // 2つのコメントが同時に表示されるのが終わるときのthisのX
-                commentEndX = calcX(comment, vend),
-                // 2つのコメントが同時に表示され始まるときのcのX
-                cStartX = calcX(c, vstart),
-                // 2つのコメントが同時に表示されるのが終わるときのcのX
-                cEndX = calcX(c, vend);
-
-          if (
-            //width + c.width < (1 - (c.vpos - comment.vpos) / delay) * (width + comment.width)
-            //commentStartX <= cStartX + c.width || commentEndX <= cEndX + c.width
-            commentStartX <= cStartX + c.width && cStartX <= commentStartX + comment.width ||
-            commentEndX <= cEndX + c.width && cEndX <= commentEndX + comment.width
-          ) {
-            y += c.height + 1;
-            if (y > height - comment.height) {
-              // 弾幕モード
-              y = Math.ceil(Math.random() * (height - comment.height));
+            if (y > height - chat.height) {
+              y = Math.floor(Math.random() * (height - chat.height));
               bullet = true;
+
               return true;
             }
+
+            flag = true;
+            return true;
+          } else {
+            const vstart = Math.max(chat.vpos, current.vpos),
+                  vend = Math.min(chat.vpos + duration, current.vpos + duration),
+                  chatStartX = this._calcX(chat, vstart),
+                  chatEndX = this._calcX(chat, vend),
+                  currentStartX = this._calcX(current, vstart),
+                  currentEndX = this._calcX(current, vend);
+
+            if ((chatStartX >= currentStartX + current.width || currentStartX >= chatStartX + chat.width) &&
+                (chatEndX >= currentEndX + current.width || currentEndX >= chatEndX + chat.width))
+                return;
+
+            y += current.height;
+
+            if (y > height - chat.height) {
+              y = Math.floor(Math.random() * (height - chat.height));
+              bullet = true;
+
+              return true;
+            }
+
+            flag = true;
+            return true;
           }
+        }, this);
 
+        if (flag) loop();
+      }).bind(this);
+
+      loop();
+
+      chat.bullet = bullet;
+      return (isShita && !bullet) ? height - y : y;
+    }
+
+    _isVisible(chat, position) {
+      const duration = (chat.position === "ue" || chat.position === "shita") ? this._durationAlt : this._duration;
+
+      if (position === void(0))
+        position = this._position;
+
+      return chat.vpos <= position && position <= chat.vpos + duration;
+    }
+
+    _binarySearch(chat, array) {
+      if (array.length === 0) return 0;
+      if (array[array.length - 1].vpos <= chat.vpos) return array.length;
+
+      var search = (start, end) => {
+        var current = Math.floor((start + end) / 2);
+        var currentChat = array[current];
+
+        if (currentChat.vpos < chat.vpos) {
+          start = current + 1;
+        } else if (currentChat.vpos > chat.vpos) {
+          end = current - 1;
+        } else {
+          return ++current === array.length ? current : search(current, current);
         }
-      });
-      comment.bullet = bullet;
-      y = Math.floor(y);
 
-      comment.y = comment.position === "shita" && !bullet ? height - y : y;
+        return start > end ? start : search(start, end);
+      };
+
+      return search(0, array.length - 1);
     }
 
-    _calcSize(comment) {
-      var size = this._el.calcCommentSize(comment);
-      comment.width = size.width;
-      comment.height = size.height;
-    }
-
-  };
+  }
 
   window.JikkyoViewer.Adapter = Adapter;
 })();
