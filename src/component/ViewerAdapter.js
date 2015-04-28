@@ -16,8 +16,8 @@
       this._playing = false;
       this._position = 0;
       this._length = 0;
-      this._span = 4000;
-      this._spanAlt = 3000;
+      this._duration = 4000;
+      this._durationAlt = 3000;
 
       this._event = new EventEmitter();
 
@@ -229,7 +229,7 @@
 
       this._comments.forEach(comment => {
         comment.y = this._calcY(comment);
-        if (comment.bullet) comment.color = "red";
+        if (comment.bullet) comment.color = "orange";
       }, this);
     }
 
@@ -258,7 +258,7 @@
       if (comment.position === "ue" || comment.position === "shita") {
         return parseInt((this._viewer.width - comment.width) / 2);
       } else {
-        let rate = (position - comment.vpos) / this._span;
+        let rate = (position - comment.vpos) / this._duration;
         return parseInt(this._viewer.width - rate * (this._viewer.width + comment.width));
       }
     }
@@ -266,71 +266,83 @@
     _calcY(comment) {
       const isUe = comment.position === "ue",
             isShita = comment.position === "shita",
-            span = (isUe || isShita) ? this._spanAlt : this._span,
+            duration = (isUe || isShita) ? this._durationAlt : this._duration,
             height = this._viewer.height;
 
       var y = 0, bullet = false;
 
-      this._comments.some(current => {
-        if (current === comment) return true;
-        if (current.position !== comment.position) return false;
-        if (comment.vpos - current.vpos > span) return false;
-        if (current.bullet) return false;
+      var loop = (() => {
+        var flag = false;
 
-        if (isUe || isShita) {
-          y += current.height/* + 1*/;
+        this._comments.some(current => {
+          if (current === comment) return true;
+          if (current.position !== comment.position) return false;
+          if (comment.vpos - current.vpos > duration) return false;
+          if (current.bullet) return false;
 
-          if (y > height - comment.height) {
-            // 弾幕モード
-            // Math.ceil or Math.floor?
-            y = Math.floor(Math.random() * (height - comment.height));
-            bullet = true;
+          if (isUe || isShita) {
+            y += current.height;
 
-            return true;
+            if (y > height - comment.height) {
+              // 弾幕モード
+              // Math.ceil or Math.floor?
+              y = Math.floor(Math.random() * (height - comment.height));
+              bullet = true;
+
+              return true;
+            }
+
+            flag = true;
+          } else {
+            if (y >= current.y + current.height || current.y >= y + comment.height) return;
+
+                  // 2つのコメントが同時に表示される時間の開始時刻
+            const vstart = Math.max(comment.vpos, current.vpos),
+                  // 2つのコメントが同時に表示される時間の終了時刻
+                  vend = Math.min(comment.vpos + duration, current.vpos + duration),
+                  // 2つのコメントが同時に表示され始まるときのcommentのx
+                  commentStartX = this._calcX(comment, vstart),
+                  // 2つのコメントが同時に表示されるのが終わるときのcommentのx
+                  commentEndX = this._calcX(comment, vend),
+                  // 2つのコメントが同時に表示され始まるときのcurrentのx
+                  currentStartX = this._calcX(current, vstart),
+                  // 2つのコメントが同時に表示されるのが終わるときのcurrentのx
+                  currentEndX = this._calcX(current, vend);
+
+            if ((commentStartX >= currentStartX + current.width || currentStartX >= commentStartX + comment.width) &&
+                (commentEndX >= currentEndX + current.width || currentEndX >= commentEndX + comment.width))
+                return;
+
+            y += current.height;
+
+            if (y > height - comment.height) {
+              // 弾幕モード
+              y = Math.floor(Math.random() * (height - comment.height));
+              bullet = true;
+
+              return true;
+            }
+
+            flag = true;
           }
-        } else {
-          if (y >= current.y + current.height || current.y >= y + comment.height) return;
+        }, this);
 
-                // 2つのコメントが同時に表示される時間の開始時刻
-          const vstart = Math.max(comment.vpos, current.vpos),
-                // 2つのコメントが同時に表示される時間の終了時刻
-                vend = Math.min(comment.vpos + span, current.vpos + span),
-                // 2つのコメントが同時に表示され始まるときのcommentのx
-                commentStartX = this._calcX(comment, vstart),
-                // 2つのコメントが同時に表示されるのが終わるときのcommentのx
-                commentEndX = this._calcX(comment, vend),
-                // 2つのコメントが同時に表示され始まるときのcurrentのx
-                currentStartX = this._calcX(current, vstart),
-                // 2つのコメントが同時に表示されるのが終わるときのcurrentのx
-                currentEndX = this._calcX(current, vend);
+        if (flag) loop();
+      }).bind(this);
 
-          if ((commentStartX >= currentStartX + current.width || currentStartX >= commentStartX + comment.width) &&
-              (commentEndX >= currentEndX + current.width || currentEndX >= commentEndX + comment.width))
-              return;
-
-          y += current.height;
-
-          if (y > height - comment.height) {
-            // 弾幕モード
-            y = Math.floor(Math.random() * (height - comment.height));
-            bullet = true;
-
-            return true;
-          }
-        }
-      }, this);
+      loop();
 
       comment.bullet = bullet;
       return (isShita && !bullet) ? height - y : y;
     }
 
     _isVisible(comment, position) {
-      const span = (comment.position === "ue" || comment.position === "shita") ? this._spanAlt : this._span;
+      const duration = (comment.position === "ue" || comment.position === "shita") ? this._durationAlt : this._duration;
 
       if (position === void(0))
         position = this._position;
 
-      return comment.vpos <= position && position <= comment.vpos + span;
+      return comment.vpos <= position && position <= comment.vpos + duration;
     }
 
   }
