@@ -133,8 +133,8 @@
       }).bind(this));
 
       this._range.addEventListener("input", (() => {
-        this._adapter.position = this._range.value;
-        if (!this._adapter.playing) this._adapter.draw();
+        this._adapter.position = parseInt(this._range.value);
+        if (!this._adapter.playing) this._adapter.render();
         this._time.totalMillisecond = this._range.value;
         this._pos.textContent = this._time.toString();
       }).bind(this));
@@ -144,7 +144,7 @@
         var pos = (e.clientX - rect.left) / rect.width;
         this._adapter.position = ~~(pos * this._adapter.length);
         this.refresh();
-        if (!this._adapter.playing) this._adapter.draw();
+        if (!this._adapter.playing) this._adapter.render();
       }).bind(this));
 
       this._playBtn.addEventListener("click", (() => {

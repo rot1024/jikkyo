@@ -84,10 +84,19 @@
       if (this._comment !== void(0)) {
         Object.unobserve(this._comment, this._observer);
       }
-
       Object.observe(comment, this._observer);
 
       this._comment = comment;
+
+      this.render();
+    }
+
+    get width() {
+      return this.clientWidth;
+    }
+
+    get height() {
+      return this.clientHeight;
     }
 
     _observer(changes) {
@@ -118,6 +127,7 @@
     _observerText() {
       var text = this._comment.text;
 
+      if (typeof text === "undefined") text = "";
       if (typeof text !== "string") {
         console.log("Warning: text must be string: " + typeof text);
         return;
@@ -131,6 +141,7 @@
     _observerColor() {
       var color = this._comment.color;
 
+      if (typeof color === "undefined") color = colorList.white;
       if (typeof color !== "string") {
         console.log("Warning: color must be string: " + typeof color);
         return;
@@ -148,6 +159,7 @@
     _observerSize() {
       var size = this._comment.size;
 
+      if (typeof size === "undefined") size = sizeList.medium;
       if (typeof size !== "string") {
         console.log("Warning: color must be string: " + typeof size);
         return;
@@ -163,6 +175,7 @@
     _observerX() {
       var x = this._comment.x;
 
+      if (typeof x === "undefined") x = 0;
       if (typeof x !== "number") {
         console.log("Warning: x must be number: " + typeof x);
         return;
@@ -174,6 +187,7 @@
     _observerY() {
       var y = this._comment.y;
 
+      if (typeof y === "undefined") y = 0;
       if (typeof y !== "number") {
         console.log("Warning: y must be number: " + typeof y);
         return;
@@ -182,9 +196,10 @@
       this.style.top = y + "px";
     }
 
-    _observerVisible() {
+    _observerVisibility() {
       var visibility = this._comment.visibility;
 
+      if (typeof visibility === "undefined") visibility = false;
       if (typeof visibility !== "boolean") {
         console.log("Warning: visibility must be number: " + typeof visibility);
         return;
@@ -212,6 +227,11 @@
       // Shadow DOMのRoot
       var root = this.createShadowRoot();
 
+      // インポート
+      var template = doc.getElementById("viewer");
+      var node = document.importNode(template.content, true);
+      root.appendChild(node);
+
       // コンテナ
       var container = root.querySelector(".container");
       this._container = container;
@@ -221,11 +241,14 @@
       dummy.visibility = false;
       container.appendChild(dummy);
       this._dummy = dummy;
+    }
 
-      // インポート
-      var template = doc.getElementById("viewer");
-      var node = document.importNode(template.content, true);
-      root.appendChild(node);
+    get width() {
+      return window.innerWidth;
+    }
+
+    get height() {
+      return window.innerHeight;
     }
 
     createComment(comment) {
@@ -238,7 +261,7 @@
       var elem = document.createElement("jikkyo-comment");
       elem.comment = comment;
       this._container.appendChild(elem);
-      this._comments.push(elem);
+      this._comments.set(comment, elem);
 
       return elem;
     }
@@ -252,7 +275,8 @@
     removeComment(comment) {
       if (!this._comments.has(comment)) return false;
 
-      var elem = this.comments.get(comment);
+      var elem = this._comments.get(comment);
+      this._comments.delete(comment);
       this._container.removeChild(elem);
 
       return true;

@@ -3,22 +3,355 @@
 
   var EventEmitter = require('events').EventEmitter;
 
-  var Adapter = class {
+  class Adapter {
+
+    constructor() {
+      this._viewer = null;
+      this._controller = null;
+
+      this._comments = [];
+      this._rows = 0;
+      this._limit = 100;
+
+      this._playing = false;
+      this._position = 0;
+      this._length = 0;
+      this._span = 4000;
+      this._spanAlt = 3000;
+
+      this._event = new EventEmitter();
+
+      this._renderComments = [];
+      this._renderDate = 0;
+      this._renderCb = (() => {
+        if (this._viewer === null) return;
+        if (!this._playing) return;
+
+        var prev = this._renderDate;
+        var current = this._renderDate = Date.now();
+
+        this._position = Math.min(this._length, this._position + current - prev);
+        this._event.emit("observe", "position", this._position);
+
+        this.render();
+
+        if (this._position === this._length) {
+          this.stop();
+        } else {
+          window.requestAnimationFrame(this._renderCb);
+        }
+      }).bind(this);
+
+      this._resizeCb = (() => {
+        if (this._viewer === null) return;
+        if (this.praying) return;
+
+        this.render();
+      }).bind(this);
+
+      window.addEventListener("resize", this._resizeCb);
+    }
+
+    get viewer() {
+      return this._viewer;
+    }
+
+    set viewer(viewer) {
+      if (viewer === this._viewer) return;
+
+      if (viewer) this.stop();
+      this._viewer = viewer;
+    }
+
+    get controller() {
+      return this._controller;
+    }
+
+    set controller(controller) {
+      if (controller === this._controller) return;
+
+      if (controller) controller.adapter = this;
+      this._controller = controller;
+    }
+
+    get rows() {
+      return this._rows;
+    }
+
+    set rows(rows) {
+      if (typeof rows !== "number")
+        throw new TypeError("rows must be number: " + typeof rows);
+
+      this._rows = rows;
+    }
+
+    get limit() {
+      return this._limit;
+    }
+
+    set limit(limit) {
+      if (typeof limit !== "number")
+        throw new TypeError("limit must be number: " + typeof limit);
+      if (limit < 1)
+        throw new RangeError("limit must be > 0: " + typeof limit);
+
+      this._limit = limit;
+    }
+
+    get playing() {
+      return this._playing;
+    }
+
+    get position() {
+      return this._position;
+    }
+
+    set position(position) {
+      if (typeof position !== "number")
+        throw new TypeError("position must be number: " + typeof position);
+      if (this._position === position) return;
+
+      this._position = Math.min(this._length, position);
+
+      this._event.emit("observe", "position", this._position);
+    }
+
+    get length() {
+      return this._length;
+    }
+
+    set length(length) {
+      if (typeof length !== "number")
+        throw new TypeError("length must be number: " + typeof length);
+      if (this._length === length) return;
+
+      this._length = length;
+      this._position = Math.min(this._position, length);
+
+      this._event.emit("observe", "length", this._length);
+      this._event.emit("observe", "position", this._position);
+    }
+
+    on(listener) {
+      this._event.on("observe", listener);
+    }
+
+    off(listener) {
+      this._event.removeListener("observe", listener);
+    }
+
+    addComment(comment) {
+      this.addComments([comment]);
+    }
+
+    addComments(comments) {
+      if (!Array.isArray(comments))
+        throw new TypeError("comments must be array: " + typeof comments);
+
+      comments = comments.map(comment => {
+        return {
+          text: comment.text || "",
+          color: comment.color || "white",
+          size: comment.size || "medium",
+          x: 0,
+          y: 0,
+          visibility: false,
+          vpos: comment.vpos || 0,
+          position: comment.position || 0,
+          width: 0,
+          height: 0,
+          bullet: false
+        };
+      }, this);
+
+      // todo: ソート済みの配列を破壊してソートし直すのは気がひけるのでバイナリサーチで挿入すべき
+      this._comments = this._comments.concat(comments);
+      this._comments.sort((a, b) => a.vpos - b.vpos);
+
+      this.refresh();
+    }
+
+    start() {
+      if (this._playing || this._position === this._length) return;
+
+      // コールバックは非同期で呼ぶ
+      setTimeout((() => {
+        this._renderCb();
+      }).bind(this));
+
+      this._playing = true;
+      this._renderDate = Date.now();
+    }
+
+    stop() {
+      this._playing = false;
+    }
+
+    render() {
+      if (this._viewer === null) return;
+
+      var rComments = this._renderComments;
+      var viewer = this._viewer;
+
+      this._comments.forEach(comment => {
+        // renderComments内にcommentが存在するか
+        if (rComments.includes(comment)) {
+          // 表示されるか
+          if (this._isVisible(comment)) {
+            comment.x = this._calcX(comment);
+          } else {
+            comment.visibility = false;
+            viewer.removeComment(comment);
+            rComments.splice(rComments.indexOf(comment), 1);
+          }
+        } else if (this._isVisible(comment)) {
+          comment.x = this._calcX(comment);
+
+          // コメントが上限に達しているか
+          if (rComments.length === this._limit) {
+            viewer.removeComment(rComments[0]);
+            rComments.shift();
+          }
+
+          comment.visibility = true;
+          viewer.createComment(comment);
+          rComments.push(comment);
+        }
+      }, this);
+    }
+
+    refresh() {
+      this._comments.forEach(comment => {
+        var size = this._calcSize(comment);
+        comment.width = size.width;
+        comment.height = size.height;
+      }, this);
+
+      this._comments.forEach(comment => {
+        comment.y = this._calcY(comment);
+        if (comment.bullet) comment.color = "red";
+      }, this);
+    }
+
+    _calcSize(comment) {
+      var dummy = this._viewer.getDummyComment(comment);
+
+      dummy.comment = {
+        text:       comment.text,
+        color:      comment.color,
+        size:       comment.size,
+        visibility: false
+      };
+      var size = {
+        width: dummy.width,
+        height: dummy.height
+      };
+      dummy.comment = {};
+
+      return size;
+    }
+
+    _calcX(comment, position) {
+      if (position === void(0))
+        position = this._position;
+
+      if (comment.position === "ue" || comment.position === "shita") {
+        return parseInt((this._viewer.width - comment.width) / 2);
+      } else {
+        let rate = (position - comment.vpos) / this._span;
+        return parseInt(this._viewer.width - rate * (this._viewer.width + comment.width));
+      }
+    }
+
+    _calcY(comment) {
+      const isUe = comment.position === "ue",
+            isShita = comment.position === "shita",
+            span = (isUe || isShita) ? this._spanAlt : this._span,
+            height = this._viewer.height;
+
+      var y = 0, bullet = false;
+
+      this._comments.some(current => {
+        if (current === comment) return true;
+        if (current.position !== comment.position) return false;
+        if (comment.vpos - current.vpos > span) return false;
+        if (current.bullet) return false;
+
+        if (isUe || isShita) {
+          y += current.height/* + 1*/;
+
+          if (y > height - comment.height) {
+            // 弾幕モード
+            // Math.ceil or Math.floor?
+            y = Math.floor(Math.random() * (height - comment.height));
+            bullet = true;
+
+            return true;
+          }
+        } else {
+          if (y >= current.y + current.height || current.y >= y + comment.height) return;
+
+                // 2つのコメントが同時に表示される時間の開始時刻
+          const vstart = Math.max(comment.vpos, current.vpos),
+                // 2つのコメントが同時に表示される時間の終了時刻
+                vend = Math.min(comment.vpos + span, current.vpos + span),
+                // 2つのコメントが同時に表示され始まるときのcommentのx
+                commentStartX = this._calcX(comment, vstart),
+                // 2つのコメントが同時に表示されるのが終わるときのcommentのx
+                commentEndX = this._calcX(comment, vend),
+                // 2つのコメントが同時に表示され始まるときのcurrentのx
+                currentStartX = this._calcX(current, vstart),
+                // 2つのコメントが同時に表示されるのが終わるときのcurrentのx
+                currentEndX = this._calcX(current, vend);
+
+          if ((commentStartX >= currentStartX + current.width || currentStartX >= commentStartX + comment.width) &&
+              (commentEndX >= currentEndX + current.width || currentEndX >= commentEndX + comment.width))
+              return;
+
+          y += current.height;
+
+          if (y > height - comment.height) {
+            // 弾幕モード
+            y = Math.floor(Math.random() * (height - comment.height));
+            bullet = true;
+
+            return true;
+          }
+        }
+      }, this);
+
+      comment.bullet = bullet;
+      return (isShita && !bullet) ? height - y : y;
+    }
+
+    _isVisible(comment, position) {
+      const span = (comment.position === "ue" || comment.position === "shita") ? this._spanAlt : this._span;
+
+      if (position === void(0))
+        position = this._position;
+
+      return comment.vpos <= position && position <= comment.vpos + span;
+    }
+
+  }
+
+  window.JikkyoViewer.Adapter = Adapter;
+/*  var Adapter = class {
 
     get viewerView() {
-      return this._el;
+      return this._viewer;
     }
 
     set viewerView(v) {
-      if (v === this._el) return;
+      if (v === this._viewer) return;
       if (v) {
         this.stop();
       }
-      this._el = v;
+      this._viewer = v;
 
       window.addEventListener("resize", (() => {
         this.refresh();
-        this.draw();
+        this.render();
       }).bind(this));
     }
 
@@ -49,11 +382,11 @@
     }
 
     get position() {
-      return this._pos;
+      return this._position;
     }
 
     set position(v) {
-      this._pos = Math.min(this._length, v);
+      this._position = Math.min(this._length, v);
     }
 
     get length() {
@@ -62,9 +395,9 @@
 
     set length(v) {
       this._length = v;
-      this._pos = Math.min(this._pos, v);
+      this._position = Math.min(this._position, v);
       this._event.emit("observe", "length", this._length);
-      this._event.emit("observe", "position", this._pos);
+      this._event.emit("observe", "position", this._position);
     }
 
     get playing() {
@@ -80,37 +413,37 @@
     }
 
     constructor() {
-      this._el = null;
+      this._viewer = null;
       this._controller = null;
       this._comments = [];
       this._rows = 12;
-      this._pos = 0;
+      this._position = 0;
       this._length = 0;
       this._playing = false;
       this._oldDate = 0;
       this._event = new EventEmitter();
-      this._drawCb = (() => {
-        if (!this._el) return;
+      this._renderCb = (() => {
+        if (!this._viewer) return;
         if (this._playing) {
           var now = Date.now();
-          this._pos = Math.min(this._length, this._pos + now - this._oldDate);
-          this._event.emit("observe", "position", this._pos);
-          this.draw();
+          this._position = Math.min(this._length, this._position + now - this._oldDate);
+          this._event.emit("observe", "position", this._position);
+          this.render();
           this._oldDate = now;
-          if (this._pos >= this._length) {
+          if (this._position >= this._length) {
             this.stop();
           } else {
-            window.requestAnimationFrame(this._drawCb);
+            window.requestAnimationFrame(this._renderCb);
           }
         } else {
-          this.draw();
+          this.render();
         }
       }).bind(this);
 
-      window.addEventListener("resize", this._drawCb);
+      window.addEventListener("resize", this._renderCb);
 
       // draw関連
-      this._delay = 4000;
+      this._span = 4000;
       this._map = new WeakMap();
       this._queue = [];
     }
@@ -139,11 +472,11 @@
     }
 
     start() {
-      if (this._playing || this._pos >= this._length)
+      if (this._playing || this._position >= this._length)
         return;
       this._playing = true;
       this._oldDate = Date.now();
-      this._drawCb();
+      this._renderCb();
     }
 
     stop() {
@@ -151,11 +484,11 @@
     }
 
     draw() {
-      if (!this._el) return;
+      if (!this._viewer) return;
       // コメントの位置決定ロジック
 
       const comments = this._comments,
-            el = this._el,
+            el = this._viewer,
             views = el.comments,
             map = this._map,
             queue = this._queue,
@@ -238,24 +571,24 @@
 
     _visible(c, pos) {
       const delay = c.position === "ue" || c.position === "shita" ? 3000 : 4000;
-      if (pos === void 0) pos = this._pos;
+      if (pos === void 0) pos = this._position;
       return c.vpos <= pos && pos <= c.vpos + delay;
     }
 
     _calcX(c, pos) {
       if (c.position === "ue" || c.position === "shita") {
-        return (this._el.width - c.width) / 2;
+        return (this._viewer.width - c.width) / 2;
       } else {
-        if (pos === void 0) pos = this._pos;
-        let r = (pos - c.vpos) / this._delay;
-        return (this._el.width + c.width) * (1 - r) - c.width;
+        if (pos === void 0) pos = this._position;
+        let r = (pos - c.vpos) / this._span;
+        return (this._viewer.width + c.width) * (1 - r) - c.width;
       }
     }
 
     _calcY(comment) {
-      const delay = comment.position === "ue" || comment.position === "shita" ? 3000 : this._delay,
-            height = this._el.height,
-            width = this._el.width,
+      const delay = comment.position === "ue" || comment.position === "shita" ? 3000 : this._span,
+            height = this._viewer.height,
+            width = this._viewer.width,
             calcX = this._calcX.bind(this);
       var bullet = false,
           y = 0;
@@ -318,12 +651,12 @@
     }
 
     _calcSize(comment) {
-      var size = this._el.calcCommentSize(comment);
+      var size = this._viewer.calcCommentSize(comment);
       comment.width = size.width;
       comment.height = size.height;
     }
 
   };
 
-  window.JikkyoViewer.Adapter = Adapter;
+  window.JikkyoViewer.Adapter = Adapter;*/
 })();
