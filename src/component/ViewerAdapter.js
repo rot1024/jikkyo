@@ -44,9 +44,9 @@
 
       this._resizeCb = (() => {
         if (this._viewer === null) return;
-        if (this.praying) return;
 
-        this.render();
+        this.refresh();
+        if (!this.praying) this.render();
       }).bind(this);
 
       window.addEventListener("resize", this._resizeCb);
@@ -229,7 +229,7 @@
 
       this._comments.forEach(comment => {
         comment.y = this._calcY(comment);
-        if (comment.bullet) comment.color = "orange";
+        comment.color = comment.bullet ? "orange" : "";
       }, this);
     }
 
