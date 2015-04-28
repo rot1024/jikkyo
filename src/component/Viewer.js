@@ -50,12 +50,12 @@
     return content.replace(/[&"<>\n]/g, m => table[m]);
   }
 
-  class Comment extends HTMLElement {
+  class Chat extends HTMLElement {
 
     createdCallback() {
       this._observer = this._observer.bind(this);
 
-      this.comment = {
+      this.chat = {
         text:       "",
         color:      "white",
         size:       "medium",
@@ -70,23 +70,23 @@
     }
 
     detachedCallback() {
-      Object.unobserve(this._comment, this._observer);
+      Object.unobserve(this._chat, this._observer);
     }
 
-    get comment() {
-      return this._comment;
+    get chat() {
+      return this._chat;
     }
 
-    set comment(comment) {
-      if (typeof comment !== "object")
-        throw new TypeError("comment must be object: " + typeof comment);
+    set chat(chat) {
+      if (typeof chat !== "object")
+        throw new TypeError("chat must be object: " + typeof chat);
 
-      if (this._comment !== void(0)) {
-        Object.unobserve(this._comment, this._observer);
+      if (this._chat !== void(0)) {
+        Object.unobserve(this._chat, this._observer);
       }
-      Object.observe(comment, this._observer);
+      Object.observe(chat, this._observer);
 
-      this._comment = comment;
+      this._chat = chat;
 
       this.render();
     }
@@ -125,7 +125,7 @@
     }
 
     _observerText() {
-      var text = this._comment.text;
+      var text = this._chat.text;
 
       if (typeof text === "undefined") text = "";
       if (typeof text !== "string") {
@@ -139,7 +139,7 @@
     }
 
     _observerColor() {
-      var color = this._comment.color;
+      var color = this._chat.color;
 
       if (typeof color === "undefined") color = colorList.white;
       if (typeof color !== "string") {
@@ -157,7 +157,7 @@
     }
 
     _observerSize() {
-      var size = this._comment.size;
+      var size = this._chat.size;
 
       if (typeof size === "undefined") size = sizeList.medium;
       if (typeof size !== "string") {
@@ -173,7 +173,7 @@
     }
 
     _observerX() {
-      var x = this._comment.x;
+      var x = this._chat.x;
 
       if (typeof x === "undefined") x = 0;
       if (typeof x !== "number") {
@@ -185,7 +185,7 @@
     }
 
     _observerY() {
-      var y = this._comment.y;
+      var y = this._chat.y;
 
       if (typeof y === "undefined") y = 0;
       if (typeof y !== "number") {
@@ -197,7 +197,7 @@
     }
 
     _observerVisibility() {
-      var visibility = this._comment.visibility;
+      var visibility = this._chat.visibility;
 
       if (typeof visibility === "undefined") visibility = false;
       if (typeof visibility !== "boolean") {
@@ -222,7 +222,7 @@
   class Viewer extends HTMLElement {
 
     createdCallback() {
-      this._comments = new Map();
+      this._comment = new Map();
 
       // Shadow DOMのRoot
       var root = this.createShadowRoot();
@@ -237,7 +237,7 @@
       this._container = container;
 
       // ダミーコメント(サイズ取得等)
-      var dummy = document.createElement("jikkyo-comment");
+      var dummy = document.createElement("jikkyo-chat");
       dummy.visibility = false;
       container.appendChild(dummy);
       this._dummy = dummy;
@@ -251,45 +251,45 @@
       return window.innerHeight;
     }
 
-    createComment(comment) {
-      if (typeof comment !== "object")
-        throw new TypeError("comment must be object: " + typeof comment);
+    createChat(chat) {
+      if (typeof chat !== "object")
+        throw new TypeError("chat must be object: " + typeof chat);
 
-      if (this._comments.has(comment))
-        return this.comments.get(comment);
+      if (this._comment.has(chat))
+        return this.comment.get(chat);
 
-      var elem = document.createElement("jikkyo-comment");
-      elem.comment = comment;
+      var elem = document.createElement("jikkyo-chat");
+      elem.chat = chat;
       this._container.appendChild(elem);
-      this._comments.set(comment, elem);
+      this._comment.set(chat, elem);
 
       return elem;
     }
 
-    getComment(comment) {
-      if (!this._comments.has(comment)) return null;
+    getChat(chat) {
+      if (!this._comment.has(chat)) return null;
 
-      return this.comments.get(comment);
+      return this.comment.get(chat);
     }
 
-    removeComment(comment) {
-      if (!this._comments.has(comment)) return false;
+    removeChat(chat) {
+      if (!this._comment.has(chat)) return false;
 
-      var elem = this._comments.get(comment);
-      this._comments.delete(comment);
+      var elem = this._comment.get(chat);
+      this._comment.delete(chat);
       this._container.removeChild(elem);
 
       return true;
     }
 
-    getDummyComment() {
+    getDummyChat() {
       return this._dummy;
     }
 
   }
 
-  window.JikkyoComment = document.registerElement("jikkyo-comment", {
-    prototype: Comment.prototype
+  window.JikkyoChat = document.registerElement("jikkyo-chat", {
+    prototype: Chat.prototype
   });
   window.JikkyoViewer = document.registerElement("jikkyo-viewer", {
     prototype: Viewer.prototype

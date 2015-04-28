@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  var EventEmitter = require('events').EventEmitter;
+  var EventEmitter = require("events").EventEmitter;
 
   class Adapter {
 
@@ -9,7 +9,7 @@
       this._viewer = null;
       this._controller = null;
 
-      this._comments = [];
+      this._comment = [];
       this._rows = 0;
       this._limit = 100;
 
@@ -21,7 +21,7 @@
 
       this._event = new EventEmitter();
 
-      this._renderComments = [];
+      this._renderComment = [];
       this._renderDate = 0;
       this._renderCb = (() => {
         if (this._viewer === null) return;
@@ -140,24 +140,24 @@
       this._event.removeListener("observe", listener);
     }
 
-    addComment(comment) {
-      this.addComments([comment]);
+    addChat(chat) {
+      this.addChats([chat]);
     }
 
-    addComments(comments) {
-      if (!Array.isArray(comments))
-        throw new TypeError("comments must be array: " + typeof comments);
+    addChats(comment) {
+      if (!Array.isArray(comment))
+        throw new TypeError("comment must be array: " + typeof comment);
 
-      comments = comments.map(comment => {
+      comment = comment.map(chat => {
         return {
-          text: comment.text || "",
-          color: comment.color || "white",
-          size: comment.size || "medium",
+          text: chat.text || "",
+          color: chat.color || "white",
+          size: chat.size || "medium",
           x: 0,
           y: 0,
           visibility: false,
-          vpos: comment.vpos || 0,
-          position: comment.position || 0,
+          vpos: chat.vpos || 0,
+          position: chat.position || 0,
           width: 0,
           height: 0,
           bullet: false
@@ -165,8 +165,8 @@
       }, this);
 
       // todo: ソート済みの配列を破壊してソートし直すのは気がひけるのでバイナリサーチで挿入すべき
-      this._comments = this._comments.concat(comments);
-      this._comments.sort((a, b) => a.vpos - b.vpos);
+      this._comment = this._comment.concat(comment);
+      this._comment.sort((a, b) => a.vpos - b.vpos);
 
       this.refresh();
     }
@@ -190,82 +190,82 @@
     render() {
       if (this._viewer === null) return;
 
-      var rComments = this._renderComments;
+      var rComment = this._renderComment;
       var viewer = this._viewer;
 
-      this._comments.forEach(comment => {
-        // renderComments内にcommentが存在するか
-        if (rComments.includes(comment)) {
+      this._comment.forEach(chat => {
+        // renderComment内にchatが存在するか
+        if (rComment.includes(chat)) {
           // 表示されるか
-          if (this._isVisible(comment)) {
-            comment.x = this._calcX(comment);
+          if (this._isVisible(chat)) {
+            chat.x = this._calcX(chat);
           } else {
-            comment.visibility = false;
-            viewer.removeComment(comment);
-            rComments.splice(rComments.indexOf(comment), 1);
+            chat.visibility = false;
+            viewer.removeChat(chat);
+            rComment.splice(rComment.indexOf(chat), 1);
           }
-        } else if (this._isVisible(comment)) {
-          comment.x = this._calcX(comment);
+        } else if (this._isVisible(chat)) {
+          chat.x = this._calcX(chat);
 
           // コメントが上限に達しているか
-          if (rComments.length === this._limit) {
-            viewer.removeComment(rComments[0]);
-            rComments.shift();
+          if (rComment.length === this._limit) {
+            viewer.removeChat(rComment[0]);
+            rComment.shift();
           }
 
-          comment.visibility = true;
-          viewer.createComment(comment);
-          rComments.push(comment);
+          chat.visibility = true;
+          viewer.createChat(chat);
+          rComment.push(chat);
         }
       }, this);
     }
 
     refresh() {
-      this._comments.forEach(comment => {
-        var size = this._calcSize(comment);
-        comment.width = size.width;
-        comment.height = size.height;
+      this._comment.forEach(chat => {
+        var size = this._calcSize(chat);
+        chat.width = size.width;
+        chat.height = size.height;
       }, this);
 
-      this._comments.forEach(comment => {
-        comment.y = this._calcY(comment);
-        comment.color = comment.bullet ? "orange" : "";
+      this._comment.forEach(chat => {
+        chat.y = this._calcY(chat);
+        chat.color = chat.bullet ? "orange" : "";
       }, this);
     }
 
-    _calcSize(comment) {
-      var dummy = this._viewer.getDummyComment(comment);
+    _calcSize(chat) {
+      var dummy = this._viewer.getDummyChat(chat);
 
-      dummy.comment = {
-        text:       comment.text,
-        color:      comment.color,
-        size:       comment.size,
+      dummy.chat = {
+        text:       chat.text,
+        color:      chat.color,
+        size:       chat.size,
         visibility: false
       };
       var size = {
         width: dummy.width,
         height: dummy.height
       };
-      dummy.comment = {};
+      dummy.chat = {};
 
       return size;
     }
 
-    _calcX(comment, position) {
+    _calcX(chat, position) {
       if (position === void(0))
         position = this._position;
 
-      if (comment.position === "ue" || comment.position === "shita") {
-        return parseInt((this._viewer.width - comment.width) / 2);
+      if (chat.position === "ue" || chat.position === "shita") {
+        return parseInt((this._viewer.width - chat.width) / 2);
       } else {
-        let rate = (position - comment.vpos) / this._duration;
-        return parseInt(this._viewer.width - rate * (this._viewer.width + comment.width));
+        let rate = (position - chat.vpos) / this._duration;
+        return parseInt(this._viewer.width - rate * (this._viewer.width + chat.width));
       }
     }
 
-    _calcY(comment) {
-      const isUe = comment.position === "ue",
-            isShita = comment.position === "shita",
+    _calcY(chat) {
+      const isUe = chat.position === "ue",
+            isShita = chat.position === "shita",
             duration = (isUe || isShita) ? this._durationAlt : this._duration,
             height = this._viewer.height;
 
@@ -274,19 +274,19 @@
       var loop = (() => {
         var flag = false;
 
-        this._comments.some(current => {
-          if (current === comment) return true;
-          if (current.position !== comment.position) return false;
-          if (comment.vpos - current.vpos > duration) return false;
+        this._comment.some(current => {
+          if (current === chat) return true;
+          if (current.position !== chat.position) return false;
+          if (chat.vpos - current.vpos > duration) return false;
           if (current.bullet) return false;
 
           if (isUe || isShita) {
             y += current.height;
 
-            if (y > height - comment.height) {
+            if (y > height - chat.height) {
               // 弾幕モード
               // Math.ceil or Math.floor?
-              y = Math.floor(Math.random() * (height - comment.height));
+              y = Math.floor(Math.random() * (height - chat.height));
               bullet = true;
 
               return true;
@@ -294,30 +294,30 @@
 
             flag = true;
           } else {
-            if (y >= current.y + current.height || current.y >= y + comment.height) return;
+            if (y >= current.y + current.height || current.y >= y + chat.height) return;
 
                   // 2つのコメントが同時に表示される時間の開始時刻
-            const vstart = Math.max(comment.vpos, current.vpos),
+            const vstart = Math.max(chat.vpos, current.vpos),
                   // 2つのコメントが同時に表示される時間の終了時刻
-                  vend = Math.min(comment.vpos + duration, current.vpos + duration),
-                  // 2つのコメントが同時に表示され始まるときのcommentのx
-                  commentStartX = this._calcX(comment, vstart),
-                  // 2つのコメントが同時に表示されるのが終わるときのcommentのx
-                  commentEndX = this._calcX(comment, vend),
+                  vend = Math.min(chat.vpos + duration, current.vpos + duration),
+                  // 2つのコメントが同時に表示され始まるときのchatのx
+                  chatStartX = this._calcX(chat, vstart),
+                  // 2つのコメントが同時に表示されるのが終わるときのchatのx
+                  chatEndX = this._calcX(chat, vend),
                   // 2つのコメントが同時に表示され始まるときのcurrentのx
                   currentStartX = this._calcX(current, vstart),
                   // 2つのコメントが同時に表示されるのが終わるときのcurrentのx
                   currentEndX = this._calcX(current, vend);
 
-            if ((commentStartX >= currentStartX + current.width || currentStartX >= commentStartX + comment.width) &&
-                (commentEndX >= currentEndX + current.width || currentEndX >= commentEndX + comment.width))
+            if ((chatStartX >= currentStartX + current.width || currentStartX >= chatStartX + chat.width) &&
+                (chatEndX >= currentEndX + current.width || currentEndX >= chatEndX + chat.width))
                 return;
 
             y += current.height;
 
-            if (y > height - comment.height) {
+            if (y > height - chat.height) {
               // 弾幕モード
-              y = Math.floor(Math.random() * (height - comment.height));
+              y = Math.floor(Math.random() * (height - chat.height));
               bullet = true;
 
               return true;
@@ -332,17 +332,17 @@
 
       loop();
 
-      comment.bullet = bullet;
+      chat.bullet = bullet;
       return (isShita && !bullet) ? height - y : y;
     }
 
-    _isVisible(comment, position) {
-      const duration = (comment.position === "ue" || comment.position === "shita") ? this._durationAlt : this._duration;
+    _isVisible(chat, position) {
+      const duration = (chat.position === "ue" || chat.position === "shita") ? this._durationAlt : this._duration;
 
       if (position === void(0))
         position = this._position;
 
-      return comment.vpos <= position && position <= comment.vpos + duration;
+      return chat.vpos <= position && position <= chat.vpos + duration;
     }
 
   }
