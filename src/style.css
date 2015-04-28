@@ -3,11 +3,14 @@
 body {
   margin: 0;
   background: rgba(0, 0, 0, 0);
-  font-size: 14px;
-  font-family: "メイリオ", sans-serif;
   overflow: hidden;
   cursor: default;
   -webkit-user-select: none;
+}
+
+body, input {
+  font-size: 14px;
+  font-family: "メイリオ", sans-serif;
 }
 
 .container {

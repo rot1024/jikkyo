@@ -94,12 +94,12 @@
       this._adapter = null;
       this._alwaysOnTop = false;
 
-      this._playBtn = root.querySelector(".play");
+      this._playBtn = root.getElementById("file-play");
       this._range = root.querySelector("input[type=range]");
-      this._pos = root.querySelector(".pos");
       this._rangeBg = root.querySelector(".range-bg");
-      this._alwaysontopBtn = root.querySelector(".alwaysontop");
-      this._menuBtn = root.querySelector(".menu");
+      this._pos = root.getElementById("file-pos");
+      this._alwaysontopBtn = root.getElementById("btn-alwaysontop");
+      this._menuBtn = root.getElementById("btn-menu");
 
       this._time = new Time();
 
@@ -109,7 +109,7 @@
           this._time.totalMillisecond = val;
           this._pos.textContent = this._time.toString();
           if (this._adapter.length <= val) {
-            this._playBtn.classList.remove("pause");
+            this._playBtn.classList.remove("btn-pause");
           }
         } else if (name === "length") {
           this._range.max = val;
@@ -154,10 +154,10 @@
             this._adapter.position = 0;
             this.refresh();
           }
-          this._playBtn.classList.add("pause");
+          this._playBtn.classList.add("btn-pause");
           this._adapter.start();
         } else {
-          this._playBtn.classList.remove("pause");
+          this._playBtn.classList.remove("btn-pause");
           this._adapter.stop();
         }
       }).bind(this));
@@ -170,13 +170,43 @@
         win.setAlwaysOnTop(on);
       }).bind(this));
 
+      // menu
+      
+      var fileMode = root.getElementById("mode-file");
+      var twitterMode = root.getElementById("mode-twitter");
       var menu = document.createElement("jikkyo-menu");
-      menu.add({ label: "Twitter モード", checked: true });
-      menu.add({ label: "ファイル モード" });
+      
+      var item1 = new window.JikkyoMenu.Menuitem({
+        label: "ファイル モード",
+        checked: true
+      });
+      
+      var item2 = new window.JikkyoMenu.Menuitem({
+        label: "Twitter モード"
+      });
+      
+      item1.click = () => {
+        if (!item1.checked) {
+          item1.checked = true;
+          item2.checked = false;
+          fileMode.classList.remove("hidden");
+          twitterMode.classList.add("hidden");
+        }
+      };
+      
+      item2.click = () => {
+        item1.checked = false;
+        item2.checked = true;
+          fileMode.classList.add("hidden");
+          twitterMode.classList.remove("hidden");
+      };
+      
+      menu.add(item1);
+      menu.add(item2);
       menu.add({ type: "separator" });
       menu.add({
         label: "設定",
-        onclick() {
+        click() {
           document.querySelector("jikkyo-preference-dialog").show();
         }
       });

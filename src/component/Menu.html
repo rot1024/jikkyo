@@ -84,6 +84,7 @@
         this.checkable = item.checkable || false;
         this.disabled = item.disabled || false;
         this.onclick = item.onclick;
+        this.click = item.click;
       }
     }
 
@@ -142,14 +143,14 @@
     }
 
     add(item) {
-      var menuItem = new MenuItem(item);
+      var menuItem = item instanceof MenuItem ? item : new MenuItem(item);
 
       menuItem.el.addEventListener("click", (e => {
         if (!menuItem.disabled) {
           if (menuItem.checkable)
             menuItem.checked = !menuItem.checked;
-          if (typeof menuItem.onclick === "function")
-            menuItem.onclick(menuItem);
+          if (typeof menuItem.click === "function")
+            menuItem.click(menuItem);
           this.hide();
         }
         e.stopPropagation();
@@ -186,6 +187,8 @@
   window.JikkyoMenu = document.registerElement("jikkyo-menu", {
     prototype: Menu.prototype
   });
+  
+  window.JikkyoMenu.Menuitem = MenuItem;
 
 })();
 </script>
