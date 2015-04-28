@@ -252,6 +252,13 @@
         chat.color = chat.bullet ? "orange2" : "";
       }, this);
     }
+    
+    refreshLength() {
+      if (this._comments.length === 0)
+        this._length = 0;
+      else
+        this._length = this._comments[this._comments.length - 1].vpos + this._delay;
+    }
 
     _calcSize(chat) {
       var dummy = this._viewer.getDummyChat(chat);
