@@ -65,10 +65,6 @@
       };
     }
 
-    attachedCallback() {
-
-    }
-
     detachedCallback() {
       Object.unobserve(this._chat, this._observer);
     }

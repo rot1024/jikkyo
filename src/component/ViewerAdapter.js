@@ -141,32 +141,52 @@
     }
 
     addChat(chat) {
-      this.addChats([chat]);
+      this.addComment([chat]);
     }
 
-    addChats(comment) {
+    addComment(comment) {
       if (!Array.isArray(comment))
         throw new TypeError("comment must be array: " + typeof comment);
 
-      comment = comment.map(chat => {
-        return {
-          text: chat.text || "",
-          color: chat.color || "white",
-          size: chat.size || "medium",
+      var binarySearch = (chat, array) => {
+        if (array.length === 0) return 0;
+        if (array[array.length - 1].vpos <= chat.vpos) return array.length;
+
+        var search = (start, end) => {
+          var current = Math.floor((start + end) / 2);
+          var currentChat = array[current];
+
+          if (currentChat.vpos < chat.vpos) {
+            start = current + 1;
+          } else if (currentChat.vpos > chat.vpos) {
+            end = current - 1;
+          } else {
+            return ++current === array.length ? current : search(current, current);
+          }
+
+          return start > end ? start : search(start, end);
+        };
+
+        return search(0, array.length - 1);
+      };
+
+      comment.forEach(obj => {
+        var chat = {
+          text: obj.text || "",
+          color: obj.color || "white",
+          size: obj.size || "medium",
           x: 0,
           y: 0,
           visibility: false,
-          vpos: chat.vpos || 0,
-          position: chat.position || 0,
+          vpos: obj.vpos || 0,
+          position: obj.position || 0,
           width: 0,
           height: 0,
           bullet: false
         };
-      }, this);
 
-      // todo: ソート済みの配列を破壊してソートし直すのは気がひけるのでバイナリサーチで挿入すべき
-      this._comment = this._comment.concat(comment);
-      this._comment.sort((a, b) => a.vpos - b.vpos);
+        this._comment.splice(binarySearch(chat, this._comment), 0, chat);
+      }, this);
 
       this.refresh();
     }
@@ -229,7 +249,7 @@
 
       this._comment.forEach(chat => {
         chat.y = this._calcY(chat);
-        chat.color = chat.bullet ? "orange" : "";
+        chat.color = chat.bullet ? "orange2" : "";
       }, this);
     }
 
