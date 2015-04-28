@@ -15,5 +15,8 @@
     "resizable": false,
     "show": false,
     "toolbar": false
+  },
+  "dependencies": {
+    "xml2js": "^0.4.8"
   }
 }

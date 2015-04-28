@@ -231,6 +231,13 @@
         if (c.bullet) c.color = "red";
       }).bind(this));
     }
+    
+    refreshLength() {
+      if (this._comments.length === 0)
+        this._length = 0;
+      else
+        this._length = this._comments[this._comments.length - 1].vpos + this._delay;
+    }
 
     _getFontSize() {
       return 36;

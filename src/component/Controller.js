@@ -98,8 +98,9 @@
       this._range = root.querySelector("input[type=range]");
       this._rangeBg = root.querySelector(".range-bg");
       this._pos = root.getElementById("file-pos");
-      this._alwaysontopBtn = root.getElementById("btn-alwaysontop");
-      this._menuBtn = root.getElementById("btn-menu");
+      
+      var alwaysontopBtn = root.getElementById("btn-alwaysontop");
+      var menuBtn = root.getElementById("btn-menu");
 
       this._time = new Time();
 
@@ -162,9 +163,9 @@
         }
       }).bind(this));
 
-      this._alwaysontopBtn.addEventListener("click", (() => {
+      alwaysontopBtn.addEventListener("click", (() => {
         const on = this._alwaysontop = !this._alwaysontop;
-        const cl = this._alwaysontopBtn.classList;
+        const cl = alwaysontopBtn.classList;
         if (on && !cl.contains("on")) cl.add("on");
         else if (!on && cl.contains("on")) cl.remove("on");
         win.setAlwaysOnTop(on);
@@ -211,10 +212,37 @@
         }
       });
 
-      this._menuBtn.addEventListener("click", (() => {
-        var rect = this._menuBtn.getBoundingClientRect();
+      menuBtn.addEventListener("click", () => {
+        var rect = menuBtn.getBoundingClientRect();
         menu.show(rect.right, rect.top);
+      });
+      
+      // file mode
+      
+      var fileInput = root.getElementById("file"),
+          fileOpenBtn = root.getElementById("file-open"),
+          NicoComment = require("./util/NicoComment");
+      
+      fileOpenBtn.addEventListener("click", (() => {
+        var adapter = this._adapter;
+        fileInput.addEventListener("change", () => {
+          if (!this || !this.value) return;
+          var path = this.value;
+          
+          var nico = new NicoComment();
+          nico.readFromFile(path).then(result => {
+            adapter.add(result);
+            adapter.refreshLength();
+          });
+          
+          fileInput.value = "";
+        });
+        fileInput.click();
       }).bind(this));
+      
+      // twitter mode
+      
+      
     }
 
   };
