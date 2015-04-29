@@ -77,7 +77,12 @@ body /deep/ input[type=text] {
   color: #fff;
   border: 1px solid #222;
   border-radius: 4px;
-  transition: border-color .2s ease-in-out;
+  transition: all .2s ease-in-out;
+}
+
+input[type=text]:-webkit-input-placeholder,
+body /deep/ input[type=text]:-webkit-input-placeholder {
+  color: #aaa;
 }
 
 input[type=text]:focus,
@@ -89,6 +94,12 @@ body /deep/ input[type=text]:focus {
 input[type=text]:disabled,
 body /deep/ input[type=text]:disabled {
   color: #aaa;
+  background-color: #454545;
+}
+
+input[type=text]:disabled:-webkit-input-placeholder,
+body /deep/ input[type=text]:disabled:-webkit-input-placeholder {
+  color: #717171;
 }
 
 select,

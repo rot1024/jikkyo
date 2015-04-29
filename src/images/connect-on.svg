@@ -4,6 +4,6 @@
       <feGaussianBlur result="blurOut" in="offOut" stdDeviation="1" />
     </filter>
   </defs>
-  <path d="M11.875 4.292h6.25l-2.5 7.5h5l-8.708 13.916 1.208-10.166h-3.75" fill="#97ff78" filter="url(#f)"/>
-  <path d="M11.875 4.292h6.25l-2.5 7.5h5l-8.708 13.916 1.208-10.166h-3.75" fill="#77e556"/>
+  <path d="M11.875 4.292h6.25l-2.5 7.5h5l-8.708 13.916 1.208-10.166h-3.75" fill="#ffe078" filter="url(#f)"/>
+  <path d="M11.875 4.292h6.25l-2.5 7.5h5l-8.708 13.916 1.208-10.166h-3.75" fill="#ff9d00"/>
 </svg>
