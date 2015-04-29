@@ -13,8 +13,7 @@
     var container = document.getElementById("window"),
         titlebar = document.querySelector("jikkyo-titlebar"),
         controller = document.querySelector("jikkyo-controller"),
-        viewer = document.querySelector("jikkyo-viewer"),
-        draggable = document.querySelector("jikkyo-draggable");
+        viewer = document.querySelector("jikkyo-viewer");
 
     win.on("maximize", () => container.classList.add("maximized"));
     win.on("unmaximize", () => container.classList.remove("maximized"));
@@ -30,14 +29,10 @@
 
       if (win.height - e.clientY < 100) {
         controller.show();
-        draggable.hide();
       } else if (!controller.isFixed) {
         controller.hide();
-        draggable.show();
       }
     });
-
-    draggable.hide();
 
     var adapter = new window.JikkyoViewer.Adapter();
     adapter.viewer = viewer;
