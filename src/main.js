@@ -15,6 +15,10 @@
         controller = document.querySelector("jikkyo-controller"),
         viewer = document.querySelector("jikkyo-viewer");
 
+    window.jikkyo = {};
+    window.jikkyo.preference = new window.JikkyoPreference();
+    window.jikkyo.preference.load();
+
     win.on("maximize", () => container.classList.add("maximized"));
     win.on("unmaximize", () => container.classList.remove("maximized"));
     win.on("focus", () => container.classList.add("hover"));
