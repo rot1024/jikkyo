@@ -4,20 +4,21 @@
 
   var doc = document.currentScript.ownerDocument;
 
-  var draggable = class extends HTMLElement {
+  class PreferenceDialog extends window.JikkyoModal {
 
     createdCallback() {
-      var root = this.createShadowRoot();
-      var template = doc.querySelector("template");
-      root.appendChild(document.importNode(template.content, true));
+      super.createdCallback();
 
-      this.addEventListener("click", e => e.stopPropagation());
+      this.width = 500;
+      this.height = 340;
 
-      var tabs = root.getElementById("tabs"),
-          prefs = root.getElementById("prefs"),
-          prefc = prefs.querySelectorAll(":scope > div");
+      this.appendStyle(document.importNode(doc.querySelector("#style").content, true));
+      this.appendContent(document.importNode(doc.querySelector("#content").content, true));
 
-      var i = false;
+      var tabs = this.content.querySelector("#tabs"),
+          prefs = this.content.querySelector("#prefs"),
+          prefc = this.content.querySelectorAll("#prefs > div");
+
       [].forEach.call(prefc, (c, i) => {
         var tab = document.createElement("li");
         tab.textContent = c.dataset.title;
@@ -26,7 +27,8 @@
           tab.classList.add("active");
         }
         tab.addEventListener("click", () => {
-          prefs.querySelector(".active").classList.remove("active");
+          var active = prefs.querySelector(".active");
+          if (active) active.classList.remove("active");
           c.classList.add("active");
           tabs.querySelector(".active").classList.remove("active");
           tab.classList.add("active");
@@ -34,21 +36,13 @@
         tabs.appendChild(tab);
       });
 
-      root.querySelector("#ok").addEventListener("click", (() => this.hide()).bind(this));
+      this.content.querySelector("#ok").addEventListener("click", (() => this.hide()).bind(this));
     }
 
-    show() {
-      this.classList.add("shown");
-    }
+  }
 
-    hide() {
-      this.classList.remove("shown");
-    }
-
-  };
-
-  window.JikkyoResizer = document.registerElement("jikkyo-preference-dialog", {
-    prototype: draggable.prototype
+  window.JikkyoPreferenceDialog = document.registerElement("jikkyo-preference-dialog", {
+    prototype: PreferenceDialog.prototype
   });
 
 })();

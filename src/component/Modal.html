@@ -1,0 +1,147 @@
+<template>
+  <style>
+    :host {
+      position: absolute;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      display: block;
+      pointer-events: none;
+    }
+
+    #modal-bg {
+      position: absolute;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      display: block;
+      background-color: rgba(0, 0, 0, .5);
+      pointer-events: auto;
+      transition: background-color .2s ease-in-out;
+    }
+
+    #modal-bg.hidden {
+      background-color: transparent;
+      pointer-events: none;
+    }
+
+    #modal {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      display: block;
+      background-color: #333;
+      color: #aaa;
+      border-radius: 8px;
+      overflow: hidden;
+      opacity: 1;
+      box-shadow: 1px 3px 10px rgba(0, 0, 0, .7);
+      pointer-events: auto;
+      transition: opacity .2s ease-in-out;
+    }
+
+    .hidden #modal {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+  </style>
+
+  <div id="modal-bg" class="hidden">
+    <div id="modal">
+    </div>
+  </div>
+</template>
+
+<script>
+  (() => {
+    "use strict";
+
+    var doc = document.currentScript.ownerDocument;
+
+    class Modal extends HTMLElement {
+
+      createdCallback() {
+        var template = document.importNode(doc.querySelector("template").content, true);
+
+        this._modalBg = template.querySelector("#modal-bg");
+        this.content = template.querySelector("#modal");
+
+        var innerHTML = this.innerHTML;
+        this.innerHTML = "";
+        template.innerHTML = innerHTML;
+        this.createShadowRoot().appendChild(template);
+
+        this.attributeChangedCallback("width", null, this.getAttribute("width"));
+        this.attributeChangedCallback("height", null, this.getAttribute("height"));
+        this.attributeChangedCallback("visible", null, this.getAttribute("visible"));
+
+        this._stopCb = e => e.stopPropagation();
+      }
+
+      attributeChangedCallback(attrName, oldVal, newVal) {
+        if (attrName === "width") {
+          if (!newVal) newVal = 400;
+          this.content.style.width = ~~(newVal) + "px";
+          this.content.style.marginLeft = ~~(-newVal / 2) + "px";
+        }
+        else if (attrName === "height") {
+          if (!newVal) newVal = 300;
+          this.content.style.height = ~~(newVal) + "px";
+          this.content.style.marginTop = ~~(-newVal / 2) + "px";
+        }
+        else if (attrName === "visible") {
+          if (newVal !== null) {
+            this._modalBg.classList.remove("hidden");
+            this.addEventListener("mousemove", this._stopCb, true);
+          } else {
+            this._modalBg.classList.add("hidden");
+            this.removeEventListener("mousemove", this._stopCb, true);
+          }
+        }
+      }
+
+      appendStyle(style) {
+        this.shadowRoot.insertBefore(style, this._modalBg);
+      }
+
+      appendContent(content) {
+        this.content.appendChild(content);
+      }
+
+      show() {
+        this.setAttribute("visible", "visible");
+      }
+
+      hide() {
+        this.removeAttribute("visible");
+      }
+
+      get width() {
+        return this.getAttribute("width") || 0;
+      }
+
+      set width(v) {
+        return this.setAttribute("width", v);
+      }
+
+      get height() {
+        return this.getAttribute("height") || 0;
+      }
+
+      set height(v) {
+        return this.setAttribute("height", v);
+      }
+
+    }
+
+    window.JikkyoModal = document.registerElement("jikkyo-modal", {
+      prototype: Modal.prototype
+    });
+
+  })();
+</script>
+
+

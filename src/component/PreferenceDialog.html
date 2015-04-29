@@ -1,42 +1,13 @@
-<template>
+<template id="style">
 
   <style>
 
-    :host {
-      position: absolute;
-      left: 0;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      display: none;
-      background-color: rgba(0, 0, 0, .5);
-    }
-
-    :host(.shown) {
-      display: block;
-    }
-
-    #dialog {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      margin: -170px 0 0 -250px;
-      width: 500px;
-      height: 340px;
-      background-color: #333;
-      color: #aaa;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 1px 3px 10px rgba(0, 0, 0, .7);
-    }
-    
     #container {
       position: absolute;
       left: 0;
       top: 0;
       right: 0;
       bottom: 50px;
-      display: none;
       display: flex;
       align-items: stretch;
     }
@@ -78,7 +49,7 @@
     #prefs > div.active {
       display: block;
     }
-    
+
     #footer {
       position: absolute;
       left: 0;
@@ -90,7 +61,7 @@
       text-align: right;
       line-height: 50px;
     }
-    
+
     .btn {
       display: inline-block;
       padding: 8px 16px;
@@ -103,32 +74,33 @@
       line-height: 1;
       box-shadow: 0 1px 2px rgba(0, 0, 0, .03);
     }
-    
+
     .btn:active {
       background-color: #222;
     }
 
   </style>
-  
-  <div id="dialog">
 
-    <div id="container">
-      <ul id="tabs"></ul>
-      <div id="prefs">
+</template>
 
-        <div id="pref-comment" data-title="コメント">
+<template id="content">
 
-        </div>
+  <div id="container">
+    <ul id="tabs"></ul>
+    <div id="prefs">
 
-        <div id="pref-twitter" data-title="Twitter">
-
-        </div>
+      <div id="pref-comment" data-title="コメント">
 
       </div>
+
+      <div id="pref-twitter" data-title="Twitter">
+
+      </div>
+
     </div>
-    <div id="footer">
-      <div id="ok" class="btn btn-ok">閉じる</div>
-    </div>
+  </div>
+  <div id="footer">
+    <div id="ok" class="btn btn-ok">閉じる</div>
   </div>
 
 </template>
