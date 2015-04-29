@@ -256,43 +256,45 @@
     refresh() {
       var start = 0, end = this._comment.length;
 
-      if (this.isSimpleMode) {
-        let refreshCb = this._refreshCb = ((index, array) => {
-          if (refreshCb !== this._refreshCb) return;
-          if (index === array.length) {
-            this._refreshCb = null;
-            return;
-          }
-
-          var chat = array[index];
-
+      var refresh = ((start, end) => {
+        this._comment.slice(start, end).forEach(chat => {
           var size = this._calcSize(chat);
           chat.width = size.width;
           chat.height = size.height;
 
           chat.y = this._calcY(chat);
+        }, this);
+      }).bind(this);
 
-          setTimeout(refreshCb, 10, ++index, array);
+      if (this.isSimpleMode) {
+        let getLastIndex = ((position, last) => {
+          return this._comment.slice(last).reduce(((prev, chat, index) => {
+            if (chat.vpos >= position) return prev;
+            return index + last + 1;
+          }).bind(this), last);
         }).bind(this);
 
-        let index = this._comment.reduce(((prev, chat, index) => {
-          if (chat.vpos >= this._position) return prev;
-          return index + 1;
-        }).bind(this), 0);
+        let refreshCb = this._refreshCb = ((start, end, array) => {
+          if (refreshCb !== this._refreshCb) return;
+          if (end === array.length) {
+            this._refreshCb = null;
+            return;
+          }
 
-        end = index;
-        start = Math.max(index - this._limit, 0);
+          refresh(start, end);
 
-        setTimeout(refreshCb, 10, end, this._comment);
+          var next = getLastIndex(this._position + 100, end);
+          setTimeout(refreshCb, 50, end, next, array);
+        }).bind(this);
+
+        end = getLastIndex(this._position, 0);
+        start = Math.max(end - this._limit, 0);
+        let next = getLastIndex(this._position + 100, 0);
+
+        setTimeout(refreshCb, 50, end, next, this._comment);
       }
 
-      this._comment.slice(start, end).forEach(chat => {
-        var size = this._calcSize(chat);
-        chat.width = size.width;
-        chat.height = size.height;
-
-        chat.y = this._calcY(chat);
-      }, this);
+      refresh(start, end);
     }
 
     _calcSize(chat) {
