@@ -92,7 +92,7 @@
 
     createdCallback() {
       var root = this.createShadowRoot();
-      var template = doc.querySelector("template");
+      var template = doc.getElementById("main");
       root.appendChild(document.importNode(template.content, true));
       root.addEventListener("click", e => e.stopPropagation());
 
@@ -116,7 +116,7 @@
           this._time.totalMillisecond = val;
           this._pos.textContent = this._time.toString();
           if (this._adapter.length <= val) {
-            this._playBtn.classList.remove("btn-pause");
+            this._playBtn.classList.remove("controller-btn-pause");
           }
         } else if (name === "length") {
           this._range.max = val;
@@ -161,10 +161,10 @@
             this._adapter.position = 0;
             this.refresh();
           }
-          this._playBtn.classList.add("btn-pause");
+          this._playBtn.classList.add("controller-btn-pause");
           this._adapter.start();
         } else {
-          this._playBtn.classList.remove("btn-pause");
+          this._playBtn.classList.remove("controller-btn-pause");
           this._adapter.stop();
         }
       }).bind(this));
@@ -255,7 +255,6 @@
       }).bind(this));
 
       // twitter mode
-
 
     }
 

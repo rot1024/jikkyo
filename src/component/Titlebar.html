@@ -10,7 +10,7 @@
       overflow: hidden;
     }
 
-    .container, .draggable, .title, .btns {
+    .container, .draggable, .title, .titlebar-btns {
       position: absolute;
       left: 0;
       top: 0;
@@ -47,7 +47,7 @@
       text-align: center;
     }
 
-    .btns {
+    .titlebar-btns {
       display: flex;
       padding-right: 6px;
       vertical-align: middle;
@@ -56,87 +56,87 @@
       align-items: center;
     }
 
-    .btn {
+    .titlebar-btn {
       transition: background-color .1s ease-in-out;
       -webkit-app-region: no-drag;
     }
 
     /* Windows/Linux */
 
-    .win .btns {
+    .win .titlebar-btns {
       flex-direction: row;
     }
 
-    .win .btn, .linux .btn {
+    .win .titlebar-btn, .linux .btn {
       width: 16px;
       height: 16px;
       padding: 2px 6px;
       border-radius: 2px;
     }
 
-    .win .btn:hover, .linux .btn:hover {
+    .win .titlebar-btn:hover, .linux .titlebar-btn:hover {
       background-color: #222;
     }
 
-    .win .btn:active, .linux .btn:active {
+    .win .titlebar-btn:active, .linux .titlebar-btn:active {
       background-color: #000;
     }
 
-    .win .btn-close, .linux .btn-close {
+    .win .titlebar-btn-close, .linux .titlebar-btn-close {
       background: transparent url("images/close.svg") no-repeat center center;
       background-size: 13px 13px;
     }
 
-    .win .btn-maximize, .linux .btn-maximize {
+    .win .titlebar-btn-maximize, .linux .titlebar-btn-maximize {
       background: transparent url("images/maximize.svg") no-repeat center center;
       background-size: 13px 13px;
     }
 
-    .win .btn-unmaximize, .linux .btn-unmaximize {
+    .win .titlebar-btn-unmaximize, .linux .titlebar-btn-unmaximize {
       background: transparent url("images/unmaximize.svg") no-repeat center center;
       background-size: 13px 13px;
     }
 
-    .win .btn-minimize, .linux .btn-minimize {
+    .win .titlebar-btn-minimize, .linux .titlebar-btn-minimize {
       background: transparent url("images/minimize.svg") no-repeat center center;
       background-size: 13px 13px;
     }
 
     /* Mac */
 
-    .mac .btns {
+    .mac .titlebar-btns {
       flex-direction: row-reverse;
     }
 
-    .mac .btn {
+    .mac .titlebar-btn {
       width: 14px;
       height: 14px;
       margin-left: 10px;
       border-radius: 50%;
     }
 
-    .mac .btn-close { background: #f73a4e; }
-    .mac .btn-maximize,
-    .mac .btn-unmaximize { background: #fdb122; }
-    .mac .btn-minimize { background: #75d668; }
+    .mac .titlebar-btn-close { background: #f73a4e; }
+    .mac .titlebar-btn-maximize,
+    .mac .titlebar-btn-unmaximize { background: #fdb122; }
+    .mac .titlebar-btn-minimize { background: #75d668; }
 
-    .mac .btn-close:hover { background: #ef5666; }
-    .mac .btn-maximize:hover { background: #ffc455; }
-    .mac .btn-minimize:hover { background: #85e579; }
+    .mac .titlebar-btn-close:hover { background: #ef5666; }
+    .mac .titlebar-btn-maximize:hover { background: #ffc455; }
+    .mac .titlebar-btn-minimize:hover { background: #85e579; }
 
-    .mac .btn-close:active { background: #c32e3e; }
-    .mac .btn-maximize:active { background: #c68a19; }
-    .mac .btn-minimize:active { background: #64be58; }
+    .mac .titlebar-btn-close:active { background: #c32e3e; }
+    .mac .titlebar-btn-maximize:active { background: #c68a19; }
+    .mac .titlebar-btn-minimize:active { background: #64be58; }
 
   </style>
 
   <div id="container" class="container">
     <div class="draggable"></div>
     <div class="title">Jikkyo</div>
-    <div class="btns">
-      <div id="minimize" class="btn btn-minimize"></div>
-      <div id="maximize" class="btn btn-maximize"></div>
-      <div id="close" class="btn btn-close"></div>
+    <div class="titlebar-btns">
+      <div id="minimize" class="titlebar-btn titlebar-btn-minimize"></div>
+      <div id="maximize" class="titlebar-btn titlebar-btn-maximize"></div>
+      <div id="close" class="titlebar-btn titlebar-btn-close"></div>
     </div>
   </div>
 
@@ -209,11 +209,11 @@
 
           var btn = this.shadowRoot.getElementById("maximize");
           if (v) {
-            btn.classList.add("btn-unmaximize");
-            btn.classList.remove("btn-maximize");
+            btn.classList.add("titlebar-btn-unmaximize");
+            btn.classList.remove("titlebar-btn-maximize");
           } else {
-            btn.classList.add("btn-maximize");
-            btn.classList.remove("btn-unmaximize");
+            btn.classList.add("titlebar-btn-maximize");
+            btn.classList.remove("titlebar-btn-unmaximize");
           }
         }).bind(this);
         maximized.on(this._maximizedChangedCb);

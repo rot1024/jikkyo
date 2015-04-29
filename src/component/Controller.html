@@ -1,4 +1,4 @@
-<template>
+<template id="main">
   <style>
 
     :host {
@@ -10,11 +10,6 @@
       font-size: 14px;
       font-family: "メイリオ", sans-serif;
       overflow: hidden;
-    }
-    
-    input {
-      font-size: 14px;
-      font-family: "メイリオ", sans-serif;
     }
 
     .container {
@@ -37,13 +32,13 @@
     .container.hidden {
       bottom: -56px;
     }
-    
+
     .mode {
       display: flex;
       flex: auto;
       align-items: center;
     }
-    
+
     .mode.hidden {
       display: none;
     }
@@ -56,7 +51,7 @@
     .item-grow {
       flex: auto;
     }
-    
+
     input[type=range] {
       position: absolute;
       width: 100%;
@@ -105,7 +100,7 @@
       border-radius: 10px;
     }
 
-    .btn {
+    .controller-btn {
       width: 30px;
       height: 30px;
       background-color: transparent;
@@ -118,71 +113,71 @@
       transition: all .2s ease-in-out;
     }
 
-    .btn:hover {
+    .controller-btn:hover {
       opacity: 1;
     }
 
-    .btn:active {
+    .controller-btn:active {
       opacity: .8;
     }
-    
-    .btn-large {
+
+    .controller-btn-large {
       width: 50px;
       height: 30px;
     }
-    
-    .btn-large.disabled:hover,
-    .btn-large.disabled:active {
+
+    .controller-btn-large.disabled:hover,
+    .controller-btn-large.disabled:active {
       background-color: transparent;
     }
-    
-    .btn-large:hover {
+
+    .controller-btn-large:hover {
       background-color: rgba(200, 200, 200, .4);
     }
-    
-    .btn-large:active {
+
+    .controller-btn-large:active {
       background-color: rgba(200, 200, 200, .2);
     }
 
-    .btn-play {
+    .controller-btn-play {
       background-image: url("images/play.svg");
     }
 
-    .btn-pause {
+    .controller-btn-pause {
       background-image: url("images/pause.svg");
     }
-    
-    .btn-open {
+
+    .controller-btn-open {
       background-image: url("images/open.svg");
     }
-    
-    .btn-rec {
+
+    .controller-btn-rec {
       background-image: url("images/rec.svg");
     }
-    
-    .btn-recstop {
+
+    .controller-btn-recstop {
       background-image: url("images/recstop.svg");
     }
 
-    .btn-connect {
+    .controller-btn-connect {
       background-image: url("images/connect.svg");
     }
 
-    .btn-connect.on {
+    .controller-btn-connect.on {
       background-image: url("images/connect-on.svg");
       opacity: 1;
     }
 
-    .btn-alwaysontop {
+    .controller-btn-alwaysontop {
       background-image: url("images/alwaysontop.svg");
     }
 
-    .btn-alwaysontop.on {
+    .controller-btn-alwaysontop.on {
       background-image: url("images/alwaysontop-on.svg");
       opacity: 1;
     }
 
-    .btn-menu {
+    .controller-btn-menu {
       background-image: url("images/menu.svg");
     }
 
@@ -194,49 +189,11 @@
       text-align: right;
       line-height: 30px;
     }
-    
-    input[type=text] {
-      padding: 4px 6px;
-      background-color: #666;
-      color: #fff;
-      border: 1px solid #222;
-      border-radius: 4px;
-      transition: border-color .2s ease-in-out;
-    }
 
-    input[type=text]:focus {
-      border-color: orange;
-      outline: none;
-    }
-
-    input[type=text]:disabled {
-      color: #aaa;
-    }
-    
     input[type=file] {
       display: none;
     }
-    
-    select {
-      padding: 5px 30px 5px 10px;
-      background: #505050 url("images/select.svg") no-repeat right center;
-      color: #fff;
-      border: 1px solid #222;
-      border-radius: 4px;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1);
-      transition: border-color .2s ease-in-out;
-      -webkit-appearance: none;
-    }
-    
-    select:focus {
-      border-color: orange;
-      outline: none;
-    }
-    
-    select:disabled {
-      color: #aaa;
-    }
-    
+
     #twitter-track {
       width: calc(100% - 20px);
     }
@@ -246,44 +203,39 @@
   <div id="container" class="container">
 
     <div id="mode-file" class="mode">
-      <div class="item"><div id="file-play" class="btn btn-large btn-play" title="再生/一時停止"></div></div>
+      <div class="item"><div id="file-play" class="controller-btn controller-btn-large controller-btn-play" title="再生/一時停止"></div></div>
       <div id="file-slider" class="item item-grow">
         <canvas class="range-bg"></canvas>
         <input type="range" min="0" max="100" value="0" />
       </div>
       <div class="item"><div id="file-pos" class="pos">00:00:00</div></div>
       <div class="item">
-        <div id="file-open" class="btn btn-open" title="コメントファイルを開く"></div>
+        <div id="file-open" class="controller-btn controller-btn-open" title="コメントファイルを開く"></div>
       </div>
     </div>
-  
+
     <div id="mode-twitter" class="mode hidden">
       <div class="item">
-        <div id="twitter-rec" class="btn btn-large btn-rec" title="録画"></div>
+        <div id="twitter-rec" class="controller-btn controller-btn-large controller-btn-rec" title="録画"></div>
       </div>
-      <div class="item">
-        <select id="twitter-mode">
-          <option value="filter">Filter</option>
-          <option value="user">User</option>
-        </select>
-      </div>
-      <div id="tweitter-item-track" class="item item-grow">
+      <div class="item item-grow">
         <input type="text" id="twitter-track" class="" placeholder="検索キーワード">
       </div>
       <div class="item">
-        <div id="twitter-connect" class="btn btn-connect" title="Twitterに接続/切断"></div>
+        <div id="twitter-connect" class="controller-btn controller-btn-connect" title="Twitterに接続/切断"></div>
       </div>
     </div>
-    
+
     <div class="item">
-      <div id="btn-alwaysontop" class="btn btn-alwaysontop" title="常に最前面"></div>
+      <div id="btn-alwaysontop" class="controller-btn controller-btn-alwaysontop" title="常に最前面"></div>
     </div>
+
     <div class="item">
-      <div id="btn-menu" class="btn btn-menu" title="メニュー"></div>
+      <div id="btn-menu" class="controller-btn controller-btn-menu" title="メニュー"></div>
     </div>
 
   </div>
-  
+
   <input id="file" type="file" accept=".xml,*.*">
 
 </template>

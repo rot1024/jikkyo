@@ -2,7 +2,7 @@
 
   <style>
 
-    #container {
+    .container {
       position: absolute;
       left: 0;
       top: 0;
@@ -50,42 +50,13 @@
       display: block;
     }
 
-    #footer {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: 50px;
-      background-color: #222;
-      padding: 0 20px;
-      text-align: right;
-      line-height: 50px;
-    }
-
-    .btn {
-      display: inline-block;
-      padding: 8px 16px;
-      background-color: #303030;
-      color: #aaa;
-      font-size: 12px;
-      border: 1px solid #000;
-      border-radius: 3px;
-      text-align: center;
-      line-height: 1;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, .03);
-    }
-
-    .btn:active {
-      background-color: #222;
-    }
-
   </style>
 
 </template>
 
 <template id="content">
 
-  <div id="container">
+  <div class="container">
     <ul id="tabs"></ul>
     <div id="prefs">
 
@@ -99,8 +70,8 @@
 
     </div>
   </div>
-  <div id="footer">
-    <div id="ok" class="btn btn-ok">閉じる</div>
+  <div class="modal-footer">
+    <div id="ok" class="btn">閉じる</div>
   </div>
 
 </template>
