@@ -252,7 +252,7 @@
         throw new TypeError("chat must be object: " + typeof chat);
 
       if (this._comment.has(chat))
-        return this.comment.get(chat);
+        return this._comment.get(chat);
 
       var elem = document.createElement("jikkyo-chat");
       elem.chat = chat;

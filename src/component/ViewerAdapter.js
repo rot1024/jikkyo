@@ -20,6 +20,9 @@
       this._duration = 4000;
       this._durationAlt = 3000;
 
+      this._refreshCb = null;
+      this._simpleLength = 1000;
+
       this._event = new EventEmitter();
 
       this._renderComment = [];
@@ -115,6 +118,7 @@
       this._position = Math.min(this._length, position);
 
       this._event.emit("observe", "position", this._position);
+      if (this.isSimpleMode) this.refresh();
     }
 
     get length() {
@@ -131,6 +135,24 @@
 
       this._event.emit("observe", "length", this._length);
       this._event.emit("observe", "position", this._position);
+    }
+
+    get simpleLength() {
+      return this._simpleLength;
+    }
+
+    set simpleLength(simpleLength) {
+      if (typeof simpleLength !== "number")
+        throw new TypeError("simpleLength must be number: " + typeof simpleLength);
+      if (this.simpleLength === simpleLength) return;
+
+      this._simpleLength = simpleLength;
+
+      if (this.isSimpleMode) this.refresh();
+    }
+
+    get isSimpleMode() {
+      return !this._realtime && this._comment.length > this._simpleLength;
     }
 
     on(listener) {
@@ -201,48 +223,78 @@
     render() {
       if (this._viewer === null) return;
 
-      var rComment = this._renderComment;
-      var viewer = this._viewer;
-
-      this._comment.forEach(chat => {
-        // renderComment内にchatが存在するか
-        if (rComment.includes(chat)) {
-          // 表示されるか
-          if (this._isVisible(chat)) {
-            chat.x = this._calcX(chat);
-          } else {
-            chat.visibility = false;
-            viewer.removeChat(chat);
-            rComment.splice(rComment.indexOf(chat), 1);
-            if (this._realtime)
-              this._comment.splice(this._comment.indexOf(chat), 1);
-          }
-        } else if (this._isVisible(chat)) {
+      this._renderComment.slice().forEach(chat => {
+        if (this._isVisible(chat)) {
           chat.x = this._calcX(chat);
+        } else {
+          chat.visibility = false;
+          this._viewer.removeChat(chat);
+          this._renderComment.splice(this._renderComment.indexOf(chat), 1);
 
-          // コメントが上限に達しているか
-          if (rComment.length === this._limit) {
-            viewer.removeChat(rComment[0]);
-            rComment.shift();
-          }
-
-          chat.visibility = true;
-          viewer.createChat(chat);
-          rComment.splice(this._binarySearch(chat, rComment), 0, chat);
+          if (this._realtime)
+            this._comment.splice(this._comment.indexOf(chat), 1);
         }
+      }, this);
+
+      this._comment.slice().forEach(chat => {
+        if (!this._isVisible(chat)) return;
+        if (this._renderComment.includes(chat)) return;
+
+        chat.x = this._calcX(chat);
+
+        if (this._renderComment.length === this._limit) {
+          this._viewer.removeChat(this._renderComment[0]);
+          this._renderComment.shift();
+        }
+
+        chat.visibility = true;
+        this._viewer.createChat(chat);
+        this._renderComment.splice(this._binarySearch(chat, this._renderComment), 0, chat);
       }, this);
     }
 
     refresh() {
-      this._comment.forEach(chat => {
-        var size = this._calcSize(chat);
-        chat.width = size.width;
-        chat.height = size.height;
-      }, this);
+      var start = 0, end = this._comment.length;
 
-      this._comment.forEach(chat => {
-        chat.y = this._calcY(chat);
-      }, this);
+      var refresh = ((start, end) => {
+        this._comment.slice(start, end).forEach(chat => {
+          var size = this._calcSize(chat);
+          chat.width = size.width;
+          chat.height = size.height;
+
+          chat.y = this._calcY(chat);
+        }, this);
+      }).bind(this);
+
+      if (this.isSimpleMode) {
+        let getLastIndex = ((position, last) => {
+          return this._comment.slice(last).reduce(((prev, chat, index) => {
+            if (chat.vpos >= position) return prev;
+            return index + last + 1;
+          }).bind(this), last);
+        }).bind(this);
+
+        let refreshCb = this._refreshCb = ((start, end, array) => {
+          if (refreshCb !== this._refreshCb) return;
+          if (end === array.length) {
+            this._refreshCb = null;
+            return;
+          }
+
+          refresh(start, end);
+
+          var next = getLastIndex(this._position + 100, end);
+          setTimeout(refreshCb, 50, end, next, array);
+        }).bind(this);
+
+        end = getLastIndex(this._position, 0);
+        start = Math.max(end - this._limit, 0);
+        let next = getLastIndex(this._position + 100, 0);
+
+        setTimeout(refreshCb, 50, end, next, this._comment);
+      }
+
+      refresh(start, end);
     }
 
     _calcSize(chat) {
@@ -254,10 +306,12 @@
         size:       chat.size,
         visibility: false
       };
+
       var size = {
         width: dummy.width,
         height: dummy.height
       };
+
       dummy.chat = {};
 
       return size;
@@ -279,7 +333,8 @@
       const isUe = chat.position === "ue",
             isShita = chat.position === "shita",
             duration = (isUe || isShita) ? this._durationAlt : this._duration,
-            height = this._viewer.height;
+            height = this._viewer.height,
+            base = this.isSimpleMode ? Math.max(this._comment.indexOf(chat) - this._limit, 0) : 0;
 
       var y = 0,
           bullet = false;
@@ -287,14 +342,13 @@
       var loop = (() => {
         var flag = false;
 
-        this._comment.some(current => {
+        this._comment.slice(base).some(current => {
           const currentY = (isShita ? height - current.y  : current.y);
 
           if (current === chat) return true;
           if (current.position !== chat.position) return false;
           if (chat.vpos - current.vpos > duration) return false;
           if (y >= currentY + current.height || currentY >= y + chat.height) return false;
-          //if (current.bullet) return false;
 
           if (isUe || isShita) {
             y += current.height;
