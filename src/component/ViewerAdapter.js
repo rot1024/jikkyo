@@ -372,7 +372,7 @@
         var flag = false;
 
         this._comment.slice(base).some(current => {
-          const currentY = (isShita ? height - current.y  : current.y);
+          const currentY = (isShita ? height - current.y - current.height  : current.y);
 
           if (current === chat) return true;
           if (current.position !== chat.position) return false;
@@ -423,7 +423,7 @@
       loop();
 
       chat.bullet = bullet;
-      return (isShita && !bullet) ? height - y : y;
+      return (isShita && !bullet) ? height - y - chat.height : y;
     }
 
     _isVisible(chat, position) {
