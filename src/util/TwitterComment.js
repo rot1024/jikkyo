@@ -133,9 +133,9 @@ module.exports = (() => {
 
         text = text.trim();
 
-        const color = null;
-        const size = null;
-        const position = null;
+        const color = void(0);
+        const size = void(0);
+        const position = void(0);
         const vpos = Date.parse(tweet.created_at) - streamStartAt;
 
         this._event.emit("chat", {
