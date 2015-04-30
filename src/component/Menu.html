@@ -176,6 +176,7 @@
       this._menu.classList.remove("hidden");
       window.addEventListener("click", this._menuCb, true);
       window.addEventListener("mousemove", this._stopPropagationCb, true);
+      window.addEventListener("mouseout", this._stopPropagationCb, true);
     }
 
     hide() {
@@ -184,6 +185,7 @@
       this.style.top = 0;
       window.removeEventListener("click", this._menuCb, true);
       window.removeEventListener("mousemove", this._stopPropagationCb, true);
+      window.removeEventListener("mouseout", this._stopPropagationCb, true);
       if (this.parentNode) document.body.removeChild(this);
     }
 

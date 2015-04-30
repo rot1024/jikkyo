@@ -22,16 +22,35 @@
     win.on("maximize", () => container.classList.add("maximized"));
     win.on("unmaximize", () => container.classList.remove("maximized"));
     win.on("focus", () => container.classList.add("hover"));
-    win.on("blur", () => container.classList.remove("hover"));
-    container.addEventListener("mouseover", () => container.classList.add("hover"));
-    container.addEventListener("mouseout", () => container.classList.remove("hover"));
+
+    win.on("blur", () => {
+      titlebar.hide();
+      if (!controller.isFixed) {
+        controller.hide();
+      }
+      container.classList.remove("hover");
+    });
+
+    container.addEventListener("mouseover", () => {
+      container.classList.add("hover");
+    });
+
+    container.addEventListener("mouseout", () => {
+      titlebar.hide();
+      if (!controller.isFixed) {
+        controller.hide();
+      }
+      container.classList.remove("hover");
+    });
+
     container.addEventListener("mousemove", e => {
-      if (e.clientY < 50)
+      var rect = container.getBoundingClientRect();
+      if (rect.top <= e.clientY && e.clientY < 50)
         titlebar.show();
       else
         titlebar.hide();
 
-      if (win.height - e.clientY < 100) {
+      if (win.height - 100 < e.clientY && e.clientY <= rect.bottom) {
         controller.show();
       } else if (!controller.isFixed) {
         controller.hide();

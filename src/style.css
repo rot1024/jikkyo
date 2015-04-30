@@ -17,10 +17,10 @@ body /deep/ select {
 
 .container {
   position: absolute;
-  left: 0;
-  top: 0;
-  right: 0;
-  bottom: 0;
+  left: 5px;
+  top: 5px;
+  right: 5px;
+  bottom: 5px;
   border: 1px solid rgba(255, 255, 255, .1);
   border-radius: 5px;
   overflow: hidden;
@@ -33,6 +33,10 @@ body /deep/ select {
 }
 
 .container.maximized {
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
   border: none;
   border-radius: 0;
   box-shadow: none;
