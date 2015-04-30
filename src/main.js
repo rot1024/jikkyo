@@ -19,6 +19,8 @@
     window.jikkyo.preference = new window.JikkyoPreference();
     window.jikkyo.preference.load();
 
+    controller.pref =  window.jikkyo.preference;
+
     win.on("maximize", () => container.classList.add("maximized"));
     win.on("unmaximize", () => container.classList.remove("maximized"));
     win.on("focus", () => container.classList.add("hover"));

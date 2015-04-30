@@ -34,12 +34,15 @@
         var prev = this._renderDate;
         var current = this._renderDate = Date.now();
 
-        this._position = Math.min(this._length, this._position + current - prev);
+        if (this._realtime)
+          this._length = this._position = this._position + current - prev;
+        else
+          this._position = Math.min(this._length, this._position + current - prev);
         this._event.emit("observe", "position", this._position);
 
         this.render();
 
-        if (this._position === this._length) {
+        if (!this._realtime && this._position === this._length) {
           this.stop();
         } else {
           window.requestAnimationFrame(this._renderCb);
@@ -73,7 +76,7 @@
 
     set controller(controller) {
       if (controller === this._controller) return;
-
+      if (this._controller) this._controller.adapter = null;
       if (controller) controller.adapter = this;
       this._controller = controller;
     }
@@ -155,6 +158,14 @@
       return !this._realtime && this._comment.length > this._simpleLength;
     }
 
+    get realtime() {
+      return this._realitme;
+    }
+
+    set realtime(v) {
+      this._realtime = v;
+    }
+
     on(listener) {
       this._event.on("observe", listener);
     }
@@ -206,7 +217,11 @@
     }
 
     start() {
-      if (this._playing || this._position === this._length) return;
+      if (this._playing || !this._realtime && this._position === this._length) return;
+
+      if (this._realtime) {
+        this._position = this._length = 0;
+      }
 
       setTimeout((() => {
         this._renderCb();

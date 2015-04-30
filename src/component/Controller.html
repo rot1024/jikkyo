@@ -123,6 +123,7 @@
 
     .controller-btn.disabled {
       opacity: .25;
+      cursor: default;
     }
 
     .controller-btn-large {
@@ -220,10 +221,10 @@
 
     <div id="mode-twitter" class="mode hidden">
       <div class="item">
-        <div id="twitter-rec" class="controller-btn controller-btn-large controller-btn-rec" title="録画"></div>
+        <div id="twitter-rec" class="controller-btn controller-btn-large controller-btn-rec disabled" title="録画"></div>
       </div>
       <div class="item item-grow">
-        <input type="text" id="twitter-track" class="" placeholder="検索キーワード">
+        <input type="text" id="twitter-track" placeholder="検索キーワード">
       </div>
       <div class="item">
         <div id="twitter-connect" class="controller-btn controller-btn-connect" title="Twitterに接続/切断"></div>

@@ -36,7 +36,30 @@
         tabs.appendChild(tab);
       });
 
-      this.content.querySelector("#ok").addEventListener("click", (() => this.hide()).bind(this));
+      this.content.querySelector("#ok").addEventListener("click", (() => {
+        this.hide();
+      }).bind(this));
+    }
+
+    show() {
+      var f = this.content,
+          p = window.jikkyo.preference;
+      f.querySelector("#twitter-ck").value = p.twitter.consumerKey;
+      f.querySelector("#twitter-cs").value = p.twitter.consumerSecret;
+      f.querySelector("#twitter-at").value = p.twitter.accessToken;
+      f.querySelector("#twitter-as").value = p.twitter.accessSecret;
+      super.show();
+    }
+
+    hide() {
+      var f = this.content,
+          p = window.jikkyo.preference;
+      p.twitter.consumerKey = f.querySelector("#twitter-ck").value;
+      p.twitter.consumerSecret = f.querySelector("#twitter-cs").value;
+      p.twitter.accessToken = f.querySelector("#twitter-at").value;
+      p.twitter.accessSecret = f.querySelector("#twitter-as").value;
+      p.save();
+      super.hide();
     }
 
   }
