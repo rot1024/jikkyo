@@ -203,11 +203,11 @@
     }
 
     get width() {
-      return window.innerWidth;
+      return this.clientWidth;
     }
 
     get height() {
-      return window.innerHeight;
+      return this.clientHeight;
     }
 
     createChat(chat) {
