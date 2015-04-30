@@ -3,5 +3,6 @@
   "browser": true,
   "esnext": true,
   "undef": true,
-  "unused": true
+  "unused": true,
+  "-W116": false
 }
