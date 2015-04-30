@@ -185,8 +185,8 @@
       comment.forEach(obj => {
         var chat = {
           text: obj.text || "",
-          color: obj.color || "white",
-          size: obj.size || "medium",
+          color: obj.color,
+          size: obj.size,
           x: 0,
           y: 0,
           visibility: false,
