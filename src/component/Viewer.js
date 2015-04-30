@@ -3,40 +3,9 @@
 
   var doc = document.currentScript.ownerDocument;
 
-  var colorList = {
-    white:          "#FFFFFF",
-    red:            "#FF0000",
-    pink:           "#FF8080",
-    orange:         "#FFC000",
-    yellow:         "#FFFF00",
-    green:          "#00FF00",
-    cyan:           "#00FFFF",
-    blue:           "#0000FF",
-    purple:         "#C000FF",
-    black:          "#000000",
-    white2:         "#CCCC99",
-    niconicowhite:  "#CCCC99",
-    red2:           "#CC0033",
-    truered:        "#CC0033",
-    pink2:          "#FF33CC",
-    orange2:        "#FF6600",
-    passionorange:  "#FF6600",
-    yellow2:        "#999900",
-    madyellow:      "#999900",
-    green2:         "#00CC66",
-    elementalgreen: "#00CC66",
-    cyan2:          "#00CCCC",
-    blue2:          "#3399FF",
-    marineblue:     "#3399FF",
-    purple2:        "#6633CC",
-    nobleviolet:    "#6633CC",
-    black2:         "#666666",
-  };
-
-  var sizeList = {
-    medium: "100%",
-    big:    "150%",
-    small:  "50%"
+  var defaults = {
+    color: "#FFFFFF",
+    size: "100%"
   };
 
   function escapeHTML(content) {
@@ -57,8 +26,8 @@
 
       this.chat = {
         text:       "",
-        color:      "white",
-        size:       "medium",
+        color:      defaults.color,
+        size:       defaults.size,
         x:          0,
         y:          0,
         visibility: false
@@ -137,7 +106,7 @@
     _observerColor() {
       var color = this._chat.color;
 
-      if (typeof color === "undefined") color = colorList.white;
+      if (typeof color === "undefined") color = defaults.color;
       if (typeof color !== "string") {
         console.log("Warning: color must be string: " + typeof color);
         return;
@@ -145,27 +114,21 @@
 
       if (/^#[\dA-F]{6}$/.test(color)) {
         this.style.color = color;
-      } else if (color in colorList) {
-        this.style.color = colorList[color];
       } else {
-        this.style.color = colorList.white;
+        this.style.color = defaults.color;
       }
     }
 
     _observerSize() {
       var size = this._chat.size;
 
-      if (typeof size === "undefined") size = sizeList.medium;
+      if (typeof size === "undefined") size = defaults.size;
       if (typeof size !== "string") {
         console.log("Warning: color must be string: " + typeof size);
         return;
       }
 
-      if (size in sizeList) {
-        this.style.fontSize = sizeList[size];
-      } else {
-        this.style.fontSize = sizeList.medium;
-      }
+      this.style.fontSize = size;
     }
 
     _observerX() {

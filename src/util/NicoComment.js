@@ -4,7 +4,7 @@ module.exports = (() => {
   var fs = require("fs"),
       xml = require("xml2js").parseString;
   
-  var NicoComment = class {
+  class NicoComment {
     
     constructor() {
       this._comment = [];
@@ -28,17 +28,24 @@ module.exports = (() => {
     read(data) {
       var deferred = Promise.defer();
       
-      this.clear();
+      this.clearComment();
+
       xml(data, ((err, result) => {
         if (err) return deferred.reject(err);
         
-        if (!result || !result.packet || !result.packet.chat) {
+        if (result === null || !("packet" in result) || !("chat" in result.packet)) {
           return deferred.resolve(this._comment);
         }
         
-        result.packet.chat.forEach((chat => {
-          this._comment.push(this._parseChat(chat));
-        }).bind(this));
+        var margin = result.packet.chat.reduce((margin, obj) => {
+          if (margin === -1) margin = 100;
+          for (; parseInt(obj.$.vpos) % margin !== 0; margin /= 10);
+          return margin;
+        }, -1);
+
+        this._comment = result.packet.chat.map(obj => {
+          return this._parseChat(obj, margin);
+        }, this);
         
         deferred.resolve(this._comment);
       }).bind(this));
@@ -50,7 +57,7 @@ module.exports = (() => {
       
     }
     
-    writeToFile(path) {
+    writeToFile(/*path*/) {
       var deferred = Promise.defer();
       
       deferred.reject(new Error("not implemented"));
@@ -59,48 +66,83 @@ module.exports = (() => {
     }
     
     addChat(chat) {
-      var comment = this._comment;
-      (Array.isArray(chat) ? chat : [chat]).forEach(c => {
-        comment.push(c);
-      });
+      this.addComment([chat]);
+    }
+
+    addComment(comment) {
+      if (!Array.isArray(comment))
+        throw new TypeError("comment must be array: " + typeof comment);
+
+      comment.forEach(chat => {
+        this._comment.push(chat);
+      }, this);
     }
     
-    clear() {
+    clearComment() {
       this._comment = [];
     }
     
-    _parseChat(chat) {
-      var color = null, size = null, position = null;
+    _parseChat(obj, margin) {
+      margin = margin || 0;
       
-      if (chat.$.mail) {
-        chat.$.mail.split(" ").forEach(command => {
-          if (NicoComment.size.indexOf(command) >= 0)
-            size = command;
-          else if (NicoComment.position.indexOf(command) >= 0)
-            position = command;
-          else if (NicoComment.color.indexOf(command) >= 0)
-            color = command;
+      var chat = {
+        text: obj._,
+        vpos: (parseInt(obj.$.vpos) + Math.floor(Math.random() * margin)) * 10
+      };
+
+      if ("mail" in obj.$) {
+        obj.$.mail.split(" ").forEach(command => {
+          if (command in NicoComment.color) {
+            chat.color = NicoComment.color[command];
+          } else if (command in NicoComment.size) {
+            chat.size = NicoComment.size[command];
+          } else if (NicoComment.position.includes(command)) {
+            chat.position = command;
+          }
         });
       }
       
-      return {
-        text: chat._,
-        vpos: chat.$.vpos * 10,
-        color: color,
-        size: size,
-        position: position
-      };
+      return chat;
     }
     
+  }
+
+  NicoComment.color = {
+    white:          "#FFFFFF",
+    red:            "#FF0000",
+    pink:           "#FF8080",
+    orange:         "#FFC000",
+    yellow:         "#FFFF00",
+    green:          "#00FF00",
+    cyan:           "#00FFFF",
+    blue:           "#0000FF",
+    purple:         "#C000FF",
+    black:          "#000000",
+    white2:         "#CCCC99",
+    niconicowhite:  "#CCCC99",
+    red2:           "#CC0033",
+    truered:        "#CC0033",
+    pink2:          "#FF33CC",
+    orange2:        "#FF6600",
+    passionorange:  "#FF6600",
+    yellow2:        "#999900",
+    madyellow:      "#999900",
+    green2:         "#00CC66",
+    elementalgreen: "#00CC66",
+    cyan2:          "#00CCCC",
+    blue2:          "#3399FF",
+    marineblue:     "#3399FF",
+    purple2:        "#6633CC",
+    nobleviolet:    "#6633CC",
+    black2:         "#666666",
   };
-  
-  NicoComment.color = [
-    "red", "pink", "orange", "yellow", "green", "cyan", "blue", "purple", "black",
-    "white2", "niconicowhite", "red2", "truered", "pink2", "orange2",
-    "passionorange", "yellow2", "madyellow", "green2", "elementalgreen",
-    "cyan2", "blue2", "marineblue", "purple2", "nobleviolet", "black2"
-  ];
-  NicoComment.size = ["big", "small"];
+
+  NicoComment.size = {
+    medium: "100%",
+    big:    "150%",
+    small:  "50%"
+  };
+
   NicoComment.position = ["ue", "shita"];
   
   return NicoComment;
