@@ -112,7 +112,7 @@
         return;
       }
 
-      if (/^#[\dA-F]{6}$/.test(color)) {
+      if (/^#[\da-fA-F]{6}$/.test(color)) {
         this.style.color = color;
       } else {
         this.style.color = defaults.color;

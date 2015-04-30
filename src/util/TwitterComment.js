@@ -16,7 +16,8 @@ module.exports = (() => {
         excludeMention: true,
         excludeRetweet: true,
         excludeHashtag: true,
-        excludeUrl: true
+        excludeUrl: true,
+        applyThemeColor: true
       };
     }
 
@@ -94,38 +95,36 @@ module.exports = (() => {
           return;
         }
 
-        if (!tweet || !tweet.text ||
-          this.options.excludeRetweet && tweet.retweeted) return;
+        var getKey = (obj, args) => {
+          return args.reduce((obj, current) => {
+            if (obj === void(0)) return;
+            return obj[current];
+          }, obj);
+        };
 
-        if (this.options.excludeMention &&
-            tweet.entities &&
-            tweet.entities.user_mentions &&
-            tweet.entities.user_mentions.length > 0) return;
+        if (!tweet || !tweet.text || this.options.excludeRetweet && tweet.retweeted) return;
+
+        var mentions_length = getKey(tweet, ["entities", "user_mentions", "length"]) || 0;
+        if (this.options.excludeMention && mentions_length > 0) return;
 
         var text = tweet.text;
 
-        if (this.options.excludeHashtag &&
-            tweet.entities &&
-            tweet.entities.hashtags &&
-            tweet.entities.hashtags.length > 0) {
+        var hashtags_length = getKey(tweet, ["entities", "hashtags", "length"]) || 0;
+        if (this.options.excludeHashtag && hashtags_length > 0) {
           tweet.entities.hashtags.forEach(hashtag => {
             text = text.replace("#" + hashtag.text, "");
           });
         }
 
-        if (this.options.excludeUrl &&
-            tweet.entities &&
-            tweet.entities.media &&
-            tweet.entities.media.length > 0) {
+        var media_length = getKey(tweet, ["entities", "media", "length"]) || 0;
+        if (this.options.excludeUrl && media_length > 0) {
           tweet.entities.media.forEach(url => {
             text = text.replace(url.url, "");
           });
         }
 
-        if (this.options.excludeUrl &&
-            tweet.entities &&
-            tweet.entities.urls &&
-            tweet.entities.urls.length > 0) {
+        var urls_length = getKey(tweet, ["entities", "media", "length"]) || 0;
+        if (this.options.excludeUrl && urls_length > 0) {
           tweet.entities.urls.forEach(url => {
             text = text.replace(url.url, "");
           });
@@ -133,9 +132,15 @@ module.exports = (() => {
 
         text = text.trim();
 
-        const color = void(0);
-        const size = void(0);
-        const position = void(0);
+        var color = "";
+
+        var link_color = getKey(tweet, ["user", "profile_link_color"]);
+        if (this.options.applyThemeColor && link_color !== void(0) && link_color !== "0084B4") {
+          color = "#" + tweet.user.profile_link_color;
+        }
+
+        const size = "";
+        const position = "";
         const vpos = Date.parse(tweet.created_at) - streamStartAt;
 
         this._event.emit("chat", {
