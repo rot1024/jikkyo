@@ -27,34 +27,9 @@
 
       this._renderComment = [];
       this._renderDate = 0;
-      this._renderCb = (() => {
-        if (this._viewer === null) return;
-        if (!this._playing) return;
+      this._renderCb = this._renderCb.bind(this);
 
-        var prev = this._renderDate;
-        var current = this._renderDate = Date.now();
-
-        if (this._realtime)
-          this._length = this._position = this._position + current - prev;
-        else
-          this._position = Math.min(this._length, this._position + current - prev);
-        this._event.emit("observe", "position", this._position);
-
-        this.render();
-
-        if (!this._realtime && this._position === this._length) {
-          this.stop();
-        } else {
-          window.requestAnimationFrame(this._renderCb);
-        }
-      }).bind(this);
-
-      this._resizeCb = (() => {
-        if (this._viewer === null) return;
-
-        this.refresh();
-        if (!this.praying) this.render();
-      }).bind(this);
+      this._resizeCb = this._resizeCb.bind(this);
 
       window.addEventListener("resize", this._resizeCb);
     }
@@ -182,6 +157,8 @@
       if (!Array.isArray(comment))
         throw new TypeError("comment must be array: " + typeof comment);
 
+      var index = this._comment.length;
+
       comment.forEach(obj => {
         var chat = {
           text: obj.text || "",
@@ -197,11 +174,16 @@
           bullet: false
         };
 
-        this._comment.splice(this._binarySearch(chat, this._comment), 0, chat);
+        var search = this._binarySearch(chat, this._comment);
+        index = Math.min(index, search);
+
+        this._comment.splice(search, 0, chat);
       }, this);
 
-      this.length = this._comment[this._comment.length - 1].vpos + Math.max(this._duration, this._durationAlt);
-      this.refresh();
+      if (!this._realtime)
+        this.length = this._comment[this._comment.length - 1].vpos + Math.max(this._duration, this._durationAlt);
+
+      this.refresh(index);
     }
 
     clearComment() {
@@ -260,6 +242,9 @@
         if (this._renderComment.length === this._limit) {
           this._viewer.removeChat(this._renderComment[0]);
           this._renderComment.shift();
+
+          if (this._realtime)
+            this._comment.shift();
         }
 
         chat.visibility = true;
@@ -268,8 +253,8 @@
       }, this);
     }
 
-    refresh() {
-      var start = 0, end = this._comment.length;
+    refresh(index) {
+      var start = index || 0, end = this._comment.length;
 
       var refresh = ((start, end) => {
         this._comment.slice(start, end).forEach(chat => {
@@ -310,6 +295,35 @@
       }
 
       refresh(start, end);
+    }
+
+    _renderCb() {
+      if (this._viewer === null) return;
+      if (!this._playing) return;
+
+      var prev = this._renderDate;
+      var current = this._renderDate = Date.now();
+
+      if (this._realtime)
+        this._length = this._position = this._position + current - prev;
+      else
+        this._position = Math.min(this._length, this._position + current - prev);
+      this._event.emit("observe", "position", this._position);
+
+      this.render();
+
+      if (!this._realtime && this._position === this._length) {
+        this.stop();
+      } else {
+        window.requestAnimationFrame(this._renderCb);
+      }
+    }
+
+    _resizeCb() {
+      if (this._viewer === null) return;
+
+      this.refresh();
+      if (!this.praying) this.render();
     }
 
     _calcSize(chat) {
