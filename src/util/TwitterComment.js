@@ -123,7 +123,7 @@ module.exports = (() => {
           });
         }
 
-        var urls_length = getKey(tweet, ["entities", "media", "length"]) || 0;
+        var urls_length = getKey(tweet, ["entities", "urls", "length"]) || 0;
         if (this.options.excludeUrl && urls_length > 0) {
           tweet.entities.urls.forEach(url => {
             text = text.replace(url.url, "");
