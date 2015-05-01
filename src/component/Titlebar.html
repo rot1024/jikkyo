@@ -63,70 +63,71 @@
 
     /* Windows/Linux */
 
-    .win .titlebar-btns {
+    .titlebar-btns {
       flex-direction: row;
     }
 
-    .win .titlebar-btn, .linux .btn {
+    .titlebar-btn, .linux .btn {
       width: 16px;
       height: 16px;
       padding: 2px 6px;
       border-radius: 2px;
     }
 
-    .win .titlebar-btn:hover, .linux .titlebar-btn:hover {
-      background-color: #222;
+    .titlebar-btn:hover {
+      background: #222;
     }
 
-    .win .titlebar-btn:active, .linux .titlebar-btn:active {
-      background-color: #000;
+    .titlebar-btn:active {
+      background: #000;
     }
 
-    .win .titlebar-btn-close, .linux .titlebar-btn-close {
+    .titlebar-btn-close {
       background: transparent url("images/close.svg") no-repeat center center;
       background-size: 13px 13px;
     }
 
-    .win .titlebar-btn-maximize, .linux .titlebar-btn-maximize {
+    .titlebar-btn-maximize {
       background: transparent url("images/maximize.svg") no-repeat center center;
       background-size: 13px 13px;
     }
 
-    .win .titlebar-btn-unmaximize, .linux .titlebar-btn-unmaximize {
+    .titlebar-btn-unmaximize {
       background: transparent url("images/unmaximize.svg") no-repeat center center;
       background-size: 13px 13px;
     }
 
-    .win .titlebar-btn-minimize, .linux .titlebar-btn-minimize {
+    .titlebar-btn-minimize {
       background: transparent url("images/minimize.svg") no-repeat center center;
       background-size: 13px 13px;
     }
 
     /* Mac */
 
-    .mac .titlebar-btns {
+    .darwin .titlebar-btns {
       flex-direction: row-reverse;
     }
 
-    .mac .titlebar-btn {
+    .darwin .titlebar-btn {
       width: 14px;
       height: 14px;
       margin-left: 10px;
+      padding: 0;
       border-radius: 50%;
     }
 
-    .mac .titlebar-btn-close { background: #f73a4e; }
-    .mac .titlebar-btn-maximize,
-    .mac .titlebar-btn-unmaximize { background: #fdb122; }
-    .mac .titlebar-btn-minimize { background: #75d668; }
+    .darwin .titlebar-btn-close { background: #f73a4e; }
+    .darwin .titlebar-btn-maximize,
+    .darwin .titlebar-btn-unmaximize { background: #fdb122; }
+    .darwin .titlebar-btn-minimize { background: #75d668; }
 
-    .mac .titlebar-btn-close:hover { background: #ef5666; }
-    .mac .titlebar-btn-maximize:hover { background: #ffc455; }
-    .mac .titlebar-btn-minimize:hover { background: #85e579; }
+    .darwin .titlebar-btn-close:hover { background: #ef5666; }
+    .darwin .titlebar-btn-maximize:hover { background: #ffc455; }
+    .darwin .titlebar-btn-minimize:hover { background: #85e579; }
 
-    .mac .titlebar-btn-close:active { background: #c32e3e; }
-    .mac .titlebar-btn-maximize:active { background: #c68a19; }
-    .mac .titlebar-btn-minimize:active { background: #64be58; }
+    .darwin .titlebar-btn-close:active { background: #c32e3e; }
+    .darwin .titlebar-btn-maximize:active { background: #c68a19; }
+    .darwin .titlebar-btn-minimize:active { background: #64be58; }
 
   </style>
 
@@ -148,7 +149,6 @@
 
     var win = require("nw.gui").Window.get();
     var maximized = require("./util/maximized")(win);
-    var os = require("./util/os");
     var doc = document.currentScript.ownerDocument;
 
     var titlebar = class extends HTMLElement {
@@ -176,10 +176,10 @@
         root.appendChild(document.importNode(template.content, true));
 
         var container = root.getElementById("container");
-        container.classList.add(os);
+        container.classList.add(process.platform);
 
         root.getElementById("minimize").addEventListener("click", e => {
-          if (os === "mac") {
+          if (process.platform === "darwin") {
             if (maximized.maximized()) win.unmaximize();
             else win.maximize();
             return;
@@ -190,7 +190,7 @@
         });
 
         root.getElementById("maximize").addEventListener("click", (e => {
-          if (os === "mac") return win.minimize();
+          if (process.platform === "darwin") return win.minimize();
           if (maximized.maximized()) win.unmaximize();
           else win.maximize();
           e.stopPropagation();
@@ -205,7 +205,7 @@
           if (v) container.classList.add("maximized");
           else container.classList.remove("maximized");
 
-          if (os === "mac") return;
+          if (process.platform === "darwin") return;
 
           var btn = this.shadowRoot.getElementById("maximize");
           if (v) {
