@@ -41,6 +41,6 @@
 
   }
 
-  window.JikkyoPreference = Preference;
+  window.jikkyo.Preference = Preference;
 
 })();

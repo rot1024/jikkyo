@@ -4,7 +4,7 @@
 
   var doc = document.currentScript.ownerDocument;
 
-  class PreferenceDialog extends window.JikkyoModal {
+  class PreferenceDialog extends window.jikkyo.Modal {
 
     createdCallback() {
       super.createdCallback();
@@ -64,7 +64,7 @@
 
   }
 
-  window.JikkyoPreferenceDialog = document.registerElement("jikkyo-preference-dialog", {
+  window.jikkyo.PreferenceDialog = document.registerElement("jikkyo-preference-dialog", {
     prototype: PreferenceDialog.prototype
   });
 

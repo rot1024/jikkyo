@@ -247,11 +247,11 @@
 
   }
 
-  window.JikkyoChat = document.registerElement("jikkyo-chat", {
-    prototype: Chat.prototype
-  });
-  window.JikkyoViewer = document.registerElement("jikkyo-viewer", {
+  window.jikkyo.Viewer = document.registerElement("jikkyo-viewer", {
     prototype: Viewer.prototype
+  });
+  window.jikkyo.Viewer.Chat = document.registerElement("jikkyo-chat", {
+    prototype: Chat.prototype
   });
 
 })();

@@ -118,5 +118,5 @@
     REALTIME: 1
   };
 
-  window.JikkyoCanvasViewer.Adapter = Adapter;
+  window.jikkyo.CanvasViewer.Adapter = Adapter;
 })();

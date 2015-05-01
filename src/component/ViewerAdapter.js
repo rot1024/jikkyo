@@ -458,5 +458,5 @@
 
   }
 
-  window.JikkyoViewer.Adapter = Adapter;
+  window.jikkyo.Viewer.Adapter = Adapter;
 })();

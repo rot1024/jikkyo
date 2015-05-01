@@ -305,12 +305,12 @@
 
       var menu = document.createElement("jikkyo-menu");
 
-      var item1 = new window.JikkyoMenu.Menuitem({
+      var item1 = new window.jikkyo.Menuitem({
         label: "ファイル モード",
         checked: true
       });
 
-      var item2 = new window.JikkyoMenu.Menuitem({
+      var item2 = new window.jikkyo.Menuitem({
         label: "Twitter モード"
       });
 
@@ -345,7 +345,7 @@
       menu.add(item2);
       menu.add({ type: "separator" });
 
-      var menuFixedItem = new window.JikkyoMenu.Menuitem({
+      var menuFixedItem = new window.jikkyo.Menuitem({
         label: "コントロールバーを固定",
         checkable: true,
         click: (item => {
@@ -377,7 +377,7 @@
 
   };
 
-  window.JikkyoController = document.registerElement("jikkyo-controller", {
+  window.jikkyo.Controller = document.registerElement("jikkyo-controller", {
     prototype: Controller.prototype
   });
 

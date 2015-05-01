@@ -15,8 +15,7 @@
         controller = document.querySelector("jikkyo-controller"),
         viewer = document.querySelector("jikkyo-viewer");
 
-    window.jikkyo = {};
-    window.jikkyo.preference = new window.JikkyoPreference();
+    window.jikkyo.preference = new window.jikkyo.Preference();
     window.jikkyo.preference.load();
 
     controller.pref =  window.jikkyo.preference;
@@ -59,7 +58,7 @@
       }
     });
 
-    var adapter = new window.JikkyoViewer.Adapter();
+    var adapter = new window.jikkyo.Viewer.Adapter();
     adapter.viewer = viewer;
     adapter.controller = controller;
 
