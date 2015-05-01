@@ -274,24 +274,23 @@
           }).bind(this), last);
         }).bind(this);
 
-        let refreshCb = this._refreshCb = ((start, end, array) => {
+        let refreshCb = this._refreshCb = ((start, array) => {
           if (refreshCb !== this._refreshCb) return;
-          if (end === array.length) {
-            this._refreshCb = null;
-            return;
-          }
 
+          var end = getLastIndex(this._position + 500, start);
           refresh(start, end);
 
-          var next = getLastIndex(this._position + 100, end);
-          setTimeout(refreshCb, 50, end, next, array);
+          if (end === array.length) {
+            this._refreshCb = null;
+          } else {
+            setTimeout(refreshCb, 100, end, array);
+          }
         }).bind(this);
 
         end = getLastIndex(this._position, 0);
         start = Math.max(end - this._limit, 0);
-        let next = getLastIndex(this._position + 100, 0);
 
-        setTimeout(refreshCb, 50, end, next, this._comment);
+        setTimeout(refreshCb, 100, end, this._comment);
       }
 
       refresh(start, end);
