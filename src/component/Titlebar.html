@@ -71,35 +71,35 @@
       width: 16px;
       height: 16px;
       padding: 2px 6px;
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-size: 13px 13px;
       border-radius: 2px;
     }
 
     .titlebar-btn:hover {
-      background: #222;
+      background-color: #222;
     }
 
     .titlebar-btn:active {
-      background: #000;
+      background-color: #000;
     }
 
     .titlebar-btn-close {
-      background: transparent url("images/close.svg") no-repeat center center;
-      background-size: 13px 13px;
+      background-image: url("images/close.svg");
     }
 
     .titlebar-btn-maximize {
-      background: transparent url("images/maximize.svg") no-repeat center center;
-      background-size: 13px 13px;
+      background-image: url("images/maximize.svg");
     }
 
-    .titlebar-btn-unmaximize {
-      background: transparent url("images/unmaximize.svg") no-repeat center center;
+    .maximized .titlebar-btn-maximize {
+      background-image: url("images/unmaximize.svg");
       background-size: 13px 13px;
     }
 
     .titlebar-btn-minimize {
-      background: transparent url("images/minimize.svg") no-repeat center center;
-      background-size: 13px 13px;
+      background-image: url("images/minimize.svg");
     }
 
     /* Mac */
@@ -118,7 +118,7 @@
 
     .darwin .titlebar-btn-close { background: #f73a4e; }
     .darwin .titlebar-btn-maximize,
-    .darwin .titlebar-btn-unmaximize { background: #fdb122; }
+    .darwin.maximized .titlebar-btn-maximize { background: #fdb122; }
     .darwin .titlebar-btn-minimize { background: #75d668; }
 
     .darwin .titlebar-btn-close:hover { background: #ef5666; }
@@ -148,7 +148,6 @@
     "use strict";
 
     var win = require("nw.gui").Window.get();
-    var maximized = require("./util/maximized")(win);
     var doc = document.currentScript.ownerDocument;
 
     var titlebar = class extends HTMLElement {
@@ -178,9 +177,13 @@
         var container = root.getElementById("container");
         container.classList.add(process.platform);
 
+        var maximized = () => container.classList.contains("maximized");
+        win.on("maximize", () => container.classList.add("maximized"));
+        win.on("unmaximize", () => container.classList.remove("maximized"));
+
         root.getElementById("minimize").addEventListener("click", e => {
           if (process.platform === "darwin") {
-            if (maximized.maximized()) win.unmaximize();
+            if (maximized()) win.unmaximize();
             else win.maximize();
             return;
           } else {
@@ -191,7 +194,7 @@
 
         root.getElementById("maximize").addEventListener("click", (e => {
           if (process.platform === "darwin") return win.minimize();
-          if (maximized.maximized()) win.unmaximize();
+          if (maximized()) win.unmaximize();
           else win.maximize();
           e.stopPropagation();
         }).bind(this));
@@ -200,24 +203,6 @@
           win.close();
           e.stopPropagation();
         });
-
-        this._maximizedChangedCb = (v => {
-          if (v) container.classList.add("maximized");
-          else container.classList.remove("maximized");
-
-          if (process.platform === "darwin") return;
-
-          var btn = this.shadowRoot.getElementById("maximize");
-          if (v) {
-            btn.classList.add("titlebar-btn-unmaximize");
-            btn.classList.remove("titlebar-btn-maximize");
-          } else {
-            btn.classList.add("titlebar-btn-maximize");
-            btn.classList.remove("titlebar-btn-unmaximize");
-          }
-        }).bind(this);
-        maximized.on(this._maximizedChangedCb);
-        maximized.emit();
       }
 
     };

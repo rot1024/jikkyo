@@ -61,7 +61,6 @@
     "use strict";
 
     var win = require("nw.gui").Window.get();
-    var maximized = require("./util/maximized")(win).maximized;
     var doc = document.currentScript.ownerDocument;
 
     var resizer = class extends HTMLElement {
@@ -70,6 +69,10 @@
         var root = this.createShadowRoot();
         var template = doc.querySelector("template");
         root.appendChild(document.importNode(template.content, true));
+
+        var maximized = false;
+        win.on("maximize", () => maximized = true);
+        win.on("unmaximize", () => maximized = false);
 
         var drag = {
           dragging: false,
@@ -132,7 +135,7 @@
           if (t === null) return;
 
           t.addEventListener("mousedown", e => {
-            if (maximized()) return;
+            if (maximized) return;
             drag.x = drag.oldX = e.clientX;
             drag.y = drag.oldY = e.clientY;
             drag.horizontal = hor;
@@ -149,7 +152,7 @@
 
           t.addEventListener("mouseenter", e => {
             window.document.body.style.cursor =
-              maximized() ? null : str + "-resize";
+              maximized ? null : str + "-resize";
           });
 
           t.addEventListener("mouseleave", e => {
