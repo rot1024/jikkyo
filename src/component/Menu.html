@@ -71,7 +71,7 @@
 
   var doc = document.currentScript.ownerDocument;
 
-  var MenuItem = class {
+  class MenuItem {
 
     constructor(item) {
       this._el = document.createElement("li");
@@ -123,7 +123,7 @@
 
   };
 
-  var Menu = class extends HTMLElement {
+  class Menu extends HTMLElement {
 
     createdCallback() {
       var root = this.createShadowRoot();
@@ -211,11 +211,11 @@
 
   };
 
+  window.jikkyo.MenuItem = MenuItem;
+
   window.jikkyo.Menu = document.registerElement("jikkyo-menu", {
     prototype: Menu.prototype
   });
-
-  window.jikkyo.Menuitem = MenuItem;
 
 })();
 </script>
