@@ -8,7 +8,7 @@ body {
   -webkit-user-select: none;
 }
 
-body, input, select,
+body,
 body /deep/ input,
 body /deep/ select {
   font-size: 14px;
@@ -44,7 +44,6 @@ body /deep/ select {
 
 /* form */
 
-.btn,
 body /deep/ .btn {
   display: inline-block;
   padding: 8px 16px;
@@ -58,22 +57,18 @@ body /deep/ .btn {
   box-shadow: 0 1px 2px rgba(0, 0, 0, .03);
 }
 
-.btn:active,
 body /deep/ .btn:active {
   background-color: #222;
 }
 
-.btn.btn-primary,
 body /deep/ .btn.btn-primary {
   background-color: #a26200;
 }
 
-.btn.btn-primary:active,
 body /deep/ .btn.btn-primary:active {
   background-color: #885800;
 }
 
-input[type=text],
 body /deep/ input[type=text] {
   margin: 0;
   padding: 4px 6px;
@@ -84,29 +79,24 @@ body /deep/ input[type=text] {
   transition: all .2s ease-in-out;
 }
 
-input[type=text]:-webkit-input-placeholder,
 body /deep/ input[type=text]:-webkit-input-placeholder {
   color: #aaa;
 }
 
-input[type=text]:focus,
 body /deep/ input[type=text]:focus {
   border-color: orange;
   outline: none;
 }
 
-input[type=text]:disabled,
 body /deep/ input[type=text]:disabled {
   color: #aaa;
   background-color: #454545;
 }
 
-input[type=text]:disabled:-webkit-input-placeholder,
 body /deep/ input[type=text]:disabled:-webkit-input-placeholder {
   color: #717171;
 }
 
-select,
 body /deep/ select {
   padding: 5px 30px 5px 10px;
   background: #505050 url("images/select.svg") no-repeat right center;
@@ -118,13 +108,11 @@ body /deep/ select {
   -webkit-appearance: none;
 }
 
-select:focus,
 body /deep/ select:focus {
   border-color: orange;
   outline: none;
 }
 
-select:disabled,
 body /deep/ select:disabled {
   color: #aaa;
 }
