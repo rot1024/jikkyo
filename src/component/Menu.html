@@ -74,12 +74,12 @@
   var MenuItem = class {
 
     constructor(item) {
-      this.el = document.createElement("li");
+      this._el = document.createElement("li");
       this._type = item.type;
       if (this._type === "separator")
-        this.el.classList.add("separator");
+        this._el.classList.add("separator");
       else {
-        this.el.classList.add("item");
+        this._el.classList.add("item");
         this.label = item.label;
         this.checked = item.checked || false;
         this.checkable = item.checkable || false;
@@ -91,25 +91,36 @@
 
     get type() { return this._type; }
 
+    get el() { return this._el; }
+
     get label() { return this._label; }
     set label(v) {
-      this.el.textContent = v;
+      this._el.textContent = v;
       this._label = v;
     }
 
     get checked() { return this._checked; }
     set checked(v) {
-      if (v) this.el.classList.add("checked");
-      else this.el.classList.remove("checked");
+      if (v) this._el.classList.add("checked");
+      else this._el.classList.remove("checked");
       this._checked = v;
     }
 
     get disabled() { return this._disabled; }
     set disabled(v) {
-      if (v) this.el.classList.add("disabled");
-      else this.el.classList.remove("disabled");
+      if (v) this._el.classList.add("disabled");
+      else this._el.classList.remove("disabled");
       this._disabled = v;
     }
+
+    on(type, listener, capture) {
+      this._el.addEventListener(type, listener, capture);
+    }
+
+    off(type, listener, capture) {
+      this._el.removeEventListener(type, listener, capture);
+    }
+
   };
 
   var Menu = class extends HTMLElement {
@@ -145,10 +156,14 @@
         rect.top <= y && y <= rect.bottom;
     }
 
-    add(item) {
+    add(item, index) {
+      if (index instanceof MenuItem) {
+        index = this._items.indexOf(index);
+      }
+
       var menuItem = item instanceof MenuItem ? item : new MenuItem(item);
 
-      menuItem.el.addEventListener("click", (e => {
+      menuItem.on("click", (e => {
         if (!menuItem.disabled) {
           if (menuItem.checkable)
             menuItem.checked = !menuItem.checked;
@@ -159,8 +174,13 @@
         e.stopPropagation();
       }).bind(this));
 
-      this._items.push(menuItem);
-      this._menu.appendChild(menuItem.el);
+      if (index >= 0 && index < this._items.length) {
+        this._items.splice(index, 0, menuItem);
+        this._menu.insertBefore(menuItem.el, this._menu.childNodes[index]);
+      } else {
+        this._items.push(menuItem);
+        this._menu.appendChild(menuItem.el);
+      }
     }
 
     show(x, y) {
