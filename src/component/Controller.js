@@ -2,9 +2,9 @@
   "use strict";
 
   var win = require("nw.gui").Window.get();
-  var Time = require("./util/Time");
-  var TwitterComment = require("./util/TwitterComment");
   var doc = document.currentScript.ownerDocument;
+
+  var EventEmitter = require("events").EventEmitter;
 
   var Controller = class extends HTMLElement {
 
@@ -45,6 +45,7 @@
     set isFixed(v) {
       this._isFixed = !!v;
       if (v) this.show();
+      this._menuFixedItem.checked = this._isFixed;
     }
 
     get mode() {
@@ -54,46 +55,25 @@
     set mode(v) {
       if (v === this._mode) return;
 
-      var fileMode = this.shadowRoot.getElementById("mode-file");
-      var twitterMode = this.shadowRoot.getElementById("mode-twitter");
+      this._modeMenuItems.forEach((m, i) => {
+        m.checked = i === v;
+      });
 
-      if (v === 0) {
-        fileMode.classList.remove("hidden");
-        twitterMode.classList.add("hidden");
-      } else if (v === 1) {
-        fileMode.classList.add("hidden");
-        twitterMode.classList.remove("hidden");
-      }
-
-      if (this._adapter && this._adapter.playing) {
-        this._adapter.stop();
-        this.refresh();
-      }
+      this._modes.forEach((m, i) => {
+        if (i === v)
+          m.classList.remove("hidden");
+        else
+          m.classList.add("hidden");
+      });
 
       this._mode = v;
     }
 
-    get adapter() {
-      return this._adapter;
-    }
-
-    set adapter(v) {
-      if (this._adapter === v) return;
-      if (this._adapter) {
-        this._adapter.off(this._adapterCb);
-      }
-      if (v) {
-        this._adapter = v;
-        this._adapter.on(this._adapterCb);
-        this.refresh();
-      }
-    }
-
-    get pref() {
+    get preference() {
       return this._pref;
     }
 
-    set pref(v) {
+    set preference(v) {
       this._pref = v;
       this.loadPref();
     }
@@ -104,8 +84,6 @@
 
       this.isAlwaysOnTop = p.controller.alwaysOnTop || false;
       this.isFixed = p.controller.fixed || false;
-      this.shadowRoot.getElementById("twitter-track").value = p.controller.track || "";
-      this.mode = p.controller.mode || 0;
     }
 
     savePref() {
@@ -114,23 +92,35 @@
 
       p.controller.alwaysOnTop = this.isAlwaysOnTop;
       p.controller.fixed = this.isFixed;
-      p.controller.track = this.shadowRoot.getElementById("twitter-track").value;
-      p.controller.mode = this.mode;
 
       p.save();
     }
 
-    refresh() {
-      if (!this._adapter) return;
-      this._range.max = this._adapter.length;
-      this._range.value = this._adapter.position;
-      this._time.totalMillisecond = this._adapter.position;
-      this._pos.textContent = this._time.toString();
-      if (this._adapter.playing) {
-        this._playBtn.classList.add("controller-btn-pause");
-      } else {
-        this._playBtn.classList.remove("controller-btn-pause");
-      }
+    addMode(mode) {
+      var i = this._modes.length;
+      var item = new window.jikkyo.MenuItem({
+        label: mode.label,
+        checked: i === this._mode,
+        click: (() => {
+          this.mode = i;
+          this._event.emit("observe", "modeChange", i);
+        }).bind(this)
+      });
+      this._menu.add(item, this._menuSeparetor);
+      this._modeMenuItems.push(item);
+
+      mode.classList.add("mode");
+      if (i !== this._mode) mode.classList.add("hidden");
+      this._modes.push(mode);
+      this._modeContainer.appendChild(mode);
+    }
+
+    on(listener) {
+      this._event.on("observe", listener);
+    }
+
+    off(listener) {
+      this._event.removeListener("observe", listener);
     }
 
     createdCallback() {
@@ -139,213 +129,26 @@
       root.appendChild(document.importNode(template.content, true));
       root.addEventListener("click", e => e.stopPropagation());
 
-      this._adapter = null;
+      this._event = new EventEmitter();
       this._alwaysOnTop = false;
       this._isFixed = false;
       this._mode = 0;
-
-      this._playBtn = root.getElementById("file-play");
-      this._range = root.querySelector("input[type=range]");
-      this._rangeBg = root.querySelector(".range-bg");
-      this._pos = root.getElementById("file-pos");
+      this._modes = [];
+      this._modeMenuItems = [];
+      this._modeContainer = root.getElementById("container-mode");
 
       var alwaysontopBtn = root.getElementById("btn-alwaysontop");
       var menuBtn = root.getElementById("btn-menu");
-
-      this._time = new Time();
-
-      this._adapterCb = ((name, val) => {
-        if (name === "position") {
-          this._range.value = val;
-          this._time.totalMillisecond = val;
-          this._pos.textContent = this._time.toString();
-          if (this._adapter.length <= val) {
-            this._playBtn.classList.remove("controller-btn-pause");
-          }
-        } else if (name === "length") {
-          this._range.max = val;
-        }
-      }).bind(this);
-
-      var playingBuf = false;
-
-      this._range.addEventListener("mousedown", (() => {
-        if (this._adapter.playing) {
-          playingBuf = true;
-          this._adapter.stop();
-        }
-      }).bind(this));
-
-      this._range.addEventListener("mouseup", (() => {
-        if (playingBuf) {
-          this._adapter.start();
-          playingBuf = false;
-        }
-      }).bind(this));
-
-      this._range.addEventListener("input", (() => {
-        this._adapter.position = parseInt(this._range.value);
-        if (!this._adapter.playing) this._adapter.render();
-        this._time.totalMillisecond = this._range.value;
-        this._pos.textContent = this._time.toString();
-      }).bind(this));
-
-      this._rangeBg.addEventListener("click", (e => {
-        var rect = this._rangeBg.getBoundingClientRect();
-        var pos = (e.clientX - rect.left) / rect.width;
-        this._adapter.position = ~~(pos * this._adapter.length);
-        this.refresh();
-        if (!this._adapter.playing) this._adapter.render();
-      }).bind(this));
-
-      this._playBtn.addEventListener("click", (() => {
-        if (!this._adapter.playing) {
-          if (this._adapter.length === 0) return;
-          this._adapter.realtime = false;
-          if (this._adapter.position === this._adapter.length) {
-            this._adapter.position = 0;
-            this.refresh();
-          }
-          this._playBtn.classList.add("controller-btn-pause");
-          this._adapter.start();
-        } else {
-          this._playBtn.classList.remove("controller-btn-pause");
-          this._adapter.stop();
-        }
-      }).bind(this));
 
       alwaysontopBtn.addEventListener("click", (() => {
         this.isAlwaysOnTop = !this.isAlwaysOnTop;
         this.savePref();
       }).bind(this));
 
-      // file mode
+      this._menu = document.createElement("jikkyo-menu");
 
-      var fileInput = root.getElementById("file"),
-          fileOpenBtn = root.getElementById("file-open"),
-          NicoComment = require("./util/NicoComment");
-
-      fileOpenBtn.addEventListener("click", (() => {
-        var adapter = this._adapter;
-        fileInput.addEventListener("change", () => {
-          if (!this || !this.value) return;
-          var path = this.value;
-
-          var nico = new NicoComment();
-          nico.readFromFile(path).then(result => {
-            adapter.clearComment();
-            adapter.addComment(result);
-          });
-
-          fileInput.value = "";
-        });
-        fileInput.click();
-      }).bind(this));
-
-      // twitter mode
-
-      var twitterRec = root.getElementById("twitter-rec"),
-          twitterTrack = root.getElementById("twitter-track"),
-          twitterConnect = root.getElementById("twitter-connect"),
-          twitter = new TwitterComment();
-
-      twitterTrack.addEventListener("blur", (() => this.savePref()).bind(this));
-
-      twitter.on("stream", (() => {
-        this._adapter.clearComment();
-        this._adapter.realtime = true;
-        this._adapter.start();
-        twitterRec.classList.remove("disabled");
-        twitterConnect.classList.remove("disabled");
-        twitterConnect.classList.add("on");
-      }).bind(this));
-
-      twitter.on("chat", (chat => {
-        chat.vpos = this._adapter.length;
-        this._adapter.addChat(chat);
-      }).bind(this));
-
-      twitter.on("error", (err => {
-        this._adapter.stop();
-        this._adapter.realtime = false;
-        twitterRec.classList.add("disabled");
-        if (err) console.error(err);
-      }).bind(this));
-
-      twitterRec.addEventListener("click", (() => {
-        if (twitterRec.classList.contains("diasbled")) return;
-      }).bind(this));
-
-      twitterConnect.addEventListener("click", (() => {
-        if (twitterConnect.classList.contains("diasbled")) return;
-
-        if (twitterConnect.classList.contains("on")) {
-          twitter.destroyStream();
-          twitterConnect.classList.remove("on");
-        twitterTrack.removeAttribute("disabled");
-          return;
-        }
-
-        twitter.auth({
-          consumer_key: this._pref.twitter.consumerKey,
-          consumer_secret: this._pref.twitter.consumerSecret,
-          access_token_key: this._pref.twitter.accessToken,
-          access_token_secret: this._pref.twitter.accessSecret
-        });
-        twitterTrack.setAttribute("disabled", "disabled");
-        twitterConnect.classList.add("disabled");
-        if (twitterTrack.value) {
-          twitter.filterStream(twitterTrack.value);
-        } else {
-          twitter.userStream();
-        }
-      }).bind(this));
-
-      // menu
-
-      var menu = document.createElement("jikkyo-menu");
-
-      var item1 = new window.jikkyo.Menuitem({
-        label: "ファイル モード",
-        checked: true
-      });
-
-      var item2 = new window.jikkyo.Menuitem({
-        label: "Twitter モード"
-      });
-
-      item1.click = (() => {
-        if (item1.checked) return;
-
-        item1.checked = true;
-        item2.checked = false;
-
-        if (twitter.isStreaming) {
-          twitter.destroyStream();
-          twitterRec.classList.add("disabled");
-          twitterTrack.removeAttribute("disabled");
-          twitterConnect.classList.remove("on");
-        }
-
-        this.mode = 0;
-        this.savePref();
-      }).bind(this);
-
-      item2.click = (() => {
-        if (item2.checked) return;
-
-        item1.checked = false;
-        item2.checked = true;
-
-        this.mode = 1;
-        this.savePref();
-      }).bind(this);
-
-      menu.add(item1);
-      menu.add(item2);
-      menu.add({ type: "separator" });
-
-      var menuFixedItem = new window.jikkyo.Menuitem({
+      this._menuSeparetor = new window.jikkyo.MenuItem({ type: "separator" });
+      this._menuFixedItem = new window.jikkyo.MenuItem({
         label: "コントロールバーを固定",
         checkable: true,
         click: (item => {
@@ -354,9 +157,10 @@
         }).bind(this)
       });
 
-      menu.add(menuFixedItem);
-      menu.add({ type: "separator" });
-      menu.add({
+      this._menu.add(this._menuSeparetor);
+      this._menu.add(this._menuFixedItem);
+      this._menu.add({ type: "separator" });
+      this._menu.add({
         label: "設定",
         click() {
           document.querySelector("jikkyo-preference-dialog").show();
@@ -364,15 +168,9 @@
       });
 
       menuBtn.addEventListener("click", (() => {
-        item1.checked = item2.checked = false;
-        if (this._mode === 0) item1.checked = true;
-        else if (this._mode === 1) item2.checked = true;
-
-        menuFixedItem.checked = this._isFixed;
         var rect = menuBtn.getBoundingClientRect();
-        menu.show(rect.right, rect.top);
+        this._menu.show(rect.right, rect.top);
       }).bind(this));
-
     }
 
   };

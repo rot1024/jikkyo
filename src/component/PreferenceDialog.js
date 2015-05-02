@@ -11,6 +11,7 @@
 
       this.width = 500;
       this.height = 340;
+      this.preference = null;
 
       this.appendStyle(document.importNode(doc.querySelector("#style").content, true));
       this.appendContent(document.importNode(doc.querySelector("#content").content, true));
@@ -43,7 +44,8 @@
 
     show() {
       var f = this.content,
-          p = window.jikkyo.preference;
+          p = this.preference;
+      if (!p) return;
       f.querySelector("#twitter-ck").value = p.twitter.consumerKey;
       f.querySelector("#twitter-cs").value = p.twitter.consumerSecret;
       f.querySelector("#twitter-at").value = p.twitter.accessToken;
@@ -53,7 +55,8 @@
 
     hide() {
       var f = this.content,
-          p = window.jikkyo.preference;
+          p = this.preference;
+      if (!p) return;
       p.twitter.consumerKey = f.querySelector("#twitter-ck").value;
       p.twitter.consumerSecret = f.querySelector("#twitter-cs").value;
       p.twitter.accessToken = f.querySelector("#twitter-at").value;

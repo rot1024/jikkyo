@@ -1,0 +1,39 @@
+<template>
+
+  <style>
+
+    #twitter-track {
+      width: calc(100% - 20px);
+    }
+
+    .controller-btn-rec {
+      background-image: url("images/rec.svg");
+    }
+
+    .controller-btn-recstop {
+      background-image: url("images/recstop.svg");
+    }
+
+    .controller-btn-connect {
+      background-image: url("images/connect.svg");
+    }
+
+    .controller-btn-connect.on {
+      background-image: url("images/connect-on.svg");
+    }
+
+  </style>
+
+  <div class="item">
+    <div id="twitter-rec" class="controller-btn controller-btn-large controller-btn-rec disabled" title="録画"></div>
+  </div>
+  <div class="item item-grow">
+    <input type="text" id="twitter-track" placeholder="検索キーワード">
+  </div>
+  <div class="item">
+    <div id="twitter-connect" class="controller-btn controller-btn-connect" title="Twitterに接続/切断"></div>
+  </div>
+
+</template>
+
+<script src="TwitterMode.js"></script>

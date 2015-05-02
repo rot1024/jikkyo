@@ -13,12 +13,13 @@
     var container = document.getElementById("window"),
         titlebar = document.querySelector("jikkyo-titlebar"),
         controller = document.querySelector("jikkyo-controller"),
-        viewer = document.querySelector("jikkyo-viewer");
+        viewer = document.querySelector("jikkyo-viewer"),
+        preferenceDialog = document.querySelector("jikkyo-preference-dialog");
 
-    window.jikkyo.preference = new window.jikkyo.Preference();
-    window.jikkyo.preference.load();
-
-    controller.pref =  window.jikkyo.preference;
+    var pref = new window.jikkyo.Preference();
+    pref.load();
+    preferenceDialog.preference = pref;
+    controller.preference = pref;
 
     win.on("maximize", () => container.classList.add("maximized"));
     win.on("unmaximize", () => container.classList.remove("maximized"));
@@ -58,9 +59,12 @@
       }
     });
 
-    var adapter = new window.jikkyo.Viewer.Adapter();
-    adapter.viewer = viewer;
-    adapter.controller = controller;
+    var manager = new window.jikkyo.ModeManager();
+    manager.viewerView = viewer;
+    manager.controllerView = controller;
+    manager.preference = pref;
+    manager.addMode(new window.jikkyo.FileMode());
+    manager.addMode(new window.jikkyo.TwitterMode());
 
     win.setTransparent(true);
     win.show();

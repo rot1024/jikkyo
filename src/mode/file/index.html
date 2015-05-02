@@ -1,0 +1,101 @@
+<template>
+
+  <style>
+
+    input[type=range] {
+      position: absolute;
+      width: 100%;
+      top: -7px;
+      -webkit-appearance: none;
+    }
+
+    input[type=range]:focus {
+      outline: none;
+    }
+
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 0px;
+      background: transparent;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      width: 18px;
+      height: 18px;
+      margin-top: -4px;
+      background: #666;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 6px rgba(0, 0, 0, .3) inset;
+      transition: background-color .2s ease-in-out;
+      -webkit-appearance: none;
+    }
+
+    input[type=range]::-webkit-slider-thumb:hover {
+      background: #999;
+    }
+
+    input[type=range]::-webkit-slider-thumb:active {
+      background: #888;
+    }
+
+    input[type=file] {
+      display: none;
+    }
+
+    .range-bg {
+      position: absolute;
+      top: 50%;
+      width: calc(100% - 18px);
+      height: 10px;
+      margin: 0 10px;
+      margin-top: -5px;
+      background: #000;
+      border-radius: 10px;
+    }
+
+    .pos {
+      width: 70px;
+      height: 30px;
+      color: #aaa;
+      font-size: 14px;
+      text-align: right;
+      line-height: 30px;
+    }
+
+    .controller-btn-play {
+      background-image: url("images/play.svg");
+    }
+
+    .controller-btn-pause {
+      background-image: url("images/pause.svg");
+    }
+
+    .controller-btn-open {
+      background-image: url("images/open.svg");
+    }
+
+  </style>
+
+  <div class="item">
+    <div id="file-play" class="controller-btn controller-btn-large controller-btn-play" title="再生/一時停止"></div>
+  </div>
+
+  <div id="file-slider" class="item item-grow">
+    <canvas class="range-bg"></canvas>
+    <input type="range" min="0" max="100" value="0" />
+  </div>
+
+  <div class="item">
+    <div id="file-pos" class="pos">00:00:00</div>
+  </div>
+
+  <div class="item">
+    <div id="file-open" class="controller-btn controller-btn-open" title="コメントファイルを開く"></div>
+  </div>
+
+  <input id="file" type="file" accept=".xml,*.*">
+
+</template>
+
+<script src="FileMode.js"></script>

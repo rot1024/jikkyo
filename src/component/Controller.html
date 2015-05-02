@@ -12,7 +12,7 @@
       overflow: hidden;
     }
 
-    .container {
+    #container {
       position: absolute;
       left: 0;
       right: 0;
@@ -29,13 +29,24 @@
       align-items: center;
     }
 
-    .container.hidden {
+    #container.hidden {
       bottom: -56px;
     }
 
-    .mode {
+    #container-mode {
+      position: relative;
       display: flex;
       flex: auto;
+      align-items: center;
+    }
+
+    .mode {
+      position: absolute;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
       align-items: center;
     }
 
@@ -43,64 +54,16 @@
       display: none;
     }
 
-    .item {
+    #container /deep/ .item {
       position: relative;
       margin: 0 10px;
     }
 
-    .item-grow {
+    #container /deep/ .item-grow {
       flex: auto;
     }
 
-    input[type=range] {
-      position: absolute;
-      width: 100%;
-      top: -7px;
-      -webkit-appearance: none;
-    }
-
-    input[type=range]:focus {
-      outline: none;
-    }
-
-    input[type=range]::-webkit-slider-runnable-track {
-      width: 100%;
-      height: 0px;
-      background: transparent;
-    }
-
-    input[type=range]::-webkit-slider-thumb {
-      width: 18px;
-      height: 18px;
-      margin-top: -4px;
-      background: #666;
-      border-radius: 50%;
-      cursor: pointer;
-      box-shadow: 0 0 6px rgba(0, 0, 0, .3) inset;
-      transition: background-color .2s ease-in-out;
-      -webkit-appearance: none;
-    }
-
-    input[type=range]::-webkit-slider-thumb:hover {
-      background: #999;
-    }
-
-    input[type=range]::-webkit-slider-thumb:active {
-      background: #888;
-    }
-
-    .range-bg {
-      position: absolute;
-      top: 50%;
-      width: calc(100% - 18px);
-      height: 10px;
-      margin: 0 10px;
-      margin-top: -5px;
-      background: #000;
-      border-radius: 10px;
-    }
-
-    .controller-btn {
+    #container /deep/ .controller-btn {
       width: 30px;
       height: 30px;
       background-color: transparent;
@@ -113,123 +76,58 @@
       transition: all .2s ease-in-out;
     }
 
-    .controller-btn:hover {
+    #container /deep/ .controller-btn:hover {
       opacity: 1;
     }
 
-    .controller-btn:active {
+    #container /deep/ .controller-btn:active {
       opacity: .8;
     }
 
-    .controller-btn.disabled {
+    #container /deep/ .controller-btn.disabled {
       opacity: .25;
       cursor: default;
     }
 
-    .controller-btn-large {
+    #container /deep/ .controller-btn.on {
+      opacity: 1;
+    }
+
+    #container /deep/ .controller-btn-large {
       width: 50px;
       height: 30px;
     }
 
-    .controller-btn-large.disabled:hover,
-    .controller-btn-large.disabled:active {
+    #container /deep/ .controller-btn-large.disabled:hover,
+    #container /deep/ .controller-btn-large.disabled:active {
       background-color: transparent;
     }
 
-    .controller-btn-large:hover {
+    #container /deep/ .controller-btn-large:hover {
       background-color: rgba(200, 200, 200, .4);
     }
 
-    .controller-btn-large:active {
+    #container /deep/ .controller-btn-large:active {
       background-color: rgba(200, 200, 200, .2);
     }
 
-    .controller-btn-play {
-      background-image: url("images/play.svg");
-    }
-
-    .controller-btn-pause {
-      background-image: url("images/pause.svg");
-    }
-
-    .controller-btn-open {
-      background-image: url("images/open.svg");
-    }
-
-    .controller-btn-rec {
-      background-image: url("images/rec.svg");
-    }
-
-    .controller-btn-recstop {
-      background-image: url("images/recstop.svg");
-    }
-
-    .controller-btn-connect {
-      background-image: url("images/connect.svg");
-    }
-
-    .controller-btn-connect.on {
-      background-image: url("images/connect-on.svg");
-      opacity: 1;
-    }
-
-    .controller-btn-alwaysontop {
+    #container /deep/ .controller-btn-alwaysontop {
       background-image: url("images/alwaysontop.svg");
     }
 
-    .controller-btn-alwaysontop.on {
+    #container /deep/ .controller-btn-alwaysontop.on {
       background-image: url("images/alwaysontop-on.svg");
-      opacity: 1;
     }
 
-    .controller-btn-menu {
+    #container /deep/ .controller-btn-menu {
       background-image: url("images/menu.svg");
-    }
-
-    .pos {
-      width: 70px;
-      height: 30px;
-      color: #aaa;
-      font-size: 14px;
-      text-align: right;
-      line-height: 30px;
-    }
-
-    input[type=file] {
-      display: none;
-    }
-
-    #twitter-track {
-      width: calc(100% - 20px);
     }
 
   </style>
 
-  <div id="container" class="container">
+  <div id="container">
 
-    <div id="mode-file" class="mode">
-      <div class="item"><div id="file-play" class="controller-btn controller-btn-large controller-btn-play" title="再生/一時停止"></div></div>
-      <div id="file-slider" class="item item-grow">
-        <canvas class="range-bg"></canvas>
-        <input type="range" min="0" max="100" value="0" />
-      </div>
-      <div class="item"><div id="file-pos" class="pos">00:00:00</div></div>
-      <div class="item">
-        <div id="file-open" class="controller-btn controller-btn-open" title="コメントファイルを開く"></div>
-      </div>
-    </div>
-
-    <div id="mode-twitter" class="mode hidden">
-      <div class="item">
-        <div id="twitter-rec" class="controller-btn controller-btn-large controller-btn-rec disabled" title="録画"></div>
-      </div>
-      <div class="item item-grow">
-        <input type="text" id="twitter-track" placeholder="検索キーワード">
-      </div>
-      <div class="item">
-        <div id="twitter-connect" class="controller-btn controller-btn-connect" title="Twitterに接続/切断"></div>
-      </div>
-    </div>
+    <div id="container-mode"></div>
 
     <div class="item">
       <div id="btn-alwaysontop" class="controller-btn controller-btn-alwaysontop" title="常に最前面"></div>
@@ -240,8 +138,6 @@
     </div>
 
   </div>
-
-  <input id="file" type="file" accept=".xml,*.*">
 
 </template>
 
