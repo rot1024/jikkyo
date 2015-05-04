@@ -23,7 +23,7 @@
       this._prefs = this.content.querySelector("#prefs");
 
       var prefc = this.content.querySelectorAll(".pref");
-      [].forEach.call(prefc, c => {
+      Array.from(prefc).forEach(c => {
         this.addModePreference(c, c.dataset.title, null, null, true);
       }, this);
 
