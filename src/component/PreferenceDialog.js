@@ -37,9 +37,9 @@
       if (at) at.classList.remove("active");
       at = this._prefs.querySelector(".pref.active");
       if (at) at.classList.remove("active");
-      at = this._tabs.querySelector(":scope > :first-child");
+      at = this._tabs.children[0];
       if (at) at.classList.add("active");
-      at = this._prefs.querySelector(":scope > :first-child");
+      at = this._prefs.children[0];
       if (at) at.classList.add("active");
 
       var pr = this.preference;
