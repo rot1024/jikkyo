@@ -62,6 +62,7 @@
     var manager = new window.jikkyo.ModeManager();
     manager.viewerView = viewer;
     manager.controllerView = controller;
+    manager.preferenceDialogView = preferenceDialog;
     manager.preference = pref;
     manager.addMode(new window.jikkyo.FileMode());
     manager.addMode(new window.jikkyo.TwitterMode());

@@ -10,9 +10,10 @@
       super.createdCallback();
 
       this.label = "Twitter モード";
+      this.preferenceLabel = "Twitter";
 
       var root = this.createShadowRoot();
-      var template = doc.querySelector("template");
+      var template = doc.getElementById("main");
       root.appendChild(document.importNode(template.content, true));
 
       var twitter = new TwitterComment(),
@@ -94,6 +95,29 @@
         this._twitterTrack.removeAttribute("disabled");
         this._twitterConnect.classList.remove("on");
       }
+    }
+
+    getPreferenceView() {
+      var element = document.createElement("div");
+      var root = element.createShadowRoot();
+      var template = doc.getElementById("preference");
+      root.appendChild(document.importNode(template.content, true));
+      return element;
+    }
+
+    initPreferenceView(e, p) {
+      e.shadowRoot.querySelector("#twitter-ck").value = p.twitter.consumerKey;
+      e.shadowRoot.querySelector("#twitter-cs").value = p.twitter.consumerSecret;
+      e.shadowRoot.querySelector("#twitter-at").value = p.twitter.accessToken;
+      e.shadowRoot.querySelector("#twitter-as").value = p.twitter.accessSecret;
+    }
+
+    savePreferenceView(e, p) {
+      if (!p.twitter) p.twitter = {};
+      p.twitter.consumerKey = e.shadowRoot.querySelector("#twitter-ck").value;
+      p.twitter.consumerSecret = e.shadowRoot.querySelector("#twitter-cs").value;
+      p.twitter.accessToken = e.shadowRoot.querySelector("#twitter-at").value;
+      p.twitter.accessSecret = e.shadowRoot.querySelector("#twitter-as").value;
     }
 
   }

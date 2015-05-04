@@ -11,9 +11,10 @@
       super.createdCallback();
 
       this.label = "ファイル モード";
+      this.preferenceLabel = "ファイル";
 
       var root = this.createShadowRoot();
-      var template = doc.querySelector("template");
+      var template = doc.getElementById("main");
       root.appendChild(document.importNode(template.content, true));
 
       this._time = new Time();
@@ -122,6 +123,20 @@
       } else {
         this._playBtn.classList.remove("controller-btn-pause");
       }
+    }
+
+    getPreferenceView() {
+      var element = document.createElement("div");
+      var root = element.createShadowRoot();
+      var template = doc.getElementById("preference");
+      root.appendChild(document.importNode(template.content, true));
+      return element;
+    }
+
+    initPreferenceView() {
+    }
+
+    savePreferenceView() {
     }
 
   }

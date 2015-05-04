@@ -80,7 +80,7 @@
 
     loadPref() {
       var p = this._pref;
-      if (!p) return;
+      if (!p || !p.controller) return;
 
       this.isAlwaysOnTop = p.controller.alwaysOnTop || false;
       this.isFixed = p.controller.fixed || false;
@@ -90,6 +90,7 @@
       var p = this._pref;
       if (!p) return;
 
+      if (!p.controller) p.controller = {};
       p.controller.alwaysOnTop = this.isAlwaysOnTop;
       p.controller.fixed = this.isFixed;
 

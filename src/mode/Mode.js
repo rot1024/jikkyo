@@ -6,6 +6,7 @@
     createdCallback() {
       this._adapter = new window.jikkyo.Viewer.Adapter();
       this._label = "";
+      this._preferenceLabel = "";
       this._viewerView = null;
       this._pref = null;
     }
@@ -47,6 +48,16 @@
     }
 
     refresh() {
+    }
+
+    getPreferenceView() {
+      return null;
+    }
+
+    initPreferenceView() {
+    }
+
+    savePreferenceView() {
     }
 
   }

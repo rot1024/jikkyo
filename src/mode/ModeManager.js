@@ -9,6 +9,7 @@
       this._pref = null;
       this._viewerView = null;
       this._controllerView = null;
+      this._preferenceDialogView = null;
       this._modeChangedCb = this._modeChangedCb.bind(this);
     }
 
@@ -68,6 +69,20 @@
       }
     }
 
+    get preferenceDialogView() {
+      return this._preferenceDialogView;
+    }
+
+    set preferenceDialogView(v) {
+      this._preferenceDialogView = v;
+      if (v) this._modeList.forEach(mode => {
+        var view = mode.getPreferenceView();
+        if (view) this._preferenceDialogView.addModePreference(
+          view, mode.preferenceLabel || mode.label,
+          mode.initPreferenceView.bind(mode), mode.savePreferenceView.bind(mode));
+      });
+    }
+
     get preference() {
       return this._pref;
     }
@@ -83,8 +98,13 @@
       this._modeList.push(mode);
       if (this._controllerView)
         this._controllerView.addMode(mode);
-      if (this._pref)
-        mode.preference = this._pref;
+      if (this._preferenceDialogView) {
+        let view = mode.getPreferenceView();
+        if (view) this._preferenceDialogView.addModePreference(
+          view, mode.preferenceLabel || mode.label,
+          mode.initPreferenceView.bind(mode), mode.savePreferenceView.bind(mode));
+      }
+      if (this._pref) mode.preference = this._pref;
       if (this._mode === -1) this.mode = 0;
     }
 

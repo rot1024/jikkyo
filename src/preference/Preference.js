@@ -4,25 +4,11 @@
   class Preference {
 
     constructor() {
-      this.twitter = {
-        consumerKey: "",
-        consumerSecret: "",
-        accessToken: "",
-        accessSecret: ""
-      };
-      this.controller = {
-        mode: 0,
-        fixed: false,
-        track: "",
-        alwaysOnTop: false
-      };
     }
 
     save() {
-      var pref = {
-        twitter: this.twitter,
-        controller: this.controller
-      };
+      var pref = {};
+      Object.keys(this).forEach(k => pref[k] = this[k], this);
       window.localStorage.setItem("preference", JSON.stringify(pref));
     }
 

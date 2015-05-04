@@ -16,26 +16,16 @@
       this.appendStyle(document.importNode(doc.querySelector("#style").content, true));
       this.appendContent(document.importNode(doc.querySelector("#content").content, true));
 
-      var tabs = this.content.querySelector("#tabs"),
-          prefs = this.content.querySelector("#prefs"),
-          prefc = this.content.querySelectorAll("#prefs > div");
+      this._modePrefs = [];
+      this._initPrefCb = [];
+      this._savePrefCb = [];
+      this._tabs = this.content.querySelector("#tabs");
+      this._prefs = this.content.querySelector("#prefs");
 
-      [].forEach.call(prefc, (c, i) => {
-        var tab = document.createElement("li");
-        tab.textContent = c.dataset.title;
-        if (i === 0) {
-          c.classList.add("active");
-          tab.classList.add("active");
-        }
-        tab.addEventListener("click", () => {
-          var active = prefs.querySelector(".active");
-          if (active) active.classList.remove("active");
-          c.classList.add("active");
-          tabs.querySelector(".active").classList.remove("active");
-          tab.classList.add("active");
-        });
-        tabs.appendChild(tab);
-      });
+      var prefc = this.content.querySelectorAll(".pref");
+      [].forEach.call(prefc, c => {
+        this.addModePreference(c, c.dataset.title, null, null, true);
+      }, this);
 
       this.content.querySelector("#ok").addEventListener("click", (() => {
         this.hide();
@@ -43,26 +33,53 @@
     }
 
     show() {
-      var f = this.content,
-          p = this.preference;
-      if (!p) return;
-      f.querySelector("#twitter-ck").value = p.twitter.consumerKey;
-      f.querySelector("#twitter-cs").value = p.twitter.consumerSecret;
-      f.querySelector("#twitter-at").value = p.twitter.accessToken;
-      f.querySelector("#twitter-as").value = p.twitter.accessSecret;
+      var at = this._tabs.querySelector(".active");
+      if (at) at.classList.remove("active");
+      at = this._prefs.querySelector(".pref.active");
+      if (at) at.classList.remove("active");
+      at = this._tabs.querySelector(":scope > :first-child");
+      if (at) at.classList.add("active");
+      at = this._prefs.querySelector(":scope > :first-child");
+      if (at) at.classList.add("active");
+
+      var pr = this.preference;
+      if (pr) {
+        this._modePrefs.forEach((p, i) => this._initPrefCb[i](p, pr), this);
+      }
+
       super.show();
     }
 
     hide() {
-      var f = this.content,
-          p = this.preference;
-      if (!p) return;
-      p.twitter.consumerKey = f.querySelector("#twitter-ck").value;
-      p.twitter.consumerSecret = f.querySelector("#twitter-cs").value;
-      p.twitter.accessToken = f.querySelector("#twitter-at").value;
-      p.twitter.accessSecret = f.querySelector("#twitter-as").value;
-      p.save();
+      var pr = this.preference;
+      if (pr) {
+        this._modePrefs.forEach((p, i) => this._savePrefCb[i](p, pr), this);
+      }
+      pr.save();
+
       super.hide();
+    }
+
+    addModePreference(element, title, initCb, saveCb, builtin) {
+      if (!element) return;
+      var tab = document.createElement("li");
+      tab.textContent = title;
+      tab.addEventListener("click", (() => {
+        var active = this._prefs.querySelector(".active");
+        if (active) active.classList.remove("active");
+        element.classList.add("active");
+        this._tabs.querySelector(".active").classList.remove("active");
+        tab.classList.add("active");
+      }).bind(this));
+      this._tabs.appendChild(tab);
+      element.classList.add("pref");
+      this._prefs.appendChild(element);
+
+      if (!builtin) {
+        this._modePrefs.push(element);
+        if (initCb) this._initPrefCb.push(initCb);
+        if (saveCb) this._savePrefCb.push(saveCb);
+      }
     }
 
   }
