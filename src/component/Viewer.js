@@ -64,33 +64,37 @@
       return this.clientHeight;
     }
 
+    get computedFontSize() {
+      return parseFloat(window.getComputedStyle(this)["font-size"].replace("px", ""));
+    }
+
     _observer(changes) {
       changes.forEach(change => {
         switch(change.name) {
           case "text":
-            this._observerText();
+            this.setText(this._chat.text, true);
             break;
           case "color":
-            this._observerColor();
+            this.setColor(this._chat.color, true);
             break;
           case "size":
-            this._observerSize();
+            this.setSize(this._chat.size, true);
             break;
           case "x":
-            this._observerX();
+            this.setX(this._chat.x, true);
             break;
           case "y":
-            this._observerY();
+            this.setY(this._chat.y, true);
             break;
           case "visibility":
-            this._observerVisibility();
+            this.setVisibility(this._chat.visibility, true);
             break;
         }
       }, this);
     }
 
-    _observerText() {
-      var text = this._chat.text;
+    setText(text, update) {
+      if (!update) this._chat.text = text;
 
       if (typeof text === "undefined") text = "";
       if (typeof text !== "string") {
@@ -103,8 +107,8 @@
       this.innerHTML = escapeHTML(text);
     }
 
-    _observerColor() {
-      var color = this._chat.color;
+    setColor(color, update) {
+      if (!update) this._chat.color = color;
 
       if (typeof color === "undefined") color = defaults.color;
       if (typeof color !== "string") {
@@ -119,8 +123,8 @@
       }
     }
 
-    _observerSize() {
-      var size = this._chat.size;
+    setSize(size, update) {
+      if (!update) this._chat.size = size;
 
       if (typeof size === "undefined") size = defaults.size;
       if (typeof size !== "string") {
@@ -131,8 +135,8 @@
       this.style.fontSize = size;
     }
 
-    _observerX() {
-      var x = this._chat.x;
+    setX(x, update) {
+      if (!update) this._chat.x = x;
 
       if (typeof x === "undefined") x = 0;
       if (typeof x !== "number") {
@@ -143,8 +147,8 @@
       this.style.left = x + "px";
     }
 
-    _observerY() {
-      var y = this._chat.y;
+    setY(y, update) {
+      if (!update) this._chat.y = y;
 
       if (typeof y === "undefined") y = 0;
       if (typeof y !== "number") {
@@ -155,8 +159,8 @@
       this.style.top = y + "px";
     }
 
-    _observerVisibility() {
-      var visibility = this._chat.visibility;
+    setVisibility(visibility, update) {
+      if (!update) this._chat.visibility = visibility;
 
       if (typeof visibility === "undefined") visibility = false;
       if (typeof visibility !== "boolean") {
@@ -168,12 +172,12 @@
     }
 
     render() {
-      this._observerText();
-      this._observerColor();
-      this._observerSize();
-      this._observerX();
-      this._observerY();
-      this._observerVisibility();
+      this.setText(this._chat.text, true);
+      this.setColor(this._chat.color, true);
+      this.setSize(this._chat.size, true);
+      this.setX(this._chat.x, true);
+      this.setY(this._chat.y, true);
+      this.setVisibility(this._chat.visibility, true);
     }
 
   }

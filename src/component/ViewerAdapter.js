@@ -164,6 +164,7 @@
           text: obj.text || "",
           color: obj.color,
           size: obj.size,
+          rawSize: obj.size,
           x: 0,
           y: 0,
           visibility: false,
@@ -261,6 +262,7 @@
           var size = this._calcSize(chat);
           chat.width = size.width;
           chat.height = size.height;
+          if ("size" in size) chat.size = size.size;
 
           chat.y = this._calcY(chat);
         }, this);
@@ -331,7 +333,7 @@
       dummy.chat = {
         text:       chat.text,
         color:      chat.color,
-        size:       chat.size,
+        size:       chat.rawSize,
         visibility: false
       };
 
@@ -339,6 +341,17 @@
         width: dummy.width,
         height: dummy.height
       };
+
+      if (chat.position === "ue" || chat.position === "shita") {
+        let r = this._viewer.width / size.width;
+        if (r < 1) {
+          let fontSize = dummy.computedFontSize;
+          size.size = (fontSize * r) + "px";
+          dummy.setSize(size.size);
+          size.width = dummy.width;
+          size.height = dummy.height;
+        }
+      }
 
       dummy.chat = {};
 
