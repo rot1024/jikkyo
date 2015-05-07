@@ -47,6 +47,23 @@
       text-align: center;
     }
 
+    .title:before {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      width: 18px;
+      height: 18px;
+      margin-top: -9px;
+      display: block;
+      background: transparent url("images/jikkyo.svg") no-repeat center center;
+      background-size: contain;
+      content: "";
+    }
+
+    .darwin .title:before {
+      content: none;
+    }
+
     .titlebar-btns {
       display: flex;
       padding-right: 6px;

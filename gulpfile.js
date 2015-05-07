@@ -24,11 +24,6 @@ gulp.task('clean:build', function(cb) {
   del(['build'], cb);
 });
 
-gulp.task('clean:bower', function(cb) {
-  del([
-  ], cb);
-});
-
 var nw = function(cb, platforms) {
   var nw = new NwBuilder({
     files: 'src/**',
@@ -36,11 +31,10 @@ var nw = function(cb, platforms) {
     platforms: platforms,
     build: 'build',
     cacheDir: 'cache',
-    // macCredits: false,
-    // macIcns: '',
+    macCredits: 'Credits.html',
+    macIcns: 'src/images/jikkyo.icns',
     macZip: true,
-    // macPlist: {mac_bundle_id: ''},
-    // winIco: ''
+    winIco: 'src/images/jikkyo.ico'
   });
   nw.on('log', function(msg) {
     gutil.log('node-webkit-builder', msg);
@@ -56,7 +50,7 @@ gulp.task('nw:build', ['clean:bower'], function(cb) {
   nw(cb, ['win64']);
 });
 
-gulp.task('clean', ['clean:build', 'clean:bower']);
+gulp.task('clean', ['clean:build']);
 gulp.task('release', ['clean', 'sync', 'nw:release']);
 gulp.task('build', ['clean:bower', 'nw:build']);
 gulp.task('default', ['build']);
