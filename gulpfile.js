@@ -46,11 +46,11 @@ gulp.task('nw:release', ['clean', 'sync'], function(cb) {
   nw(cb, ['win', 'mac', 'linux']);
 });
 
-gulp.task('nw:build', ['clean:bower'], function(cb) {
+gulp.task('nw:build', function(cb) {
   nw(cb, ['win64']);
 });
 
 gulp.task('clean', ['clean:build']);
 gulp.task('release', ['clean', 'sync', 'nw:release']);
-gulp.task('build', ['clean:bower', 'nw:build']);
+gulp.task('build', ['nw:build']);
 gulp.task('default', ['build']);
