@@ -199,6 +199,18 @@
       this.refresh();
     }
 
+    hideComment() {
+      this._renderComment.forEach(chat => {
+        chat.visibility = false;
+      }, this);
+    }
+
+    showComment() {
+      this._renderComment.forEach(chat => {
+        chat.visibility = true;
+      }, this);
+    }
+
     start() {
       if (this._playing || !this._realtime && this._position === this._length) return;
 

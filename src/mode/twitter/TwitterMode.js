@@ -95,6 +95,8 @@
         this._twitterTrack.removeAttribute("disabled");
         this._twitterConnect.classList.remove("on");
       }
+
+      this._adapter.clearComment();
     }
 
     getPreferenceView() {

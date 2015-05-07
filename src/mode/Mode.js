@@ -41,10 +41,12 @@
     }
 
     show() {
+      this._adapter.showComment();
     }
 
     hide() {
       this._adapter.stop();
+      this._adapter.hideComment();
     }
 
     refresh() {
