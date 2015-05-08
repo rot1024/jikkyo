@@ -96,6 +96,9 @@
 
     win.show();
 
+    setTimeout(() => {
+      container.classList.remove("attention");
+    }, 100);
   });
 
 })();
