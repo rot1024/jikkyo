@@ -1,8 +1,11 @@
 (() => {
   "use strict";
 
-  var doc = document.currentScript.ownerDocument;
-  var TwitterComment = require("./mode/twitter/TwitterComment");
+  var gui = require('nw.gui'),
+      TwitterComment = require("./mode/twitter/TwitterComment"),
+      TwitterAuth = require("./mode/twitter/TwitterAuth"),
+      constants = require("./constants"),
+      doc = document.currentScript.ownerDocument;
 
   class TwitterMode extends window.jikkyo.Mode {
 
@@ -44,6 +47,8 @@
         this._adapter.stop();
         this._adapter.realtime = false;
         twitterRec.classList.add("disabled");
+        twitterConnect.classList.remove("disabled");
+        twitterConnect.classList.remove("on");
         if (err) console.error(err);
       }).bind(this));
 
@@ -65,12 +70,34 @@
           return;
         }
 
-        twitter.auth({
-          consumer_key: this._pref.twitter.consumerKey,
-          consumer_secret: this._pref.twitter.consumerSecret,
-          access_token_key: this._pref.twitter.accessToken,
-          access_token_secret: this._pref.twitter.accessSecret
-        });
+        var opts = {};
+
+        if (this.preference.twitter.advanced) {
+          if (!this.preference.twitter.consumerKey ||
+             !this.preference.twitter.consumerSecret ||
+             !this.preference.twitter.accessToken ||
+             !this.preference.twitter.accessSecret) {
+            window.alert("上級者向けモードに必要な情報が入力されていません。");
+            return;
+          }
+          opts.consumer_key = this.preference.twitter.consumerKey;
+          opts.consumer_secret = this.preference.twitter.consumerSecret;
+          opts.access_token_key = this.preference.twitter.accessToken;
+          opts.access_token_secret = this.preference.twitter.accessSecret;
+        }
+        else if (this.preference.twitter._accessToken) {
+          opts.consumer_key = constants.twitter.consumerKey;
+          opts.consumer_secret = constants.twitter.consumerSecret;
+          opts.access_token_key = this.preference.twitter._accessToken;
+          opts.access_token_secret = this.preference.twitter._accessSecret;
+        }
+        else {
+          window.alert("Twitterアカウントが認証されていません。先に設定画面で認証してください。");
+          return;
+        }
+
+        twitter.auth(opts);
+
         twitterTrack.setAttribute("disabled", "disabled");
         twitterConnect.classList.add("disabled");
         if (twitterTrack.value) {
@@ -122,18 +149,60 @@
             loading = content.querySelector("#twitter-auth-loading"),
             authContent = content.querySelector("#twitter-auth-content");
 
+        var auth;
+
         resetModal = () => {
           pin.value = "";
           loading.classList.remove("hidden");
           authContent.classList.add("hidden");
+
+          auth = new TwitterAuth({
+            consumerKey: constants.twitter.consumerKey,
+            consumerSecret: constants.twitter.consumerSecret
+          });
+
+          auth.getAuthorizeURL().then(url => {
+            gui.Shell.openExternal(url);
+            loading.classList.add("hidden");
+            authContent.classList.remove("hidden");
+          }, err => {
+            console.error("TwitterAuth#getAuthorizeURL failed", err);
+            modal.hide();
+            auth = null;
+            window.alert("認証に失敗しました。ネットワーク接続を確認の上、再度試してみてください。");
+          });
         };
 
         cancel.addEventListener("click", () => {
           modal.hide();
+          auth = null;
         });
 
         ok.addEventListener("click", () => {
-          modal.hide();
+          if (!pin.value) return;
+
+          loading.classList.remove("hidden");
+          authContent.classList.add("hidden");
+
+          auth.getAccessToken(pin.value).then(data => {
+            if (!p) throw new Error("preference is null");
+            p.twitter._accessToken = data.accessToken;
+            p.twitter._accessSecret = data.accessTokenSecret;
+            p.save();
+            modal.hide();
+            unauthed.classList.add("form-hidden");
+            authed.classList.remove("form-hidden");
+            auth = null;
+          }, err => {
+            console.error("TwitterAuth#getAccessToken failed", err);
+            loading.classList.add("hidden");
+            authContent.classList.remove("hidden");
+            window.alert("認証に失敗しました。PINコードが正しくないようです。");
+          }).catch(err => {
+            console.error("TwitterAuth#getAccessToken failed", err);
+            loading.classList.add("hidden");
+            authContent.classList.remove("hidden");
+          });
         });
 
         modal.appendContent(content);
@@ -155,7 +224,6 @@
           authed.classList.add("form-hidden");
           p.twitter._accessToken = "";
           p.twitter._accessSecret = "";
-          p.twitter.screenname = "";
           p.save();
         });
       }
@@ -168,18 +236,9 @@
           r = e.shadowRoot,
           t = p.twitter;
 
-      if (!t) t = p.twitter = {
-        screenname: "",
-        advanced: false,
-        consumerKey: "",
-        consumerSecret: "",
-        accessToken: "",
-        accessSecret: "",
-        _accessToken: "",
-        _accessSecret: ""
-      };
+      if (!t) t = p.twitter = this.initPreference();
 
-      if (t.screenname) {
+      if (t._accessToken) {
         r.querySelector("#twitter-unauthed").classList.add("form-hidden");
         r.querySelector("#twitter-authed").classList.remove("form-hidden");
       } else {
@@ -187,7 +246,6 @@
         r.querySelector("#twitter-authed").classList.add("form-hidden");
       }
 
-      r.querySelector("#twitter-screenname").textContent = t.screenname;
       r.querySelector("#twitter-advanced").checked = t.advanced;
       r.querySelector("#twitter-ck").value = t.consumerKey;
       r.querySelector("#twitter-cs").value = t.consumerSecret;
@@ -200,12 +258,24 @@
     savePreferenceView(e) {
       var p = this.preference,
           r = e.shadowRoot;
-      if (!p.twitter) p.twitter = {};
+      if (!p.twitter) p.twitter = this.initPreference();
       p.twitter.advanced = r.querySelector("#twitter-advanced").checked;
       p.twitter.consumerKey = r.querySelector("#twitter-ck").value;
       p.twitter.consumerSecret = r.querySelector("#twitter-cs").value;
       p.twitter.accessToken = r.querySelector("#twitter-at").value;
       p.twitter.accessSecret = r.querySelector("#twitter-as").value;
+    }
+
+    initPreference() {
+      return {
+        advanced: false,
+        consumerKey: "",
+        consumerSecret: "",
+        accessToken: "",
+        accessSecret: "",
+        _accessToken: "",
+        _accessSecret: ""
+      };
     }
 
   }

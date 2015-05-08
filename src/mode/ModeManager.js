@@ -96,6 +96,7 @@
       if (!(mode instanceof window.jikkyo.Mode))
         throw new TypeError("mode must be Mode: " + typeof mode);
       this._modeList.push(mode);
+      if (this._pref) mode.preference = this._pref;
       if (this._controllerView)
         this._controllerView.addMode(mode);
       if (this._preferenceDialogView) {
