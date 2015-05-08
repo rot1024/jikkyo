@@ -15,7 +15,9 @@
     "resizable": false,
     "show": false,
     "toolbar": false,
-    "icon": "images/jikkyo.png"
+    "icon": "images/jikkyo.png",
+    "width": 800,
+    "height": 520
   },
   "dependencies": {
     "twitter": "^1.2.5",

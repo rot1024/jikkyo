@@ -9,8 +9,8 @@
     createdCallback() {
       super.createdCallback();
 
-      this.width = 500;
-      this.height = 340;
+      this.width = 640;
+      this.height = 420;
       this.preference = null;
 
       this.appendStyle(document.importNode(doc.querySelector("#style").content, true));
