@@ -15,6 +15,7 @@
     "resizable": false,
     "show": false,
     "toolbar": false,
+    "transparent": true,
     "icon": "images/jikkyo.png",
     "width": 800,
     "height": 520

@@ -33,6 +33,21 @@
       container.classList.remove("hover");
     });
 
+    win.on("close", () => {
+      win.hide();
+
+      pref.maximized = container.classList.contains("maximized");
+      if (!pref.maximized) {
+        pref.x = win.x;
+        pref.y = win.y;
+        pref.width = win.width;
+        pref.height = win.height;
+      }
+      pref.save();
+
+      win.close(true);
+    });
+
     container.addEventListener("mouseover", () => {
       container.classList.add("hover");
     });
@@ -67,7 +82,18 @@
     manager.addMode(new window.jikkyo.FileMode());
     manager.addMode(new window.jikkyo.TwitterMode());
 
-    win.setTransparent(true);
+    if (pref.maximized) win.maximize();
+    else {
+      if (typeof pref.x === "number")
+        win.x = pref.x;
+      if (typeof pref.y === "number")
+        win.y = pref.y;
+      if (typeof pref.width === "number" && pref.width >= 100)
+        win.width = pref.width;
+      if (typeof pref.height === "number" && pref.height >= 100)
+        win.height = pref.height;
+    }
+
     win.show();
 
   });
