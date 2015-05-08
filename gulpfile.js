@@ -43,14 +43,29 @@ var nw = function(cb, platforms) {
 };
 
 gulp.task('nw:release', ['clean', 'sync'], function(cb) {
-  nw(cb, ['win', 'mac', 'linux']);
+  nw(cb, ['win', 'osx', 'linux']);
 });
 
-gulp.task('nw:build', function(cb) {
+gulp.task('nw:win32', function(cb) {
+  nw(cb, ['win32']);
+});
+
+gulp.task('nw:win64', function(cb) {
   nw(cb, ['win64']);
+});
+
+gulp.task('nw:osx32', function(cb) {
+  nw(cb, ['osx32']);
+});
+
+gulp.task('nw:osx64', function(cb) {
+  nw(cb, ['osx64']);
+});
+
+gulp.task('nw:linux', function(cb) {
+  nw(cb, ['linux']);
 });
 
 gulp.task('clean', ['clean:build']);
 gulp.task('release', ['clean', 'sync', 'nw:release']);
-gulp.task('build', ['nw:build']);
 gulp.task('default', ['build']);
