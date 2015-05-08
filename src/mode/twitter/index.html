@@ -38,6 +38,22 @@
 
 <template id="preference">
 
+  <div id="twitter-unauthed" class="form form-end">
+    <p>Twitterアカウントが認証されていません。</p>
+    <div id="twitter-auth" class="btn">アカウントを認証する</div>
+  </div>
+
+  <div id="twitter-authed" class="form form-end">
+    <p>@<span id="twitter-screenname">dsfh</span> で認証されています。</p>
+    <div id="twitter-unauth" class="btn">認証を取り消す</div>
+  </div>
+
+  <hr>
+
+  <div class="form-group">
+    <input type="checkbox" id="twitter-advanced"> <label for="twitter-advanced">上級者向け</label>
+  </div>
+
   <div class="form-group">
     <label for="twitter-ck" class="form-label">Consumer Key</label>
     <div class="form-control">
@@ -65,6 +81,25 @@
       <input type="text" id="twitter-as" placeholder="Access Secret">
     </div>
   </div>
+
+</template>
+
+<template id="modal-auth">
+
+  <div id="twitter-auth-content">
+
+    <div class="modal-form">
+      <input type="text" id="twitter-auth-pin" class="modal-control" placeholder="PINコード">
+    </div>
+
+    <div class="modal-footer">
+      <div id="twitter-auth-cancel" class="btn">キャンセル</div>
+      <div id="twitter-auth-ok" class="btn">OK</div>
+    </div>
+
+  </div>
+
+  <div id="twitter-auth-loading" class="modal-loading"></div>
 
 </template>
 

@@ -100,27 +100,112 @@
     }
 
     getPreferenceView() {
+      var p = this.preference;
       var element = document.createElement("div");
       var root = element.createShadowRoot();
-      var template = doc.getElementById("preference");
-      root.appendChild(document.importNode(template.content, true));
+      root.appendChild(document.importNode(
+        doc.getElementById("preference").content, true));
+
+      var unauthed = root.querySelector("#twitter-unauthed"),
+          authed = root.querySelector("#twitter-authed"),
+          modal = document.createElement("jikkyo-modal"),
+          resetModal;
+
+      {
+        modal.width = 300;
+        modal.height = 120;
+
+        let content = document.importNode(doc.getElementById("modal-auth").content, true),
+            pin = content.querySelector("#twitter-auth-pin"),
+            cancel = content.querySelector("#twitter-auth-cancel"),
+            ok = content.querySelector("#twitter-auth-ok"),
+            loading = content.querySelector("#twitter-auth-loading"),
+            authContent = content.querySelector("#twitter-auth-content");
+
+        resetModal = () => {
+          pin.value = "";
+          loading.classList.remove("hidden");
+          authContent.classList.add("hidden");
+        };
+
+        cancel.addEventListener("click", () => {
+          modal.hide();
+        });
+
+        ok.addEventListener("click", () => {
+          modal.hide();
+        });
+
+        modal.appendContent(content);
+        root.appendChild(modal);
+      }
+
+      {
+        let authBtn = root.querySelector("#twitter-auth");
+        authBtn.addEventListener("click", () => {
+          resetModal();
+          modal.show();
+        });
+      }
+
+      {
+        let unauthBtn = root.querySelector("#twitter-unauth");
+        unauthBtn.addEventListener("click", () => {
+          unauthed.classList.remove("form-hidden");
+          authed.classList.add("form-hidden");
+          p.twitter._accessToken = "";
+          p.twitter._accessSecret = "";
+          p.twitter.screenname = "";
+          p.save();
+        });
+      }
+
       return element;
     }
 
-    initPreferenceView(e, p) {
-      if (!p.twutter) return;
-      e.shadowRoot.querySelector("#twitter-ck").value = p.twitter.consumerKey;
-      e.shadowRoot.querySelector("#twitter-cs").value = p.twitter.consumerSecret;
-      e.shadowRoot.querySelector("#twitter-at").value = p.twitter.accessToken;
-      e.shadowRoot.querySelector("#twitter-as").value = p.twitter.accessSecret;
+    initPreferenceView(e) {
+      var p = this.preference,
+          r = e.shadowRoot,
+          t = p.twitter;
+
+      if (!t) t = p.twitter = {
+        screenname: "",
+        advanced: false,
+        consumerKey: "",
+        consumerSecret: "",
+        accessToken: "",
+        accessSecret: "",
+        _accessToken: "",
+        _accessSecret: ""
+      };
+
+      if (t.screenname) {
+        r.querySelector("#twitter-unauthed").classList.add("form-hidden");
+        r.querySelector("#twitter-authed").classList.remove("form-hidden");
+      } else {
+        r.querySelector("#twitter-unauthed").classList.remove("form-hidden");
+        r.querySelector("#twitter-authed").classList.add("form-hidden");
+      }
+
+      r.querySelector("#twitter-screenname").textContent = t.screenname;
+      r.querySelector("#twitter-advanced").checked = t.advanced;
+      r.querySelector("#twitter-ck").value = t.consumerKey;
+      r.querySelector("#twitter-cs").value = t.consumerSecret;
+      r.querySelector("#twitter-at").value = t.accessToken;
+      r.querySelector("#twitter-as").value = t.accessSecret;
+
+      r.querySelector("jikkyo-modal").hide();
     }
 
-    savePreferenceView(e, p) {
+    savePreferenceView(e) {
+      var p = this.preference,
+          r = e.shadowRoot;
       if (!p.twitter) p.twitter = {};
-      p.twitter.consumerKey = e.shadowRoot.querySelector("#twitter-ck").value;
-      p.twitter.consumerSecret = e.shadowRoot.querySelector("#twitter-cs").value;
-      p.twitter.accessToken = e.shadowRoot.querySelector("#twitter-at").value;
-      p.twitter.accessSecret = e.shadowRoot.querySelector("#twitter-as").value;
+      p.twitter.advanced = r.querySelector("#twitter-advanced").checked;
+      p.twitter.consumerKey = r.querySelector("#twitter-ck").value;
+      p.twitter.consumerSecret = r.querySelector("#twitter-cs").value;
+      p.twitter.accessToken = r.querySelector("#twitter-at").value;
+      p.twitter.accessSecret = r.querySelector("#twitter-as").value;
     }
 
   }
