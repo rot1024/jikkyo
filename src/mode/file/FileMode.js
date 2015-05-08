@@ -12,6 +12,7 @@
 
       this.label = "ファイル モード";
       this.preferenceLabel = "ファイル";
+      this.preferenceName = "file";
 
       var root = this.createShadowRoot();
       var template = doc.getElementById("main");
@@ -134,9 +135,17 @@
     }
 
     initPreferenceView() {
+      super.initPreferenceView();
+
+
     }
 
     savePreferenceView() {
+      super.savePreferenceView();
+
+    }
+
+    initPreference() {
     }
 
   }

@@ -14,6 +14,7 @@
 
       this.label = "Twitter モード";
       this.preferenceLabel = "Twitter";
+      this.preferenceName = "twitter";
 
       var root = this.createShadowRoot();
       var template = doc.getElementById("main");
@@ -57,7 +58,9 @@
       }).bind(this));
 
       twitterTrack.addEventListener("blur", (() => {
-        this.savePref();
+        if (!this.preference) return;
+        this.preference.twitter.track = twitterTrack.value;
+        this.preference.save();
       }).bind(this));
 
       twitterConnect.addEventListener("click", (() => {
@@ -111,6 +114,9 @@
 
     show() {
       super.show();
+
+      if (this.preference && this.preference.twitter && this.preference.twitter.track)
+        this._twitterTrack.value = this.preference.twitter.track || "";
     }
 
     hide() {
@@ -232,11 +238,11 @@
     }
 
     initPreferenceView(e) {
+      super.initPreferenceView();
+
       var p = this.preference,
           r = e.shadowRoot,
           t = p.twitter;
-
-      if (!t) t = p.twitter = this.initPreference();
 
       if (t._accessToken) {
         r.querySelector("#twitter-unauthed").classList.add("form-hidden");
@@ -256,9 +262,11 @@
     }
 
     savePreferenceView(e) {
+      super.savePreferenceView();
+
       var p = this.preference,
           r = e.shadowRoot;
-      if (!p.twitter) p.twitter = this.initPreference();
+
       p.twitter.advanced = r.querySelector("#twitter-advanced").checked;
       p.twitter.consumerKey = r.querySelector("#twitter-ck").value;
       p.twitter.consumerSecret = r.querySelector("#twitter-cs").value;
@@ -274,7 +282,8 @@
         accessToken: "",
         accessSecret: "",
         _accessToken: "",
-        _accessSecret: ""
+        _accessSecret: "",
+        track: ""
       };
     }
 

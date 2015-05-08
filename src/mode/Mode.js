@@ -34,10 +34,7 @@
 
     set preference(v) {
       this._pref = v;
-    }
-
-    savePref() {
-      if (this._pref) this._pref.save();
+      this._initPref();
     }
 
     show() {
@@ -57,9 +54,21 @@
     }
 
     initPreferenceView() {
+      this._initPref();
     }
 
     savePreferenceView() {
+      this._initPref();
+    }
+
+    initPreference() {
+    }
+
+    _initPref() {
+      if (this._pref && !this._pref[this.preferenceName]) {
+        this._pref[this.preferenceName] = this.initPreference();
+        this._pref.save();
+      }
     }
 
   }
