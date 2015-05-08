@@ -20,7 +20,7 @@
     "del": "^1.1.1",
     "gulp": "^3.8.11",
     "gulp-util": "^3.0.4",
-    "node-webkit-builder": "^1.0.10"
+    "nw-builder": "git://github.com/rot1024/nw-builder.git"
   },
   "dependencies": {
     "nw": "^0.12.1"
