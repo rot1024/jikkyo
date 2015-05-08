@@ -44,6 +44,14 @@ body /deep/ select {
 
 /* form */
 
+body /deep/ .none {
+  display: none;
+}
+
+body /deep/ .hidden {
+  visibility: hidden;
+}
+
 body /deep/ .btn {
   display: inline-block;
   padding: 8px 16px;

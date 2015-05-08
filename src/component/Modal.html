@@ -59,20 +59,29 @@
       line-height: 50px;
     }
 
-    .form-group {
-      display: flex;
-      margin-bottom: 10px;
-      padding: 0 20px;
+    .modal-form {
+      display: block;
+      padding: 20px;
     }
 
-    .form-label {
-      padding: 4px 20px 0 0;
-      width: 150px;
-      text-align: right;
+    .modal-control {
+      width: 100%;
     }
 
-    .form-control {
-      flex: auto;
+    .modal-form .modal-control {
+      width: calc(100% - 20px);
+    }
+
+    .modal-loading {
+      position: absolute;
+      display: block;
+      left: 50%;
+      top: 50%;
+      width: 36px;
+      height: 36px;
+      margin: -18px 0 0 -18px;
+      background: transparent url("images/loading.svg") no-repeat center center;
+      background-size: contain;
     }
 
   </style>
