@@ -351,15 +351,14 @@
 
       var size = {
         width: dummy.width,
-        height: dummy.height
+        height: dummy.height,
+        size: chat.rawSize
       };
 
       if (chat.position === "ue" || chat.position === "shita") {
         let r = this._viewer.width / size.width;
         if (r < 1) {
-          let fontSize = dummy.computedFontSize;
-          size.size = (fontSize * r) + "px";
-          dummy.setSize(size.size);
+          size.size = dummy.size = (dummy.computedFontSize * r) + "px";
           size.width = dummy.width;
           size.height = dummy.height;
         }
