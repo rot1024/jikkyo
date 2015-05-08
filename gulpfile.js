@@ -2,7 +2,7 @@ var fs = require('fs');
 var gulp = require('gulp');
 var gutil = require('gulp-util');
 var del = require('del');
-var NwBuilder = require('node-webkit-builder');
+var NwBuilder = require('nw-builder');
 
 gulp.task('sync', function() {
   var package = JSON.parse(fs.readFileSync('package.json', 'utf8'));
