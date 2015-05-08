@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "twitter": "^1.2.5",
+    "oauth": "^0.9.12",
     "xml2js": "^0.4.8"
   }
 }
