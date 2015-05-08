@@ -21,19 +21,14 @@
       if (v === this._mode) return;
       if (typeof v !== "number")
         throw new TypeError("mode must be number: " + typeof v);
-      v = ~~v;
-      if (v !== -1 && (v < 0 || v >= this._modeList.length))
+      if (v < 0 || v >= this._modeList.length)
         throw new RangeError("mode is wrong: " + v);
 
-      if (this._mode >= 0) {
-        this.currentMode.hide();
-        this.currentMode.viewerView = null;
-      }
-      this._mode = v;
-      if (this._mode >= 0) {
-        if (this._controllerView) this._controllerView.mode = v;
-        this.currentMode.viewerView = this._viewerView;
-        this.currentMode.show();
+      this._setMode(v);
+
+      if (this._pref && v !== this._pref.mode) {
+        this._pref.mode = v;
+        this._pref.save();
       }
     }
 
@@ -106,7 +101,26 @@
           mode.initPreferenceView.bind(mode), mode.savePreferenceView.bind(mode));
       }
       if (this._pref) mode.preference = this._pref;
-      if (this._mode === -1) this.mode = 0;
+      if (this._mode === -1) this._setMode(0);
+    }
+
+    setModeFromPref() {
+      if (!this._pref || typeof this._pref.mode !== "number") return;
+      this.mode = this._pref.mode;
+    }
+
+    _setMode(mode) {
+      if (this.currentMode) {
+        this.currentMode.hide();
+        this.currentMode.viewerView = null;
+      }
+
+      this._mode = mode;
+
+      if (this._controllerView)
+        this._controllerView.mode = mode;
+      this.currentMode.viewerView = this._viewerView;
+      this.currentMode.show();
     }
 
     _modeChangedCb(type, i) {

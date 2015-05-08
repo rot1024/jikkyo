@@ -81,6 +81,7 @@
     manager.preference = pref;
     manager.addMode(new window.jikkyo.FileMode());
     manager.addMode(new window.jikkyo.TwitterMode());
+    manager.setModeFromPref();
 
     if (pref.maximized) win.maximize();
     else {
