@@ -34,8 +34,7 @@ body /deep/ select {
 }
 
 .container.hover {
-  border-width: 2px;
-  border-color: rgba(170, 170, 170, 0.6);
+  border-color: #aaa;
 }
 
 .container.maximized {
