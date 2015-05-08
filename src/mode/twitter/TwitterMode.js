@@ -108,6 +108,7 @@
     }
 
     initPreferenceView(e, p) {
+      if (!p.twutter) return;
       e.shadowRoot.querySelector("#twitter-ck").value = p.twitter.consumerKey;
       e.shadowRoot.querySelector("#twitter-cs").value = p.twitter.consumerSecret;
       e.shadowRoot.querySelector("#twitter-at").value = p.twitter.accessToken;
