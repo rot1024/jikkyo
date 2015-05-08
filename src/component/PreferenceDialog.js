@@ -42,9 +42,8 @@
       at = this._prefs.children[0];
       if (at) at.classList.add("active");
 
-      var pr = this.preference;
-      if (pr) {
-        this._modePrefs.forEach((p, i) => this._initPrefCb[i](p, pr), this);
+      if (this.preference) {
+        this._modePrefs.forEach((p, i) => this._initPrefCb[i](p), this);
       }
 
       super.show();
@@ -53,9 +52,9 @@
     hide() {
       var pr = this.preference;
       if (pr) {
-        this._modePrefs.forEach((p, i) => this._savePrefCb[i](p, pr), this);
+        this._modePrefs.forEach((p, i) => this._savePrefCb[i](p), this);
+        pr.save();
       }
-      pr.save();
 
       super.hide();
     }
