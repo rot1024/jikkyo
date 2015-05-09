@@ -34,7 +34,8 @@ var nw = function(cb, platforms) {
     macCredits: 'Credits.html',
     macIcns: 'src/images/jikkyo.icns',
     macZip: true,
-    winIco: 'src/images/jikkyo.ico'
+    winIco: 'src/images/jikkyo.ico',
+    winZip: false
   });
   nw.on('log', function(msg) {
     gutil.log('node-webkit-builder', msg);
