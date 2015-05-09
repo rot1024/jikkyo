@@ -44,7 +44,12 @@
 
     set isFixed(v) {
       this._isFixed = !!v;
-      if (v) this.show();
+      var btn = this.shadowRoot.getElementById("btn-fix");
+      if (v) {
+        this.show();
+        btn.classList.add("on");
+      }
+      else btn.classList.remove("on");
       this._menuFixedItem.checked = this._isFixed;
     }
 
@@ -138,11 +143,17 @@
       this._modeMenuItems = [];
       this._modeContainer = root.getElementById("container-mode");
 
-      var alwaysontopBtn = root.getElementById("btn-alwaysontop");
-      var menuBtn = root.getElementById("btn-menu");
+      var alwaysontopBtn = root.getElementById("btn-alwaysontop"),
+          fixBtn = root.getElementById("btn-fix"),
+          menuBtn = root.getElementById("btn-menu");
 
       alwaysontopBtn.addEventListener("click", (() => {
         this.isAlwaysOnTop = !this.isAlwaysOnTop;
+        this.savePref();
+      }).bind(this));
+
+      fixBtn.addEventListener("click", (() => {
+        this.isFixed = !this.isFixed;
         this.savePref();
       }).bind(this));
 
@@ -161,6 +172,12 @@
       this._menu.add(this._menuSeparetor);
       this._menu.add(this._menuFixedItem);
       this._menu.add({ type: "separator" });
+      this._menu.add({
+        label: "開発者ツールを表示",
+        click() {
+          win.showDevTools();
+        }
+      });
       this._menu.add({
         label: "設定",
         click() {

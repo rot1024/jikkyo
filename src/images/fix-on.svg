@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30">
+  <filter width="200%" height="200%" y="0" x="0">
+    <feGaussianBlur stdDeviation="1" in="offOut" result="blurOut"></feGaussianBlur>
+  </filter>
+  <g filter="url(#f)">
+    <path fill="#FFE078" d="M16.52 16.764h5.223c-.928-1.145-2.282-2.036-3.874-2.53l.8-5.692h.903V6.266h-9.15V8.54h.905l.8 5.692c-1.59.496-2.945 1.387-3.873 2.53h5.224L15 26.66l1.52-9.896z"/>
+  </g>
+  <path fill="#FF9D00" d="M16.52 16.764h5.223c-.928-1.145-2.282-2.036-3.874-2.53l.8-5.692h.903V6.266h-9.15V8.54h.905l.8 5.692c-1.59.496-2.945 1.387-3.873 2.53h5.224L15 26.66l1.52-9.896z"/>
+</svg>
