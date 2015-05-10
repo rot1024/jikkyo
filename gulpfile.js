@@ -7,16 +7,15 @@ var NwBuilder = require('nw-builder');
 gulp.task('sync', function() {
   var package = JSON.parse(fs.readFileSync('package.json', 'utf8'));
   var srcPackage = JSON.parse(fs.readFileSync('src/package.json', 'utf8'));
-  var srcBower = JSON.parse(fs.readFileSync('src/bower.json', 'utf8'));
-  srcPackage.name = srcBower.name = package.name;
-  srcPackage.version = srcBower.version = package.version;
-  srcPackage.description = srcBower.description = package.description;
+  srcPackage.name = package.name;
+  srcPackage.version = package.version;
+  srcPackage.description = package.description;
+  srcPackage.repository = package.repository;
+  srcPackage.homepage = package.homepage;
   try {
-    fs.writeFileSync('src/package.json',
-                     JSON.stringify(srcPackage, null, "  "), 'utf8');
-    fs.writeFileSync('src/bower.json',
-                     JSON.stringify(srcBower, null, "  "), 'utf8');
-  } catch(ignore) {
+    fs.writeFileSync('src/package.json', JSON.stringify(srcPackage, null, "  "), 'utf8');
+  } catch(e) {
+    console.error("Failed to sync package.json");
   }
 });
 
