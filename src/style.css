@@ -94,7 +94,7 @@ body /deep/ input[type=text]:-webkit-input-placeholder {
 }
 
 body /deep/ input[type=text]:focus {
-  border-color: orange;
+  border-color: #ffa500;
   outline: none;
 }
 
@@ -105,6 +105,80 @@ body /deep/ input[type=text]:disabled {
 
 body /deep/ input[type=text]:disabled:-webkit-input-placeholder {
   color: #717171;
+}
+
+body /deep/ input[type=checkbox],
+body /deep/ input[type=radio] {
+  margin: 2px 7px 0 0;
+  padding: 0;
+  width: 16px;
+  height: 16px;
+  background-color: #444;
+  border: 1px solid #222;
+  border-radius: 2px;
+  vertical-align: middle;
+  outline: none;
+  transition: all .2s ease-in-out;
+  -webkit-appearance: none;
+}
+
+body /deep/ input[type=radio] {
+  margin-top: -1px;
+  border-radius: 50%;
+}
+
+body /deep/ input[type=checkbox]:hover,
+body /deep/ input[type=radio]:hover {
+  background-color: #505050;
+}
+
+body /deep/ input[type=checkbox]:checked:before {
+  position: relative;
+  top: -6px;
+  left: 0;
+  display: inline-block;
+  color: #ccc;
+  font-size: 18px;
+  content: "\2714";
+  opacity: 0;
+  transition: opacity .2s ease-in-out;
+}
+
+body /deep/ input[type=checkbox]:focus,
+body /deep/ input[type=radio]:focus {
+  border-color: #ffa500;
+}
+
+body /deep/ input[type=checkbox]:disabled,
+body /deep/ input[type=radio]:disabled {
+  background-color: #333;
+}
+
+body /deep/ input[type=checkbox]:checked:before,
+body /deep/ input[type=radio]:checked:before {
+  opacity: 1;
+}
+
+body /deep/ input[type=checkbox]:disabled:checked:before {
+  color: #777;
+}
+
+body /deep/ input[type=radio]:before {
+  position: relative;
+  top: -5px;
+  left: 4px;
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background-color: #ccc;
+  border-radius: 50%;
+  opacity: 0;
+  content: "";
+  transition: opacity .2s ease-in-out;
+}
+
+body /deep/ input[type=radio]:disabled:checked:before {
+  background-color: #777;
 }
 
 body /deep/ select {
@@ -119,7 +193,7 @@ body /deep/ select {
 }
 
 body /deep/ select:focus {
-  border-color: orange;
+  border-color: #ffa500;
   outline: none;
 }
 
