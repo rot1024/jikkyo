@@ -50,7 +50,6 @@
         btn.classList.add("on");
       }
       else btn.classList.remove("on");
-      this._menuFixedItem.checked = this._isFixed;
     }
 
     get mode() {
@@ -160,18 +159,8 @@
       this._menu = document.createElement("jikkyo-menu");
 
       this._menuSeparetor = new window.jikkyo.MenuItem({ type: "separator" });
-      this._menuFixedItem = new window.jikkyo.MenuItem({
-        label: "コントロールバーを固定",
-        checkable: true,
-        click: (item => {
-          this.isFixed = item.checked;
-          this.savePref();
-        }).bind(this)
-      });
 
       this._menu.add(this._menuSeparetor);
-      this._menu.add(this._menuFixedItem);
-      this._menu.add({ type: "separator" });
       this._menu.add({
         label: "開発者ツールを表示",
         click() {
