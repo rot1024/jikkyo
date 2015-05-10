@@ -1,8 +1,9 @@
-
 (() => {
   "use strict";
 
-  var doc = document.currentScript.ownerDocument;
+  var fs = require("fs"),
+      gui = require("nw.gui"),
+      doc = document.currentScript.ownerDocument;
 
   class PreferenceDialog extends window.jikkyo.Modal {
 
@@ -24,12 +25,26 @@
 
       var prefc = this.content.querySelectorAll(".pref");
       Array.from(prefc).forEach(c => {
-        this.addModePreference(c, c.dataset.title, null, null, true);
+        this.addModePreference(c, c.dataset.title, null, null, true, c.hasAttribute("data-last"));
       }, this);
 
       this.content.querySelector("#ok").addEventListener("click", (() => {
         this.hide();
       }).bind(this));
+
+      try {
+        var packagejson = JSON.parse(fs.readFileSync("package.json", "utf8"));
+        if (packagejson.version)
+          this.shadowRoot.querySelector("#about-version").textContent = packagejson.version;
+        if (packagejson.homepage)
+          this.shadowRoot.querySelector("#about-homepage").addEventListener(
+            "click", () => gui.Shell.openExternal(packagejson.homepage));
+        if (packagejson.repository && packagejson.repository.url)
+          this.shadowRoot.querySelector("#about-repository").addEventListener(
+            "click", () => gui.Shell.openExternal(packagejson.repository.url));
+      } catch(e) {
+        this.shadowRoot.querySelector("#about-version").textContent = "ERROR";
+      }
     }
 
     show() {
@@ -63,9 +78,10 @@
       super.hide();
     }
 
-    addModePreference(element, title, initCb, saveCb, builtin) {
+    addModePreference(element, title, initCb, saveCb, builtin, last) {
       if (!element) return;
       var tab = document.createElement("li");
+      if (last) tab.setAttribute("data-last", "");
       tab.textContent = title;
       tab.addEventListener("click", (() => {
         var active = this._prefs.querySelector(".active");
@@ -74,9 +90,12 @@
         this._tabs.querySelector(".active").classList.remove("active");
         tab.classList.add("active");
       }).bind(this));
-      this._tabs.appendChild(tab);
       element.classList.add("pref");
       this._prefs.appendChild(element);
+
+      var lastTab = this._tabs.querySelector("li[data-last]");
+      if (lastTab) this._tabs.insertBefore(tab, lastTab);
+      else this._tabs.appendChild(tab);
 
       if (!builtin) {
         this._modePrefs.push(element);
@@ -95,7 +114,8 @@
         sizing: 0,
         fontSize: "32px",
         rows: 12,
-        style: ""
+        style: "",
+        checkNewVersionAuto: true
       };
     }
 
@@ -109,6 +129,7 @@
       r.querySelector("#comment-font-size").value = p.fontSize;
       r.querySelector("#comment-rows").value = p.rows;
       r.querySelector("#comment-style").value = p.style;
+      r.querySelector("#about-check-auto").checked = p.checkNewVersionAuto;
     }
 
     _saveGeneralPreference(r, p) {
@@ -134,6 +155,8 @@
       if (tmp > 0 && tmp < 40) p.rows = tmp;
 
       p.style = r.querySelector("#comment-style").value;
+
+      p.checkNewVersionAuto = r.querySelector("#about-check-auto").checked;
     }
 
   }

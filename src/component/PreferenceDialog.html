@@ -88,6 +88,39 @@
       font-size: 80%;
     }
 
+    .about {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .about img {
+      margin-right: 20px;
+    }
+
+    .about-content {
+      margin-bottom: 5px;
+    }
+
+    .about-title {
+      font-size: 20px;
+    }
+
+    .about-version {
+      font-size: 16px;
+    }
+
+    .about-repository {
+      font-size: 12px;
+    }
+
+    .about-repository span {
+      margin-left: 10px;
+      color: #ffa500;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
   </style>
 
 </template>
@@ -97,6 +130,7 @@
   <div class="container">
     <ul id="tabs"></ul>
     <div id="prefs">
+
       <div id="pref-comment" class="pref" data-title="コメント">
 
          <div class="form-group">
@@ -159,6 +193,27 @@
          </div>
 
       </div>
+
+      <div id="pref-about" class="pref" data-title="jikkyo" data-last>
+
+        <div class="about">
+          <img src="./images/jikkyo.svg" width="48" height="48" alt="jikkyo">
+          <div class="about-content">
+            <div class="about-title">
+              jikkyo <span id="about-version" class="about-version">1.0.0</span>
+            </div>
+            <div class="about-repository">
+              MIT License <span id="about-homepage">Homepage</span> <span id="about-repository">GitHub</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="about-check" class="btn">更新をチェックする</div>
+
+        <p><input type="checkbox" id="about-check-auto"><label for="about-check-auto">起動時に更新チェック</label></p>
+
+      </div>
+
     </div>
   </div>
   <div class="modal-footer">
