@@ -101,6 +101,16 @@
 
         twitter.auth(opts);
 
+        if (this.preference) {
+          twitter.options = {
+            excludeMention: this.preference.twitter.excludeMention,
+            excludeRetweet: this.preference.twitter.excludeRetweet,
+            excludeHashtag: this.preference.twitter.excludeHashtag,
+            excludeUrl: this.preference.twitter.excludeUrl,
+            applyThemeColor: this.preference.twitter.applyThemeColor
+          };
+        }
+
         twitterTrack.setAttribute("disabled", "disabled");
         twitterConnect.classList.add("disabled");
         if (twitterTrack.value) {
@@ -252,6 +262,12 @@
         r.querySelector("#twitter-authed").classList.add("form-hidden");
       }
 
+      r.querySelector("#twitter-exclude-mention").checked = p.twitter.excludeMention;
+      r.querySelector("#twitter-exclude-retweet").checked = p.twitter.excludeRetweet;
+      r.querySelector("#twitter-exclude-hashtag").checked = p.twitter.excludeHashtag;
+      r.querySelector("#twitter-exclude-url").checked = p.twitter.excludeUrl;
+      r.querySelector("#twitter-apply-color").checked = p.twitter.applyThemeColor;
+
       r.querySelector("#twitter-advanced").checked = t.advanced;
       r.querySelector("#twitter-ck").value = t.consumerKey;
       r.querySelector("#twitter-cs").value = t.consumerSecret;
@@ -266,6 +282,12 @@
 
       var p = this.preference,
           r = e.shadowRoot;
+
+      p.twitter.excludeMention = r.querySelector("#twitter-exclude-mention").checked;
+      p.twitter.excludeRetweet = r.querySelector("#twitter-exclude-retweet").checked;
+      p.twitter.excludeHashtag = r.querySelector("#twitter-exclude-hashtag").checked;
+      p.twitter.excludeUrl = r.querySelector("#twitter-exclude-url").checked;
+      p.twitter.applyThemeColor = r.querySelector("#twitter-apply-color").checked;
 
       p.twitter.advanced = r.querySelector("#twitter-advanced").checked;
       p.twitter.consumerKey = r.querySelector("#twitter-ck").value;
@@ -283,7 +305,12 @@
         accessSecret: "",
         _accessToken: "",
         _accessSecret: "",
-        track: ""
+        track: "",
+        excludeMention: true,
+        excludeRetweet: true,
+        excludeHashtag: true,
+        excludeUrl: true,
+        applyThemeColor: true
       };
     }
 
