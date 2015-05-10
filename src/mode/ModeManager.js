@@ -84,14 +84,25 @@
 
     set preference(v) {
       this._pref = v;
-      this._modeList.forEach(m => m.preference = v);
+      this._modeList.forEach(m => {
+        m.preference = v;
+        if (m.preferenceName && !this._pref[m.preferenceName])
+          this._pref[m.preferenceName] = m.initPreference();
+      });
+      this._pref.save();
     }
 
     addMode(mode) {
       if (!(mode instanceof window.jikkyo.Mode))
         throw new TypeError("mode must be Mode: " + typeof mode);
       this._modeList.push(mode);
-      if (this._pref) mode.preference = this._pref;
+      if (this._pref) {
+        mode.preference = this._pref;
+        if (mode.preferenceName && !this._pref[mode.preferenceName]) {
+          this._pref[mode.preferenceName] = mode.initPreference();
+          this._pref.save();
+        }
+      }
       if (this._controllerView)
         this._controllerView.addMode(mode);
       if (this._preferenceDialogView) {
@@ -100,7 +111,6 @@
           view, mode.preferenceLabel || mode.label,
           mode.initPreferenceView.bind(mode), mode.savePreferenceView.bind(mode));
       }
-      if (this._pref) mode.preference = this._pref;
       if (this._mode === -1) this._setMode(0);
     }
 

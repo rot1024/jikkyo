@@ -65,7 +65,7 @@
     }
 
     _initPref() {
-      if (this._pref && !this._pref[this.preferenceName]) {
+      if (this._pref && this.preferenceName && !this._pref[this.preferenceName]) {
         this._pref[this.preferenceName] = this.initPreference();
         this._pref.save();
       }
