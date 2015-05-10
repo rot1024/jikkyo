@@ -11,6 +11,10 @@
       this._pref = null;
     }
 
+    get adapter() {
+      return this._adapter;
+    }
+
     get label() {
       return this._label;
     }
