@@ -44,6 +44,9 @@
 
       if (this.preference) {
         this._modePrefs.forEach((p, i) => this._initPrefCb[i](p), this);
+        if (!this.preference.general)
+          this.preference.general = this._initGeneralPreference();
+        this._loadGeneralPreference(this.content, this.preference.general);
       }
 
       super.show();
@@ -53,6 +56,7 @@
       var pr = this.preference;
       if (pr) {
         this._modePrefs.forEach((p, i) => this._savePrefCb[i](p), this);
+        this._saveGeneralPreference(this.content, this.preference.general);
         pr.save();
       }
 
@@ -79,6 +83,57 @@
         if (initCb) this._initPrefCb.push(initCb);
         if (saveCb) this._savePrefCb.push(saveCb);
       }
+    }
+
+    _initGeneralPreference() {
+      return {
+        fontFamily: process.platform === "darwin" ? "sans-serif" : 'Meiryo, sans-serif',
+        duration: 4000,
+        usDuration: 3000,
+        opacity: 1,
+        bulletOpacity: 1,
+        sizing: 0,
+        fontSize: "32px",
+        rows: 12,
+        style: ""
+      };
+    }
+
+    _loadGeneralPreference(r, p) {
+      r.querySelector("#comment-font-family").value = p.fontFamily;
+      r.querySelector("#comment-duration").value = p.duration;
+      r.querySelector("#comment-us-duration").value = p.usDuration;
+      r.querySelector("#comment-opacity").value = p.opacity;
+      r.querySelector("#comment-bullet-opacity").value = p.bulletOpacity;
+      r.querySelector("#comment-sizing").value = p.sizing;
+      r.querySelector("#comment-font-size").value = p.fontSize;
+      r.querySelector("#comment-rows").value = p.rows;
+      r.querySelector("#comment-style").value = p.style;
+    }
+
+    _saveGeneralPreference(r, p) {
+      var tmp;
+      p.fontFamily = r.querySelector("#comment-font-family").value;
+
+      tmp = r.querySelector("#comment-duration").value;
+      if (tmp >= 100 && tmp < 10000) p.duration = tmp;
+
+      tmp = r.querySelector("#comment-us-duration").value;
+      if (tmp >= 100 && tmp < 10000) p.usDuration = tmp;
+
+      tmp = r.querySelector("#comment-opacity").value;
+      if (tmp >= 0 && tmp <= 1) p.opacity = tmp;
+
+      tmp = r.querySelector("#comment-bullet-opacity").value;
+      if (tmp >= 0 && tmp <= 1) p.bulletOpacity = tmp;
+
+      p.sizing = r.querySelector("#comment-sizing").value;
+      p.fontSize = r.querySelector("#comment-font-size").value;
+
+      tmp = r.querySelector("#comment-rows").value;
+      if (tmp > 0 && tmp < 40) p.rows = tmp;
+
+      p.style = r.querySelector("#comment-style").value;
     }
 
   }

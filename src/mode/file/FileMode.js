@@ -134,18 +134,33 @@
       return element;
     }
 
-    initPreferenceView() {
+    initPreferenceView(e) {
       super.initPreferenceView();
 
+      var p = this.preference,
+          r = e.shadowRoot,
+          t = p.file;
 
+      r.querySelector("#file-comment-big-size").value = t.bigSize;
+      r.querySelector("#file-comment-small-size").value = t.smallSize;
     }
 
-    savePreferenceView() {
+    savePreferenceView(e) {
       super.savePreferenceView();
 
+      var p = this.preference,
+          r = e.shadowRoot,
+          t = p.file;
+
+      t.bigSize = r.querySelector("#file-comment-big-size").value;
+      t.smallSize = r.querySelector("#file-comment-small-size").value;
     }
 
     initPreference() {
+      return {
+        bigSize: "150%",
+        smallSize: "50%"
+      };
     }
 
   }

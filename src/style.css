@@ -79,31 +79,42 @@ body /deep/ .btn.btn-primary:active {
   background-color: #885800;
 }
 
-body /deep/ input[type=text] {
+body /deep/ input[type=text],
+body /deep/ input[type=number],
+body /deep/ textarea {
   margin: 0;
   padding: 4px 6px;
   background-color: #666;
   color: #fff;
   border: 1px solid #222;
   border-radius: 4px;
+  outline: none;
   transition: all .2s ease-in-out;
 }
 
-body /deep/ input[type=text]:-webkit-input-placeholder {
+body /deep/ input[type=text]:-webkit-input-placeholder,
+body /deep/ input[type=number]:-webkit-input-placeholder,
+body /deep/ textarea:-webkit-input-placeholder {
   color: #aaa;
 }
 
-body /deep/ input[type=text]:focus {
+body /deep/ input[type=text]:focus,
+body /deep/ input[type=number]:focus,
+body /deep/ textare:focus {
   border-color: #ffa500;
   outline: none;
 }
 
-body /deep/ input[type=text]:disabled {
+body /deep/ input[type=text]:disabled,
+body /deep/ input[type=number]:disabled,
+body /deep/ textarea:disabled {
   color: #aaa;
   background-color: #454545;
 }
 
-body /deep/ input[type=text]:disabled:-webkit-input-placeholder {
+body /deep/ input[type=text]:disabled:-webkit-input-placeholder,
+body /deep/ input[type=number]:disabled:-webkit-input-placeholder,
+body /deep/ textarea:disabled:-webkit-input-placeholder {
   color: #717171;
 }
 
