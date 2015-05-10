@@ -8,6 +8,11 @@
   },
   "author": "rot1024",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rot1024/jikkyo"
+  },
+  "homepage": "https://rot1024.github.io/jikkyo",
   "main": "index.html",
   "js-flags": "--es_staging --harmony_arrow_functions --harmony_arrays --harmony_array_includes",
   "window": {

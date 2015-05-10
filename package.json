@@ -15,7 +15,7 @@
   "bugs": {
     "url": "https://github.com/rot1024/jikkyo/issues"
   },
-  "homepage": "https://github.com/rot1024/jikkyo",
+  "homepage": "https://rot1024.github.io/jikkyo",
   "devDependencies": {
     "del": "^1.1.1",
     "gulp": "^3.8.11",
