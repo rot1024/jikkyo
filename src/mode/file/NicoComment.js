@@ -1,42 +1,48 @@
 module.exports = (() => {
   "use strict";
-  
+
   var fs = require("fs"),
       xml = require("xml2js").parseString;
-  
+
   class NicoComment {
-    
+
     constructor() {
       this._comment = [];
+      this.options = {
+        size: {
+          big: NicoComment.defaultSize.big,
+          small: NicoComment.defaultSize.small
+        }
+      };
     }
-    
+
     get comment() {
       return this._comment;
     }
-    
+
     readFromFile(path) {
       var deferred = Promise.defer();
-      
+
       fs.readFile(path, "utf8", ((err, data) => {
         if (err) return deferred.reject(err);
         this.read(data).then(r => deferred.resolve(r));
       }).bind(this));
-      
+
       return deferred.promise;
     }
-    
+
     read(data) {
       var deferred = Promise.defer();
-      
+
       this.clearComment();
 
       xml(data, ((err, result) => {
         if (err) return deferred.reject(err);
-        
+
         if (result === null || !("packet" in result) || !("chat" in result.packet)) {
           return deferred.resolve(this._comment);
         }
-        
+
         var margin = result.packet.chat.reduce((margin, obj) => {
           if (margin === -1) margin = 100;
           for (; parseInt(obj.$.vpos) % margin !== 0; margin /= 10);
@@ -46,25 +52,25 @@ module.exports = (() => {
         this._comment = result.packet.chat.map(obj => {
           return this._parseChat(obj, margin);
         }, this);
-        
+
         deferred.resolve(this._comment);
       }).bind(this));
-      
+
       return deferred.promise;
     }
-    
+
     write() {
-      
+
     }
-    
+
     writeToFile(/*path*/) {
       var deferred = Promise.defer();
-      
+
       deferred.reject(new Error("not implemented"));
-      
+
       return deferred.promise;
     }
-    
+
     addChat(chat) {
       this.addComment([chat]);
     }
@@ -77,14 +83,14 @@ module.exports = (() => {
         this._comment.push(chat);
       }, this);
     }
-    
+
     clearComment() {
       this._comment = [];
     }
-    
+
     _parseChat(obj, margin) {
       margin = margin || 0;
-      
+
       var chat = {
         text: obj._,
         vpos: (parseInt(obj.$.vpos) + Math.floor(Math.random() * margin)) * 10
@@ -94,17 +100,17 @@ module.exports = (() => {
         obj.$.mail.split(" ").forEach(command => {
           if (command in NicoComment.color) {
             chat.color = NicoComment.color[command];
-          } else if (command in NicoComment.size) {
-            chat.size = NicoComment.size[command];
+          } else if (command in this.options.size) {
+            chat.size = this.options.size[command];
           } else if (NicoComment.position.includes(command)) {
             chat.position = command;
           }
-        });
+        }, this);
       }
-      
+
       return chat;
     }
-    
+
   }
 
   NicoComment.color = {
@@ -137,13 +143,12 @@ module.exports = (() => {
     black2:         "#666666",
   };
 
-  NicoComment.size = {
-    medium: "100%",
+  NicoComment.defaultSize = {
     big:    "150%",
     small:  "50%"
   };
 
   NicoComment.position = ["ue", "shita"];
-  
+
   return NicoComment;
 })();

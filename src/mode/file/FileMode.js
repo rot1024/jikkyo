@@ -88,20 +88,25 @@
         }
       }).bind(this));
 
-      fileOpenBtn.addEventListener("click", (() => {
-        var adapter = this._adapter;
+      {
+        let that = this;
         fileInput.addEventListener("change", () => {
           if (!this || !this.value) return;
           var path = this.value;
 
           var nico = new NicoComment();
+          nico.options.size.big = that.preference.file.bigSize;
+          nico.options.size.small = that.preference.file.smallSize;
           nico.readFromFile(path).then(result => {
-            adapter.clearComment();
-            adapter.addComment(result);
+            that._adapter.clearComment();
+            that._adapter.addComment(result);
           });
 
           fileInput.value = "";
         });
+      }
+
+      fileOpenBtn.addEventListener("click", (() => {
         fileInput.click();
       }).bind(this));
     }
