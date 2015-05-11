@@ -10,7 +10,6 @@
       this._controller = null;
 
       this._comment = [];
-      this._rows = 0;
       this._limit = 100;
 
       this._playing = false;
@@ -19,6 +18,9 @@
       this._length = 0;
       this._duration = 4000;
       this._durationAlt = 3000;
+      this._sizingMode = 0;
+      this._baseFontSize = "32px";
+      this._rows = 12;
 
       this._refreshCb = null;
       this._simpleLength = 1000;
@@ -43,6 +45,8 @@
 
       if (viewer) this.stop();
       this._viewer = viewer;
+
+      this._calcBaseFontSize();
     }
 
     get controller() {
@@ -74,6 +78,22 @@
       this._durationAlt = duration;
     }
 
+    get sizingMode() {
+      return this._sizingMode;
+    }
+
+    set sizingMode(sizing) {
+      this._sizingMode = sizing;
+    }
+
+    get baseFontSize() {
+      return this._baseFontSize;
+    }
+
+    set baseFontSize(fontSize) {
+      this._baseFontSize = fontSize;
+    }
+
     get rows() {
       return this._rows;
     }
@@ -81,7 +101,6 @@
     set rows(rows) {
       if (typeof rows !== "number")
         throw new TypeError("rows must be number: " + typeof rows);
-
       this._rows = rows;
     }
 
@@ -292,6 +311,8 @@
     refresh(index) {
       var start = index || 0, end = this._comment.length;
 
+      this._calcBaseFontSize();
+
       var refresh = ((start, end) => {
         this._comment.slice(start, end).forEach(chat => {
           var size = this._calcSize(chat);
@@ -481,6 +502,19 @@
       return chat.vpos <= position && position <= chat.vpos + duration;
     }
 
+    _calcBaseFontSize() {
+      if (this._viewer === null) return;
+
+      var fontSize = "";
+      if (this._sizingMode === 1 && this._rows > 0) {
+        fontSize = (this._viewer.height / this._rows) + "px";
+      } else {
+        fontSize = this._baseFontSize;
+      }
+
+      this._viewer.setBaseFontSize(fontSize);
+    }
+
     _binarySearch(chat, array) {
       if (array.length === 0) return 0;
       if (array[array.length - 1].vpos <= chat.vpos) return array.length;
@@ -504,6 +538,9 @@
     }
 
   }
+
+  Adapter.SIZING_FIX_FONT_SIZE = 0;
+  Adapter.SIZING_FIX_ROWS = 1;
 
   window.jikkyo.Viewer.Adapter = Adapter;
 })();

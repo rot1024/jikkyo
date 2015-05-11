@@ -7,7 +7,6 @@
       top: 0;
       right: 0;
       bottom: 0;
-      font-size: 32px;
     }
 
     .container {
@@ -16,6 +15,10 @@
       top: 0;
       right: 0;
       bottom: 0;
+    }
+
+    .base {
+      font-size: 32px;
     }
 
     jikkyo-chat {
@@ -31,8 +34,15 @@
     .admin, .enquete { display: none; }
 
   </style>
+  <style id="base">
+    .base { font-size: 32px; }
+    jikkyo-chat {}
+    jikkyo-chat.bullet {}
+  </style>
+  <style id="chat"></style>
+  <style id="chat-bullet"></style>
 
-  <div class="container"></div>
+  <div class="container base"></div>
 
 </template>
 

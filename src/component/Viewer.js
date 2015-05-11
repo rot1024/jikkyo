@@ -295,31 +295,18 @@
       return this._dummy;
     }
 
+    setBaseFontSize(fontSize) {
+      var style = this.shadowRoot.querySelector("style#base");
+      style.sheet.cssRules[0].style.fontSize = fontSize;
+    }
+
     setChatStyle(css) {
       var style = this.shadowRoot.querySelector("style#chat");
-      if (!css) {
-        if (style) this.shadowRoot.removeChild(style);
-        return;
-      }
-      if (!style) {
-        style = document.createElement("style");
-        style.id = "chat";
-        this.shadowRoot.appendChild(style);
-      }
       style.textContent = `jikkyo-chat { ${css} }`;
     }
 
     setBulletChatStyle(css) {
-      var style = this.shadowRoot.querySelector("style#bullet");
-      if (!css) {
-        if (style) this.shadowRoot.removeChild(style);
-        return;
-      }
-      if (!style) {
-        style = document.createElement("style");
-        style.id = "bullet";
-        this.shadowRoot.appendChild(style);
-      }
+      var style = this.shadowRoot.querySelector("style#chat-bullet");
       style.textContent = `jikkyo-chat.bullet { ${css} }`;
     }
 

@@ -83,23 +83,21 @@
     manager.addMode(new window.jikkyo.TwitterMode());
     manager.setModeFromPref();
 
-    var refreshPref = () => {
-      var css = `font-family: ${pref.general.fontFamily};`;
-      css += `opacity: ${pref.general.opacity};`;
+    var applyPreference = () => {
+      var css = `font-family: ${pref.general.fontFamily}; `;
+      css += `opacity: ${pref.general.opacity}; `;
       css += pref.general.style;
 
-      var bulletCss = `opacity: ${pref.general.bulletOpacity};`;
+      var bulletCss = `opacity: ${pref.general.bulletOpacity}; `;
       bulletCss += pref.general.bulletStyle;
-
-      manager.setDuration(pref.general.duration);
-      manager.setDurationAlt(pref.general.usDuration);
+      manager.applyPreference();
       viewer.setChatStyle(css);
       viewer.setBulletChatStyle(bulletCss);
 
       manager.refresh();
     };
-    refreshPref();
-    preferenceDialog.on("hide", refreshPref);
+    applyPreference();
+    preferenceDialog.on("hide", applyPreference);
 
     win.show();
 

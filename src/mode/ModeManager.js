@@ -127,8 +127,33 @@
       this._modeList.forEach(m => m.adapter.durationAlt = duration);
     }
 
+    setSizingMode(sizingMode) {
+      this._modeList.forEach(m => m.adapter.sizingMode = sizingMode);
+    }
+
+    setBaseFontSize(fontSize) {
+      this._modeList.forEach(m => m.adapter.baseFontSize = fontSize);
+    }
+
+    setRows(rows) {
+      this._modeList.forEach(m => m.adapter.rows = rows);
+    }
+
     refresh() {
       this._modeList.forEach(m => m.refresh());
+    }
+
+    applyPreference() {
+      var p = this._pref;
+      if (!p) return;
+      this._modeList.forEach(m => {
+        m.adapter.duration = p.general.duration;
+        m.adapter.durationAlt = p.general.usDuration;
+        m.adapter.sizingMode = p.general.sizing;
+        m.adapter.baseFontSize = p.general.fontSize;
+        m.adapter.rows = p.general.rows;
+      });
+
     }
 
     _setMode(mode) {

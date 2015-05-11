@@ -172,10 +172,10 @@
       tmp = parseFloat(r.querySelector("#comment-bullet-opacity").value);
       if (tmp >= 0 && tmp <= 1) p.bulletOpacity = tmp;
 
-      p.sizing = r.querySelector("#comment-sizing").value;
+      p.sizing = parseInt(r.querySelector("#comment-sizing").value);
       p.fontSize = r.querySelector("#comment-font-size").value;
 
-      tmp = r.querySelector("#comment-rows").value;
+      tmp = parseInt(r.querySelector("#comment-rows").value);
       if (tmp > 0 && tmp < 40) p.rows = tmp;
 
       p.style = r.querySelector("#comment-style").value;
