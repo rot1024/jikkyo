@@ -2,6 +2,7 @@ module.exports = (() => {
   "use strict";
 
   var EventEmitter = require("events").EventEmitter,
+      util = require("util"),
       Twitter = require("twitter");
 
   class TwitterComment {
@@ -12,6 +13,8 @@ module.exports = (() => {
       this._stream = null;
       this._streamType = "";
       this._streaming = false;
+      this.textNg = [];
+      this.userNg = [];
       this.options = {
         excludeMention: true,
         excludeRetweet: true,
@@ -103,6 +106,22 @@ module.exports = (() => {
         };
 
         if (!tweet || !tweet.text || this.options.excludeRetweet && tweet.retweeted) return;
+
+        if (this.userNg.some(ng => {
+          if (ng === null) return false;
+          if (util.isRegExp(ng))
+            return ng.test(tweet.user.screen_name);
+          else
+            return tweet.user.screen_name === ng;
+        })) return;
+
+        if (this.textNg.some(ng => {
+          if (ng === null) return false;
+          if (util.isRegExp(ng))
+            return ng.test(tweet.text);
+          else
+            return tweet.text.indexOf(ng) >= 0;
+        })) return;
 
         var mentions_length = getKey(tweet, ["entities", "user_mentions", "length"]) || 0;
         if (this.options.excludeMention && mentions_length > 0) return;

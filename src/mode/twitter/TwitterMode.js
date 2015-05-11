@@ -100,6 +100,8 @@
         }
 
         twitter.auth(opts);
+        twitter.textNg = this._getNgList(this.preference.twitter.textNg);
+        twitter.userNg = this._getNgList(this.preference.twitter.userNg);
 
         if (this.preference) {
           twitter.options = {
@@ -262,11 +264,14 @@
         r.querySelector("#twitter-authed").classList.add("form-hidden");
       }
 
-      r.querySelector("#twitter-exclude-mention").checked = p.twitter.excludeMention;
-      r.querySelector("#twitter-exclude-retweet").checked = p.twitter.excludeRetweet;
-      r.querySelector("#twitter-exclude-hashtag").checked = p.twitter.excludeHashtag;
-      r.querySelector("#twitter-exclude-url").checked = p.twitter.excludeUrl;
-      r.querySelector("#twitter-apply-color").checked = p.twitter.applyThemeColor;
+      r.querySelector("#twitter-exclude-mention").checked = t.excludeMention;
+      r.querySelector("#twitter-exclude-retweet").checked = t.excludeRetweet;
+      r.querySelector("#twitter-exclude-hashtag").checked = t.excludeHashtag;
+      r.querySelector("#twitter-exclude-url").checked = t.excludeUrl;
+      r.querySelector("#twitter-apply-color").checked = t.applyThemeColor;
+
+      r.querySelector("#twitter-ng-text").value = t.textNg;
+      r.querySelector("#twitter-ng-user").value = t.userNg;
 
       r.querySelector("#twitter-advanced").checked = t.advanced;
       r.querySelector("#twitter-ck").value = t.consumerKey;
@@ -280,20 +285,23 @@
     savePreferenceView(e) {
       super.savePreferenceView();
 
-      var p = this.preference,
+      var p = this.preference.twitter,
           r = e.shadowRoot;
 
-      p.twitter.excludeMention = r.querySelector("#twitter-exclude-mention").checked;
-      p.twitter.excludeRetweet = r.querySelector("#twitter-exclude-retweet").checked;
-      p.twitter.excludeHashtag = r.querySelector("#twitter-exclude-hashtag").checked;
-      p.twitter.excludeUrl = r.querySelector("#twitter-exclude-url").checked;
-      p.twitter.applyThemeColor = r.querySelector("#twitter-apply-color").checked;
+      p.excludeMention = r.querySelector("#twitter-exclude-mention").checked;
+      p.excludeRetweet = r.querySelector("#twitter-exclude-retweet").checked;
+      p.excludeHashtag = r.querySelector("#twitter-exclude-hashtag").checked;
+      p.excludeUrl = r.querySelector("#twitter-exclude-url").checked;
+      p.applyThemeColor = r.querySelector("#twitter-apply-color").checked;
 
-      p.twitter.advanced = r.querySelector("#twitter-advanced").checked;
-      p.twitter.consumerKey = r.querySelector("#twitter-ck").value;
-      p.twitter.consumerSecret = r.querySelector("#twitter-cs").value;
-      p.twitter.accessToken = r.querySelector("#twitter-at").value;
-      p.twitter.accessSecret = r.querySelector("#twitter-as").value;
+      p.textNg = r.querySelector("#twitter-ng-text").value;
+      p.userNg = r.querySelector("#twitter-ng-user").value;
+
+      p.advanced = r.querySelector("#twitter-advanced").checked;
+      p.consumerKey = r.querySelector("#twitter-ck").value;
+      p.consumerSecret = r.querySelector("#twitter-cs").value;
+      p.accessToken = r.querySelector("#twitter-at").value;
+      p.accessSecret = r.querySelector("#twitter-as").value;
     }
 
     initPreference() {
@@ -305,6 +313,8 @@
         accessSecret: "",
         _accessToken: "",
         _accessSecret: "",
+        textNg: "",
+        userNg: "",
         track: "",
         excludeMention: true,
         excludeRetweet: true,
@@ -312,6 +322,23 @@
         excludeUrl: true,
         applyThemeColor: true
       };
+    }
+
+    _getNgList(ng) {
+      return ng.split("\n").map(n => {
+        var m = n.match(/\/(.+)\/([igmy]*)/);
+        var result;
+        if (m) {
+          try {
+            result = new RegExp(m[1], m[2]);
+          } catch(e) {
+            result = null;
+          }
+        } else {
+          result = n;
+        }
+        return result;
+      });
     }
 
   }

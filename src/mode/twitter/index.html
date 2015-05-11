@@ -73,6 +73,18 @@
   <hr>
 
   <div class="form-group">
+    <label for="twitter-ng-text" class="form-label">テキストNG<span class="form-desc">ツイート内容に設定した文字が含まれていた場合ツイートを表示しません。//で囲うと正規表現が利用可能です。</span></label>
+    <textarea id="twitter-ng-text" class="form-control form-textarea-mono" rows="8"></textarea>
+  </div>
+
+  <div class="form-group">
+    <label for="twitter-ng-user" class="form-label">ユーザーNG<span class="form-desc">設定したユーザーのスクリーンネーム（@不要）のツイートを表示しません。//で囲うと正規表現が利用可能です。</span></label>
+    <textarea id="twitter-ng-user" class="form-control form-textarea-mono" rows="8"></textarea>
+  </div>
+
+  <hr>
+
+  <div class="form-group">
     <input type="checkbox" id="twitter-advanced"><label for="twitter-advanced">上級者向け</label>
   </div>
 
