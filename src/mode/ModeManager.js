@@ -119,6 +119,11 @@
       this.mode = this._pref.mode;
     }
 
+    refresh() {
+      if (this._mode < 0) return;
+      this.currentMode.refresh();
+    }
+
     _setMode(mode) {
       if (this.currentMode) {
         this.currentMode.hide();

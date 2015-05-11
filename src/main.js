@@ -83,6 +83,21 @@
     manager.addMode(new window.jikkyo.TwitterMode());
     manager.setModeFromPref();
 
+    var refreshPref = () => {
+      var css = `font-family: ${pref.general.fontFamily};`;
+      css += `opacity: ${pref.general.opacity};`;
+      css += pref.general.style;
+
+      var bulletCss = `opacity: ${pref.general.bulletOpacity};`;
+      bulletCss += pref.general.bulletStyle;
+
+      viewer.setChatStyle(css);
+      viewer.setBulletChatStyle(bulletCss);
+      manager.refresh();
+    };
+    refreshPref();
+    preferenceDialog.on("hide", refreshPref);
+
     if (pref.maximized) win.maximize();
     else {
       if (typeof pref.x === "number")

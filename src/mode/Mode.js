@@ -41,6 +41,13 @@
       this._initPref();
     }
 
+    refresh() {
+      if (!this.viewerView) return;
+      this._adapter.refresh();
+      if (!this._adapter.praying)
+        this._adapter.render();
+    }
+
     show() {
       this._adapter.showComment();
     }
@@ -48,9 +55,6 @@
     hide() {
       this._adapter.stop();
       this._adapter.hideComment();
-    }
-
-    refresh() {
     }
 
     getPreferenceView() {

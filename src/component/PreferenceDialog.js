@@ -3,6 +3,7 @@
 
   var fs = require("fs"),
       gui = require("nw.gui"),
+      EventEmitter = require("events").EventEmitter,
       doc = document.currentScript.ownerDocument;
 
   class PreferenceDialog extends window.jikkyo.Modal {
@@ -22,6 +23,7 @@
       this._savePrefCb = [];
       this._tabs = this.content.querySelector("#tabs");
       this._prefs = this.content.querySelector("#prefs");
+      this._event = new EventEmitter();
 
       var prefc = this.content.querySelectorAll(".pref");
       Array.from(prefc).forEach(c => {
@@ -45,6 +47,14 @@
       } catch(e) {
         this.shadowRoot.querySelector("#about-version").textContent = "ERROR";
       }
+    }
+
+    on(type, listener) {
+      this._event.on(type, listener);
+    }
+
+    off(type, listener) {
+      this._event.removeListener(type, listener);
     }
 
     show() {
@@ -73,6 +83,8 @@
         this._modePrefs.forEach((p, i) => this._savePrefCb[i](p), this);
         this._saveGeneralPreference(this.content, this.preference.general);
         pr.save();
+
+        this._event.emit("hide");
       }
 
       super.hide();
@@ -115,6 +127,7 @@
         fontSize: "32px",
         rows: 12,
         style: "",
+        bulletStyle: "",
         checkNewVersionAuto: true
       };
     }
@@ -129,6 +142,7 @@
       r.querySelector("#comment-font-size").value = p.fontSize;
       r.querySelector("#comment-rows").value = p.rows;
       r.querySelector("#comment-style").value = p.style;
+      r.querySelector("#comment-bullet-style").value = p.bulletStyle;
       r.querySelector("#about-check-auto").checked = p.checkNewVersionAuto;
     }
 
@@ -155,6 +169,7 @@
       if (tmp > 0 && tmp < 40) p.rows = tmp;
 
       p.style = r.querySelector("#comment-style").value;
+      p.bulletStyle = r.querySelector("#comment-bullet-style").value;
 
       p.checkNewVersionAuto = r.querySelector("#about-check-auto").checked;
     }

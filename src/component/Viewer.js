@@ -30,7 +30,8 @@
         size:       defaults.size,
         x:          0,
         y:          0,
-        visibility: false
+        visibility: false,
+        bullet:     false
       };
     }
 
@@ -166,6 +167,15 @@
       this._update("visibility", visibility);
     }
 
+    get bullet() {
+      return this.classList.contains("bullet");
+    }
+
+    set bullet(bullet) {
+      if (bullet) this.classList.add("bullet");
+      else this.classList.remove("bullet");
+    }
+
     get computedFontSize() {
       return parseFloat(window.getComputedStyle(this)["font-size"].replace("px", ""));
     }
@@ -177,6 +187,7 @@
       this.x = this._chat.x;
       this.y = this._chat.y;
       this.visibility = this._chat.visibility;
+      this.bullet = this._chat.bullet;
     }
 
     _observer(changes) {
@@ -199,6 +210,9 @@
             break;
           case "visibility":
             this.visibility = this._chat.visibility;
+            break;
+          case "bullet":
+            this.bullet = this._chat.bullet;
             break;
         }
       }, this);
@@ -279,6 +293,34 @@
 
     getDummyChat() {
       return this._dummy;
+    }
+
+    setChatStyle(css) {
+      var style = this.shadowRoot.querySelector("style#chat");
+      if (!css) {
+        if (style) this.shadowRoot.removeChild(style);
+        return;
+      }
+      if (!style) {
+        style = document.createElement("style");
+        style.id = "chat";
+        this.shadowRoot.appendChild(style);
+      }
+      style.textContent = `jikkyo-chat { ${css} }`;
+    }
+
+    setBulletChatStyle(css) {
+      var style = this.shadowRoot.querySelector("style#bullet");
+      if (!css) {
+        if (style) this.shadowRoot.removeChild(style);
+        return;
+      }
+      if (!style) {
+        style = document.createElement("style");
+        style.id = "bullet";
+        this.shadowRoot.appendChild(style);
+      }
+      style.textContent = `jikkyo-chat.bullet { ${css} }`;
     }
 
   }
