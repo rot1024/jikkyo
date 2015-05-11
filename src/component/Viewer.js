@@ -302,12 +302,12 @@
 
     setChatStyle(css) {
       var style = this.shadowRoot.querySelector("style#chat");
-      style.textContent = `jikkyo-chat { ${css} }`;
+      style.sheet.cssRules[0].style.cssText = css;
     }
 
     setBulletChatStyle(css) {
       var style = this.shadowRoot.querySelector("style#chat-bullet");
-      style.textContent = `jikkyo-chat.bullet { ${css} }`;
+      style.sheet.cssRules[0].style.cssText = css;
     }
 
   }
