@@ -61,17 +61,12 @@
     });
 
     container.addEventListener("mousemove", e => {
-      var rect = container.getBoundingClientRect();
-      if (rect.top <= e.clientY && e.clientY < 50)
-        titlebar.show();
-      else
-        titlebar.hide();
-
-      if (win.height - 100 < e.clientY && e.clientY <= rect.bottom) {
+      if (e.clientY < 70) titlebar.show();
+      else titlebar.hide();
+      if (win.height - 150 < e.clientY)
         controller.show();
-      } else if (!controller.isFixed) {
+      else if (!controller.isFixed)
         controller.hide();
-      }
     });
 
     var manager = new window.jikkyo.ModeManager();
