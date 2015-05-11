@@ -84,8 +84,10 @@
     }
 
     .container /deep/ .form-desc {
-      color: #757575;
-      font-size: 80%;
+      display: block;
+      margin: 5px 0 0 0;
+      color: #777;
+      font-size: 85%;
     }
 
     .form-textarea-mono {
@@ -187,12 +189,12 @@
          <hr>
 
          <div class="form-group">
-            <label for="comment-style" class="form-label">コメントCSS</label>
+            <label for="comment-style" class="form-label">コメントCSS<span class="form-desc">コメントに適用するCSSを記述します。例："color: yellow;"</span></label>
            <textarea id="comment-style" class="form-control form-textarea-mono" rows="8"></textarea>
          </div>
 
          <div class="form-group">
-            <label for="comment-bullet-style" class="form-label">弾幕コメントCSS</label>
+            <label for="comment-bullet-style" class="form-label">弾幕コメントCSS<span class="form-desc">弾幕コメントに適用するCSSを記述します。コメントCSSをベースにCSSが上書きされます。</span></label>
             <textarea id="comment-bullet-style" class="form-control form-textarea-mono" rows="8"></textarea>
          </div>
 
