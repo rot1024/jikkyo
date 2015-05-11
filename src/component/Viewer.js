@@ -4,7 +4,7 @@
   var doc = document.currentScript.ownerDocument;
 
   var defaults = {
-    color: "#FFFFFF",
+    color: "",
     size: "100%"
   };
 
