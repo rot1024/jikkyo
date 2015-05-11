@@ -133,7 +133,7 @@
         usDuration: 3000,
         opacity: 1,
         bulletOpacity: 1,
-        sizing: 0,
+        sizing: "font-size",
         fontSize: "32px",
         rows: 12,
         style: "",
@@ -172,7 +172,7 @@
       tmp = parseFloat(r.querySelector("#comment-bullet-opacity").value);
       if (tmp >= 0 && tmp <= 1) p.bulletOpacity = tmp;
 
-      p.sizing = parseInt(r.querySelector("#comment-sizing").value);
+      p.sizing = r.querySelector("#comment-sizing").value;
       p.fontSize = r.querySelector("#comment-font-size").value;
 
       tmp = r.querySelector("#comment-rows").value;
