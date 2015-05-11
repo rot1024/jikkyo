@@ -101,6 +101,8 @@
     refreshPref();
     preferenceDialog.on("hide", refreshPref);
 
+    win.show();
+
     if (pref.maximized) win.maximize();
     else {
       if (typeof pref.x === "number")
@@ -112,8 +114,6 @@
       if (typeof pref.height === "number" && pref.height >= 100)
         win.height = pref.height;
     }
-
-    win.show();
 
     setTimeout(() => {
       container.classList.remove("attention");
