@@ -120,6 +120,7 @@
     }
 
     refresh() {
+      super.refresh();
       this._range.max = this._adapter.length;
       this._range.value = this._adapter.position;
       this._time.totalMillisecond = this._adapter.position;

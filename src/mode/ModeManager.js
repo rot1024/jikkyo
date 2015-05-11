@@ -119,9 +119,16 @@
       this.mode = this._pref.mode;
     }
 
+    setDuration(duration) {
+      this._modeList.forEach(m => m.adapter.duration = duration);
+    }
+
+    setDurationAlt(duration) {
+      this._modeList.forEach(m => m.adapter.durationAlt = duration);
+    }
+
     refresh() {
-      if (this._mode < 0) return;
-      this.currentMode.refresh();
+      this._modeList.forEach(m => m.refresh());
     }
 
     _setMode(mode) {

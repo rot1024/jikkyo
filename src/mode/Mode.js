@@ -42,10 +42,8 @@
     }
 
     refresh() {
-      if (!this.viewerView) return;
       this._adapter.refresh();
-      if (!this._adapter.praying)
-        this._adapter.render();
+      this._adapter.render();
     }
 
     show() {

@@ -160,19 +160,19 @@
       var tmp;
       p.fontFamily = r.querySelector("#comment-font-family").value;
 
-      tmp = r.querySelector("#comment-duration").value;
-      if (tmp >= 100 && tmp < 10000) p.duration = tmp;
+      tmp = parseInt(r.querySelector("#comment-duration").value);
+      if (tmp >= 100 && tmp <= 10000) p.duration = tmp;
 
-      tmp = r.querySelector("#comment-us-duration").value;
-      if (tmp >= 100 && tmp < 10000) p.usDuration = tmp;
+      tmp = parseInt(r.querySelector("#comment-us-duration").value);
+      if (tmp >= 100 && tmp <= 10000) p.usDuration = tmp;
 
-      tmp = r.querySelector("#comment-opacity").value;
+      tmp = parseFloat(r.querySelector("#comment-opacity").value);
       if (tmp >= 0 && tmp <= 1) p.opacity = tmp;
 
-      tmp = r.querySelector("#comment-bullet-opacity").value;
+      tmp = parseFloat(r.querySelector("#comment-bullet-opacity").value);
       if (tmp >= 0 && tmp <= 1) p.bulletOpacity = tmp;
 
-      p.sizing = r.querySelector("#comment-sizing").value;
+      p.sizing = parseInt(r.querySelector("#comment-sizing").value);
       p.fontSize = r.querySelector("#comment-font-size").value;
 
       tmp = r.querySelector("#comment-rows").value;

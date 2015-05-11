@@ -56,6 +56,24 @@
       this._controller = controller;
     }
 
+    get duration() {
+      return this._duration;
+    }
+
+    set duration(duration) {
+      if (duration < 100 || duration > 10000) return;
+      this._duration = duration;
+    }
+
+    get durationAlt() {
+      return this._durationAlt;
+    }
+
+    set durationAlt(duration) {
+      if (duration < 100 || duration > 10000) return;
+      this._durationAlt = duration;
+    }
+
     get rows() {
       return this._rows;
     }
@@ -181,8 +199,13 @@
         this._comment.splice(search, 0, chat);
       }, this);
 
-      if (!this._realtime)
-        this.length = this._comment[this._comment.length - 1].vpos + Math.max(this._duration, this._durationAlt);
+      if (!this._realtime) {
+        let lastComment = this._comment[this._comment.length - 1];
+        this.length =
+          lastComment.vpos +
+          (lastComment.position === "ue" || lastComment.position === "shita" ?
+          this._durationAlt : this._duration);
+      }
 
       this.refresh(index);
     }

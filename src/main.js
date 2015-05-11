@@ -91,8 +91,11 @@
       var bulletCss = `opacity: ${pref.general.bulletOpacity};`;
       bulletCss += pref.general.bulletStyle;
 
+      manager.setDuration(pref.general.duration);
+      manager.setDurationAlt(pref.general.usDuration);
       viewer.setChatStyle(css);
       viewer.setBulletChatStyle(bulletCss);
+
       manager.refresh();
     };
     refreshPref();
