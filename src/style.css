@@ -10,7 +10,8 @@ body {
 
 body,
 body /deep/ input,
-body /deep/ select {
+body /deep/ select,
+body /deep/ textarea {
   font-size: 14px;
   font-family: "メイリオ", sans-serif;
 }
