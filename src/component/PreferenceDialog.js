@@ -13,7 +13,7 @@
 
       this.width = 640;
       this.height = 420;
-      this.preference = null;
+      this._preference = null;
 
       this.appendStyle(document.importNode(doc.querySelector("#style").content, true));
       this.appendContent(document.importNode(doc.querySelector("#content").content, true));
@@ -47,6 +47,16 @@
       } catch(e) {
         this.shadowRoot.querySelector("#about-version").textContent = "ERROR";
       }
+    }
+
+    get preference() {
+      return this._preference;
+    }
+
+    set preference(v) {
+      this._preference = v;
+      if (!v.general)
+        v.general = this._initGeneralPreference();
     }
 
     on(type, listener) {
