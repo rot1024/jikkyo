@@ -43,6 +43,11 @@
     .sw { left: 0; bottom: 0; }
     .se { right: 0; bottom: 0; }
 
+    .w:hover, .e:hover { cursor: ew-resize; }
+    .n:hover, .s:hover { cursor: ns-resize; }
+    .nw:hover, .se:hover { cursor: nwse-resize; }
+    .ne:hover, .sw:hover { cursor: nesw-resize; }
+
   </style>
 
   <div id="w" class="grip w"></div>
@@ -62,6 +67,13 @@
 
     var win = require("nw.gui").Window.get();
     var doc = document.currentScript.ownerDocument;
+
+    var cursors = [
+      {name: "ew-resize", c: ["w", "e"] },
+      {name: "ns-resize", c: ["n", "s"] },
+      {name: "nwse-resize", c: ["nw", "se"] },
+      {name: "nesw-resize", c: ["ne", "sw"] }
+    ];
 
     var resizer = class extends HTMLElement {
 
@@ -143,21 +155,22 @@
             window.addEventListener("mousemove", mousemove);
             window.addEventListener("mouseup", mouseup);
             drag.dragging = true;
-            window.document.body.style.cursor = str + "-resize";
+
+            var cursorName = "";
+            cursors.some((c, i) => {
+              if (c.c.indexOf(str) >= 0) {
+                cursorName = c.name;
+                return true;
+              }
+            });
+
+            if (cursorName)
+              window.document.body.style.cursor = cursorName;
             window.requestAnimationFrame(tick);
             e.stopPropagation();
           });
 
           t.addEventListener("click", e => e.stopPropagation());
-
-          t.addEventListener("mouseenter", e => {
-            window.document.body.style.cursor =
-              maximized ? null : str + "-resize";
-          });
-
-          t.addEventListener("mouseleave", e => {
-            window.document.body.style.cursor = null;
-          });
         };
 
         [["nw", "n", "ne"], ["w", null, "e"], ["sw", "s", "se"]]
