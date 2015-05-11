@@ -51,7 +51,7 @@ module.exports = (() => {
 
         this._comment = result.packet.chat.map(obj => {
           return this._parseChat(obj, margin);
-        }, this);
+        }, this).filter(obj => obj !== null);
 
         deferred.resolve(this._comment);
       }).bind(this));
@@ -89,6 +89,8 @@ module.exports = (() => {
     }
 
     _parseChat(obj, margin) {
+      if (!obj._) return null;
+
       margin = margin || 0;
 
       var chat = {
