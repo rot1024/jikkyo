@@ -1,9 +1,9 @@
 (() => {
   "use strict";
 
-  var fs = require("fs"),
-      gui = require("nw.gui"),
+  var gui = require("nw.gui"),
       EventEmitter = require("events").EventEmitter,
+      UpdateChecker = require("./util/UpdateChecker"),
       doc = document.currentScript.ownerDocument;
 
   class PreferenceDialog extends window.jikkyo.Modal {
@@ -34,19 +34,36 @@
         this.hide();
       }).bind(this));
 
-      try {
-        var packagejson = JSON.parse(fs.readFileSync("package.json", "utf8"));
-        if (packagejson.version)
-          this.shadowRoot.querySelector("#about-version").textContent = packagejson.version;
-        if (packagejson.homepage)
-          this.shadowRoot.querySelector("#about-homepage").addEventListener(
-            "click", () => gui.Shell.openExternal(packagejson.homepage));
-        if (packagejson.repository && packagejson.repository.url)
-          this.shadowRoot.querySelector("#about-repository").addEventListener(
-            "click", () => gui.Shell.openExternal(packagejson.repository.url));
-      } catch(e) {
-        this.shadowRoot.querySelector("#about-version").textContent = "ERROR";
-      }
+      var modal = this.shadowRoot.querySelector("#about-modal");
+
+      this.shadowRoot.querySelector("#about-version").textContent = UpdateChecker.currentVersion;
+      this.shadowRoot.querySelector("#about-homepage").addEventListener(
+          "click", () => gui.Shell.openExternal(UpdateChecker.homepageURL));
+      this.shadowRoot.querySelector("#about-repository").addEventListener(
+        "click", () => gui.Shell.openExternal(UpdateChecker.repositoryURL));
+
+      this.shadowRoot.querySelector("#about-check").addEventListener(
+        "click", () => {
+          modal.use("loading");
+          modal.show();
+          UpdateChecker.getLatestVersion().then(v => {
+            if (v !== UpdateChecker.currentVersion) {
+              modal.use(
+                "alert", `新バージョン ${v} が公開されています。公式サイトを開きますか？`,
+                () => modal.hide(),
+                () => {
+                  gui.Shell.openExternal(UpdateChecker.homepageURL);
+                  modal.hide();
+                });
+            } else {
+              modal.use("alert", "最新バージョンをお使いです。", () => modal.hide());
+            }
+          }).catch(e => {
+            console.error(e);
+            modal.use("alert", "データの取得に失敗しました。", () => modal.hide());
+          });
+        });
+
     }
 
     get preference() {

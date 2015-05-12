@@ -1,8 +1,27 @@
 (() => {
   "use strict";
 
-  var gui = require("nw.gui");
-  var win = gui.Window.get();
+  var gui = require("nw.gui"),
+      win = gui.Window.get(),
+      UpdateChecker = require("./util/UpdateChecker");
+
+  var pref = new window.jikkyo.Preference();
+  pref.load();
+
+  if (pref.general && pref.general.checkNewVersionAuto) {
+    UpdateChecker.getLatestVersion().then(v => {
+      if (v === UpdateChecker.currentVersion) return;
+      var modal = document.querySelector("jikkyo-modal");
+      modal.use(
+        "yesno", `新バージョン ${v} が公開されています。公式サイトを開きますか？`,
+        () => modal.hide(),
+        () => {
+          gui.Shell.openExternal(UpdateChecker.homepageURL);
+          modal.hide();
+        }
+      );
+    });
+  }
 
   win.on("loaded", () => {
 
@@ -16,8 +35,6 @@
         viewer = document.querySelector("jikkyo-viewer"),
         preferenceDialog = document.querySelector("jikkyo-preference-dialog");
 
-    var pref = new window.jikkyo.Preference();
-    pref.load();
     preferenceDialog.preference = pref;
     controller.preference = pref;
 
