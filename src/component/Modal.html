@@ -1,4 +1,4 @@
-<template>
+<template id="main">
   <style>
     :host {
       position: absolute;
@@ -96,6 +96,25 @@
   </div>
 </template>
 
+<template id="loading" data-width="200" data-height="50">
+  <div class="modal-loading"></div>
+</template>
+
+<template id="alert" data-width="400" data-height="150">
+  <div id="modal-content" class="modal-form"></div>
+  <div class="modal-footer">
+    <div id="modal-btn-ok" class="btn">OK</div>
+  </div>
+</template>
+
+<template id="yesno" data-width="400" data-height="150">
+  <div id="modal-content" class="modal-form"></div>
+  <div class="modal-footer">
+    <div id="modal-btn-no" class="btn">いいえ</div>
+    <div id="modal-btn-yes" class="btn btn-primary">はい</div>
+  </div>
+</template>
+
 <script>
   (() => {
     "use strict";
@@ -105,7 +124,7 @@
     class Modal extends HTMLElement {
 
       createdCallback() {
-        var template = document.importNode(doc.querySelector("template").content, true);
+        var template = document.importNode(doc.getElementById("main").content, true);
 
         this._modalBg = template.querySelector("#modal-bg");
         this.content = template.querySelector("#modal");
@@ -150,6 +169,28 @@
 
       appendContent(content) {
         this.content.appendChild(content);
+      }
+
+      use(name, content, listener1, listener2) {
+        if (name === "main") return;
+        var template = doc.querySelector("template#" + name);
+        if (!template) return;
+        var root = document.importNode(template.content, true);
+
+        this.width = parseInt(template.dataset.width);
+        this.height = parseInt(template.dataset.height);
+
+        if (name !== "loading")
+          root.querySelector("#modal-content").innerHTML = content;
+        if (name === "yesno") {
+          root.querySelector("#modal-btn-no").addEventListener("click", listener1);
+          root.querySelector("#modal-btn-yes").addEventListener("click", listener2);
+        } else if (name === "alert") {
+          root.querySelector("#modal-btn-ok").addEventListener("click", listener1);
+        }
+
+        this.content.innerHTML = "";
+        this.appendContent(root);
       }
 
       show() {
