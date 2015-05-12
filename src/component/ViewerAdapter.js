@@ -503,11 +503,12 @@
     }
 
     _calcBaseFontSize() {
-      if (this._viewer === null) return;
+      if (!this._viewer) return;
 
       var fontSize = "";
       if (this._sizingMode === 1 && this._rows > 0) {
-        fontSize = (this._viewer.height / this._rows) + "px";
+        fontSize = this._viewer.calcChatFontSizeFromHeight(
+          this._viewer.height / this._rows) + "px";
       } else {
         fontSize = this._baseFontSize;
       }

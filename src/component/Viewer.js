@@ -310,6 +310,33 @@
       style.sheet.cssRules[0].style.cssText = css;
     }
 
+    calcChatFontSizeFromHeight(height) {
+      var baseStyle = this.shadowRoot.querySelector("style#base").sheet.cssRules[1].style;
+      var chatStyle = this.shadowRoot.querySelector("style#chat").sheet.cssRules[0].style;
+
+      var lineHeight = chatStyle.lineHeight || baseStyle.lineHeight;
+
+      var dummyStyle = window.getComputedStyle(this.getDummyChat()),
+          paddingTop = parseFloat(dummyStyle.paddingTop),
+          paddingBottom = parseFloat(dummyStyle.paddingBottom);
+
+      var h = height - paddingTop - paddingBottom;
+
+      if (/[A-Za-z]+$/.test(lineHeight)) {
+        let lh = parseFloat(dummyStyle.lineHeight);
+        if (h > lh) h = lh;
+      } else {
+        let lh = parseFloat(lineHeight);
+        if (lineHeight.slice(-1) === "%") {
+          h /= lh / 100;
+        } else {
+          if (lh !== 0) h /= lh;
+        }
+      }
+
+      return h;
+    }
+
   }
 
   window.jikkyo.Viewer = document.registerElement("jikkyo-viewer", {

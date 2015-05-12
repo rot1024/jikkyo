@@ -17,16 +17,11 @@
       bottom: 0;
     }
 
-    .base {
-      font-size: 32px;
-    }
-
     jikkyo-chat {
       position: absolute;
       display: inline-block;
       color: #fff;
       font-weight: bold;
-      line-height: 1.2;
       white-space: nowrap;
       text-shadow: 0 0 5px #000;
     }
@@ -36,8 +31,12 @@
   </style>
   <style id="base">
     .base { font-size: 32px; }
-    jikkyo-chat {}
-    jikkyo-chat.bullet {}
+    jikkyo-chat {
+      line-height: 1.2;
+      box-sizing: content-box;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
   </style>
   <style id="chat">jikkyo-chat { }</style>
   <style id="chat-bullet">jikkyo-chat.bullet { }</style>
