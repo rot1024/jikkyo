@@ -15,6 +15,7 @@ module.exports = (() => {
       this._streaming = false;
       this.textNg = [];
       this.userNg = [];
+      this.sourceNg = [];
       this.options = {
         excludeMention: true,
         excludeRetweet: true,
@@ -123,6 +124,16 @@ module.exports = (() => {
             return tweet.text.indexOf(ng) >= 0;
         })) return;
 
+        var sourceMatch = tweet.source.match(/<a.*?>(.*?)<\/a>/);
+        var source = sourceMatch && sourceMatch[1] ? sourceMatch[1] : tweet.source;
+        if (this.sourceNg.some(ng => {
+          if (ng === null) return false;
+          if (util.isRegExp(ng))
+            return ng.test(source);
+          else
+            return source.indexOf(ng) >= 0;
+        })) return;
+
         var mentions_length = getKey(tweet, ["entities", "user_mentions", "length"]) || 0;
         if (this.options.excludeMention && mentions_length > 0) return;
 
@@ -169,6 +180,7 @@ module.exports = (() => {
           position: position,
           vpos: vpos
         });
+
       }).bind(this));
 
       stream.on("error", error => {

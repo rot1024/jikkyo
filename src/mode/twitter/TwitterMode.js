@@ -102,6 +102,7 @@
         twitter.auth(opts);
         twitter.textNg = this._getNgList(this.preference.twitter.textNg);
         twitter.userNg = this._getNgList(this.preference.twitter.userNg);
+        twitter.sourceNg = this._getNgList(this.preference.twitter.sourceNg);
 
         if (this.preference) {
           twitter.options = {
@@ -272,6 +273,7 @@
 
       r.querySelector("#twitter-ng-text").value = t.textNg;
       r.querySelector("#twitter-ng-user").value = t.userNg;
+      r.querySelector("#twitter-ng-source").value = t.sourceNg;
 
       r.querySelector("#twitter-advanced").checked = t.advanced;
       r.querySelector("#twitter-ck").value = t.consumerKey;
@@ -296,6 +298,7 @@
 
       p.textNg = r.querySelector("#twitter-ng-text").value;
       p.userNg = r.querySelector("#twitter-ng-user").value;
+      p.sourceNg = r.querySelector("#twitter-ng-source").value;
 
       p.advanced = r.querySelector("#twitter-advanced").checked;
       p.consumerKey = r.querySelector("#twitter-ck").value;
@@ -315,6 +318,7 @@
         _accessSecret: "",
         textNg: "",
         userNg: "",
+        sourceNg: "",
         track: "",
         excludeMention: true,
         excludeRetweet: true,
@@ -325,6 +329,7 @@
     }
 
     _getNgList(ng) {
+      if (ng === "") return [];
       return ng.split("\n").map(n => {
         var m = n.match(/\/(.+)\/([igmy]*)/);
         var result;
@@ -335,7 +340,8 @@
             result = null;
           }
         } else {
-          result = n;
+          if (n === "") result = null;
+          else result = n;
         }
         return result;
       });
