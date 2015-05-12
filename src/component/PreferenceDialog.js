@@ -133,7 +133,7 @@
         usDuration: 3000,
         opacity: 1,
         bulletOpacity: 1,
-        sizing: "font-size",
+        sizing: 0,
         fontSize: "32px",
         rows: 12,
         style: "",
