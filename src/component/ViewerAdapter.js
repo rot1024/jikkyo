@@ -130,7 +130,7 @@
         throw new TypeError("position must be number: " + typeof position);
       if (this._position === position) return;
 
-      this._position = Math.min(this._length, position);
+      this._position = Math.max(0, Math.min(this._length, position));
 
       this._event.emit("observe", "position", this._position);
       if (this.isSimpleMode) this.refresh();
@@ -354,6 +354,36 @@
       refresh(start, end);
     }
 
+    seekForward() {
+      this.position += 10000;
+      if (!this._playing) this.render();
+    }
+
+    seekBackward() {
+      this.position -= 10000;
+      if (!this._playing) this.render();
+    }
+
+    seekForwardBit() {
+      this.position += 1000;
+      if (!this._playing) this.render();
+    }
+
+    seekBackwardBit() {
+      this.position -= 1000;
+      if (!this._playing) this.render();
+    }
+
+    seekToStart() {
+      this.position = 0;
+      if (!this._playing) this.render();
+    }
+
+    seekToEnd() {
+      this.position = this._length;
+      if (!this._playing) this.render();
+    }
+
     _renderCb() {
       if (this._viewer === null) return;
       if (!this._playing) return;
@@ -364,7 +394,7 @@
       if (this._realtime)
         this._length = this._position = this._position + current - prev;
       else
-        this._position = Math.min(this._length, this._position + current - prev);
+        this._position = Math.max(0, Math.min(this._length, this._position + current - prev));
       this._event.emit("observe", "position", this._position);
 
       this.render();
