@@ -10,6 +10,11 @@
       pointer-events: none;
     }
 
+    h1 {
+      margin: 10px 0;
+      font-size: 100%;
+    }
+
     #modal-bg {
       position: absolute;
       left: 0;
@@ -72,6 +77,17 @@
       width: calc(100% - 20px);
     }
 
+    .modal-content {
+      position: absolute;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 50px;
+      display: block;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
     .modal-loading {
       position: absolute;
       display: block;
@@ -101,14 +117,14 @@
 </template>
 
 <template id="alert" data-width="400" data-height="150">
-  <div id="modal-content" class="modal-form"></div>
+  <div class="modal-content"></div>
   <div class="modal-footer">
     <div id="modal-btn-ok" class="btn">OK</div>
   </div>
 </template>
 
 <template id="yesno" data-width="400" data-height="150">
-  <div id="modal-content" class="modal-form"></div>
+  <div class="modal-content"></div>
   <div class="modal-footer">
     <div id="modal-btn-no" class="btn">いいえ</div>
     <div id="modal-btn-yes" class="btn btn-primary">はい</div>
@@ -125,6 +141,8 @@
 
       createdCallback() {
         var template = document.importNode(doc.getElementById("main").content, true);
+
+        this._styles = [];
 
         this._modalBg = template.querySelector("#modal-bg");
         this.content = template.querySelector("#modal");
@@ -164,11 +182,34 @@
       }
 
       appendStyle(style) {
-        this.shadowRoot.insertBefore(style, this._modalBg);
+        var s;
+        if (typeof style === "string") {
+          s = document.createElement("style");
+          s.textContent = style;
+        } else {
+          s = style;
+        }
+
+        this._styles.push(s);
+        this.shadowRoot.insertBefore(s, this._modalBg);
+      }
+
+      emptyStyle() {
+        this._styles.forEach(s => {
+          this.shadowRoot.removeChild(s);
+        }, this);
+        this._styles = [];
       }
 
       appendContent(content) {
-        this.content.appendChild(content);
+        if (typeof content === "string")
+          this.content.innerHTML += content;
+        else
+          this.content.appendChild(content);
+      }
+
+      emptyContent() {
+        this.content.innerHTML = "";
       }
 
       use(name, content, listener1, listener2) {
@@ -181,15 +222,19 @@
         this.height = parseInt(template.dataset.height);
 
         if (name !== "loading")
-          root.querySelector("#modal-content").innerHTML = content;
+          root.querySelector(".modal-content").innerHTML = content;
         if (name === "yesno") {
-          root.querySelector("#modal-btn-no").addEventListener("click", listener1);
-          root.querySelector("#modal-btn-yes").addEventListener("click", listener2);
+          root.querySelector("#modal-btn-no").addEventListener(
+            "click", listener1 || (() => this.hide()).bind(this));
+          root.querySelector("#modal-btn-yes").addEventListener(
+            "click", listener2 || (() => this.hide()).bind(this));
         } else if (name === "alert") {
-          root.querySelector("#modal-btn-ok").addEventListener("click", listener1);
+          root.querySelector("#modal-btn-ok").addEventListener(
+            "click", listener1 || (() => this.hide()).bind(this));
         }
 
-        this.content.innerHTML = "";
+        this.emptyStyle();
+        this.emptyContent();
         this.appendContent(root);
       }
 
@@ -225,5 +270,3 @@
 
   })();
 </script>
-
-
