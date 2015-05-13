@@ -26,8 +26,9 @@
     "height": 520
   },
   "dependencies": {
-    "twitter": "^1.2.5",
+    "mousetrap": "^1.5.2",
     "oauth": "^0.9.12",
+    "twitter": "^1.2.5",
     "xml2js": "^0.4.8"
   }
 }

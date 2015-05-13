@@ -72,7 +72,7 @@
         if (!this._adapter.playing) this._adapter.render();
       }).bind(this));
 
-      this._playBtn.addEventListener("click", (() => {
+      var play = (() => {
         if (!this._adapter.playing) {
           if (this._adapter.length === 0) return;
           this._adapter.realtime = false;
@@ -86,7 +86,9 @@
           this._playBtn.classList.remove("controller-btn-pause");
           this._adapter.stop();
         }
-      }).bind(this));
+      }).bind(this);
+
+      this._playBtn.addEventListener("click", play);
 
       {
         let that = this;
@@ -106,9 +108,27 @@
         });
       }
 
-      fileOpenBtn.addEventListener("click", (() => {
-        fileInput.click();
-      }).bind(this));
+      var open = () => fileInput.click();
+
+      this._seekForward = this._seekForward.bind(this);
+      this._seekBackward = this._seekBackward.bind(this);
+      this._seekForwardBit = this._seekForwardBit.bind(this);
+      this._seekBackwardBit = this._seekBackwardBit.bind(this);
+      this._seekToStart = this._seekToStart.bind(this);
+      this._seekToEnd = this._seekToEnd.bind(this);
+
+      fileOpenBtn.addEventListener("click", open);
+
+      this.shortcutkeys = [
+        { key: "ctrl+o", macKey: "command+o", label: "コメントファイルを開く", press: open },
+        { key: "space", label: "再生/停止", press: play },
+        { key: "right", label: "10秒進む", press: this._seekForward },
+        { key: "left", label: "10秒戻る", press: this._seekBackward },
+        { key: "shift+right", label: "1秒進む", press: this._seekForwardBit },
+        { key: "shift+left", label: "1秒戻る", press: this._seekBackwardBit },
+        { key: "home", label: "始めに戻る", press: this._seekToStart },
+        { key: "end", label: "終わりまで進む", press: this._seekToEnd }
+      ];
     }
 
     show() {
@@ -167,6 +187,30 @@
         bigSize: "150%",
         smallSize: "50%"
       };
+    }
+
+    _seekForward() {
+      this._adapter.seekForward();
+    }
+
+    _seekBackward() {
+      this._adapter.seekBackward();
+    }
+
+    _seekForwardBit() {
+      this._adapter.seekForwardBit();
+    }
+
+    _seekBackwardBit() {
+      this._adapter.seekBackwardBit();
+    }
+
+    _seekToStart() {
+      this._adapter.seekToStart();
+    }
+
+    _seekToEnd() {
+      this._adapter.seekToEnd();
     }
 
   }

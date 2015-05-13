@@ -1,3 +1,4 @@
+/* global Mousetrap */
 (() => {
   "use strict";
 
@@ -9,6 +10,7 @@
       this._preferenceLabel = "";
       this._viewerView = null;
       this._pref = null;
+      this.shortcutkeys = [];
     }
 
     get adapter() {
@@ -48,11 +50,21 @@
 
     show() {
       this._adapter.showComment();
+
+      const mac = process.platform === "darwin";
+      this.shortcutkeys.forEach(k => {
+        Mousetrap.bind(mac && k.macKey ? k.macKey : k.key, k.press);
+      });
     }
 
     hide() {
       this._adapter.stop();
       this._adapter.hideComment();
+
+      const mac = process.platform === "darwin";
+      this.shortcutkeys.forEach(k => {
+        Mousetrap.unbind(mac && k.macKey ? k.macKey : k.key);
+      });
     }
 
     getPreferenceView() {

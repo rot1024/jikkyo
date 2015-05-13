@@ -1,3 +1,4 @@
+/* global Mousetrap */
 (() => {
   "use strict";
 
@@ -129,6 +130,7 @@
     }
 
     createdCallback() {
+      var that = this;
       var root = this.createShadowRoot();
       var template = doc.getElementById("main");
       root.appendChild(document.importNode(template.content, true));
@@ -146,21 +148,28 @@
           fixBtn = root.getElementById("btn-fix"),
           menuBtn = root.getElementById("btn-menu");
 
-      alwaysontopBtn.addEventListener("click", (() => {
-        this.isAlwaysOnTop = !this.isAlwaysOnTop;
-        this.savePref();
-      }).bind(this));
-
-      fixBtn.addEventListener("click", (() => {
+      var fix = (() => {
         this.isFixed = !this.isFixed;
         this.savePref();
-      }).bind(this));
+      }).bind(this);
+
+      var alwaysontop = (() => {
+        this.isAlwaysOnTop = !this.isAlwaysOnTop;
+        this.savePref();
+      }).bind(this);
+
+      alwaysontopBtn.addEventListener("click", alwaysontop);
+      fixBtn.addEventListener("click", fix);
 
       this._menu = document.createElement("jikkyo-menu");
-
       this._menuSeparetor = new window.jikkyo.MenuItem({ type: "separator" });
-
       this._menu.add(this._menuSeparetor);
+      this._menu.add({
+        label: "ショートカットキーのヘルプ",
+        click() {
+          that._event.emit("observe", "showShortcutkeysHelp");
+        }
+      });
       this._menu.add({
         label: "開発者ツールを表示",
         click() {
@@ -178,6 +187,16 @@
         var rect = menuBtn.getBoundingClientRect();
         this._menu.show(rect.right, rect.top);
       }).bind(this));
+
+      this.shortcutkeys = [
+        { key: "ctrl+t", macKey: "command+t", label: "常に最前面表示", press: alwaysontop },
+        { key: "ctrl+f", macKey: "command+f", label: "コントロールバーを固定", press: fix }
+      ];
+
+      const mac = process.platform === "darwin";
+      this.shortcutkeys.forEach(k => {
+        Mousetrap.bind(mac && k.macKey ? k.macKey : k.key, k.press);
+      });
     }
 
   };

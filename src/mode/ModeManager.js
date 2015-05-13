@@ -156,6 +156,53 @@
 
     }
 
+    showShortcutkeysHelp() {
+      if (!this.modal) return;
+
+      const mac = process.platform === "darwin";
+      var str = "", keys = [];
+
+      if (this._controllerView && Array.isArray(this._controllerView.shortcutkeys))
+        keys.push({ keys: this._controllerView.shortcutkeys });
+      keys = keys.concat(this._modeList.map(m => ({ label: m.label, keys: m.shortcutkeys })));
+
+      keys.forEach(m => {
+        if (m.label) str += `<h1>${m.label}</h1>`;
+        m.keys.forEach(k => {
+          var key = (mac && k.macKey ? k.macKey : k.key).split("+");
+          key = key.map(s => {
+            if (s === "left") return "←";
+            if (s === "right") return "→";
+            if (s === "command") return "&#x2318;";
+            if (s === "shift" && mac) return "&#x21e7;";
+            if (s === "ctrl" && mac) return "&#8963;";
+            return s.length === 1 ? s.toUpperCase() : s[0].toUpperCase() + s.slice(1);
+          });
+          str += `<p><kbd><span>${key.join("</span> + <span>")}</span></kbd> ${k.label}</p>`;
+        });
+      });
+
+      this.modal.use("alert", str);
+      this.modal.height = 400;
+      this.modal.appendStyle(`
+p { vertical-align: middle; }
+kbd {
+display: inline-block;
+min-width: 120px;
+padding-right: 10px;
+vertical-align: middle;
+}
+kbd span {
+display: inline-block;
+margin-bottom: 4px;
+padding: 2px 5px;
+border: 1px solid #666;
+border-radius: 2px;
+vertical-align: middle;
+}`);
+      this.modal.show();
+    }
+
     _setMode(mode) {
       if (this.currentMode) {
         this.currentMode.hide();
@@ -173,6 +220,8 @@
     _modeChangedCb(type, i) {
       if (type === "modeChange") {
         this.mode = i;
+      } else if (type === "showShortcutkeysHelp") {
+        this.showShortcutkeysHelp();
       }
     }
 

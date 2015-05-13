@@ -33,7 +33,8 @@
         titlebar = document.querySelector("jikkyo-titlebar"),
         controller = document.querySelector("jikkyo-controller"),
         viewer = document.querySelector("jikkyo-viewer"),
-        preferenceDialog = document.querySelector("jikkyo-preference-dialog");
+        preferenceDialog = document.querySelector("jikkyo-preference-dialog"),
+        modal = document.querySelector("jikkyo-modal");
 
     preferenceDialog.preference = pref;
     controller.preference = pref;
@@ -91,6 +92,7 @@
     manager.controllerView = controller;
     manager.preferenceDialogView = preferenceDialog;
     manager.preference = pref;
+    manager.modal = modal;
     manager.addMode(new window.jikkyo.FileMode());
     manager.addMode(new window.jikkyo.TwitterMode());
     manager.setModeFromPref();

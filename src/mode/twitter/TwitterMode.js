@@ -63,13 +63,13 @@
         this.preference.save();
       }).bind(this));
 
-      twitterConnect.addEventListener("click", (() => {
+      var connect = (() => {
         if (twitterConnect.classList.contains("diasbled")) return;
 
         if (twitterConnect.classList.contains("on")) {
           twitter.destroyStream();
           twitterConnect.classList.remove("on");
-        twitterTrack.removeAttribute("disabled");
+          twitterTrack.removeAttribute("disabled");
           return;
         }
 
@@ -121,8 +121,20 @@
         } else {
           twitter.userStream();
         }
-      }).bind(this));
 
+      }).bind(this);
+
+      twitterConnect.addEventListener("click", connect);
+
+      var focusTrack = () => {
+        twitterTrack.focus();
+      };
+
+      this.shortcutkeys = [
+        { key: "ctrl+q", macKey: "command+q", label: "キーワード入力", press: focusTrack },
+        { key: "ctrl+c", macKey: "command+c", label: "Twitterに接続/切断", press: connect },
+        //{ key: "ctrl+r", macKey: "command+r", label: "録画開始/録画停止", press: recode }
+      ];
     }
 
     show() {
