@@ -58,6 +58,7 @@
         window.addEventListener("drop", e => {
           e.preventDefault();
           container.classList.remove("hovered");
+          if (e.dataTransfer.files.length === 0) return false;
           event.emit("drop", e.dataTransfer.files[0].path);
           return false;
         });
