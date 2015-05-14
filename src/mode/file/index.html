@@ -39,6 +39,11 @@
       background: #888;
     }
 
+    input[type=range]:disabled::-webkit-slider-thumb {
+      background: #555;
+      cursor: default;
+    }
+
     input[type=file] {
       display: none;
     }
@@ -79,12 +84,12 @@
 
   <div class="item">
     <input id="file" type="file" accept=".xml,*.*">
-    <div id="file-play" class="controller-btn controller-btn-large controller-btn-play" title="再生/一時停止"></div>
+    <div id="file-play" class="controller-btn controller-btn-large controller-btn-play disabled" title="再生/一時停止"></div>
   </div>
 
   <div id="file-slider" class="item item-grow">
     <canvas id="file-slider-bg" class="range-bg" width="1000" height="1"></canvas>
-    <input type="range" min="0" max="100" value="0" />
+    <input type="range" min="0" max="100" value="0" disabled />
   </div>
 
   <div class="item">

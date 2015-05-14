@@ -104,6 +104,8 @@
             that._adapter.addComment(result);
             that._adapter.render();
             that._drawSeekbarBackground();
+            that._range.removeAttribute("disabled");
+            that._playBtn.classList.remove("disabled");
           });
 
           fileInput.value = "";
