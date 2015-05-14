@@ -98,6 +98,12 @@
     manager.setModeFromPref();
 
     var applyPreference = () => {
+      if (pref.general.windowBgColorTransparent) {
+        container.style.backgroundColor = null;
+      } else {
+        container.style.backgroundColor = pref.general.windowBgColor;
+      }
+
       var css = `font-family: ${pref.general.fontFamily}; `;
       if (pref.general.fontWeight) css += `font-weight: bold; `;
       css += `opacity: ${pref.general.opacity}; `;

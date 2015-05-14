@@ -143,67 +143,77 @@
 
       <div id="pref-comment" class="pref" data-title="コメント">
 
-         <div class="form-group">
-            <label for="comment-font-family" class="form-label">フォントファミリー</label>
-            <input type="text" id="comment-font-family" class="form-control">
-            <div class="form-control-right">
-              <input type="checkbox" id="comment-font-weight"><label for="comment-font-weight">太字</label>
-            </div>
-         </div>
+        <div class="form-group">
+          <label for="comment-font-family" class="form-label">フォントファミリー</label>
+          <input type="text" id="comment-font-family" class="form-control">
+          <div class="form-control-right">
+            <input type="checkbox" id="comment-font-weight"><label for="comment-font-weight">太字</label>
+          </div>
+        </div>
 
-         <div class="form-group">
-            <label for="comment-duration" class="form-label">表示時間（ミリ秒）</label>
-            <input type="number" id="comment-duration" class="form-control" max="10000" min="100">
-         </div>
+        <div class="form-group">
+          <label for="comment-duration" class="form-label">表示時間（ミリ秒）</label>
+          <input type="number" id="comment-duration" class="form-control" max="10000" min="100">
+        </div>
 
-         <div class="form-group">
-            <label for="comment-us-duration" class="form-label">ue/shitaの表示時間</label>
-            <input type="number" id="comment-us-duration" class="form-control" max="10000" min="100">
-         </div>
+        <div class="form-group">
+          <label for="comment-us-duration" class="form-label">ue/shitaの表示時間</label>
+          <input type="number" id="comment-us-duration" class="form-control" max="10000" min="100">
+        </div>
 
-         <div class="form-group">
-            <label for="comment-opacity" class="form-label">不透明度</label>
-            <input type="number" id="comment-opacity" class="form-control" max="1" min="0"　pattern="[0-9]+([\.|,][0-9]+)?" step="0.01">
-         </div>
+        <div class="form-group">
+          <label for="comment-opacity" class="form-label">不透明度</label>
+          <input type="number" id="comment-opacity" class="form-control" max="1" min="0"　pattern="[0-9]+([\.|,][0-9]+)?" step="0.01">
+        </div>
 
-         <div class="form-group">
-            <label for="comment-bullet-opacity" class="form-label">弾幕コメントの不透明度</label>
-            <input type="number" id="comment-bullet-opacity" class="form-control" max="1" min="0"　pattern="[0-9]+([\.|,][0-9]+)?" step="0.01">
-         </div>
+        <div class="form-group">
+          <label for="comment-bullet-opacity" class="form-label">弾幕コメントの不透明度</label>
+          <input type="number" id="comment-bullet-opacity" class="form-control" max="1" min="0"　pattern="[0-9]+([\.|,][0-9]+)?" step="0.01">
+        </div>
 
-         <hr>
+        <hr>
 
-         <div class="form-group">
-            <div class="form-label">フォントサイズの計算方法</div>
-            <div class="form-control">
-              <select id="comment-sizing">
-                <option value="0">フォントサイズ固定</option>
-                <option value="1">表示行数固定</option>
-              </select>
-            </div>
-         </div>
+        <div class="form-group">
+          <div class="form-label">フォントサイズの計算方法</div>
+          <div class="form-control">
+            <select id="comment-sizing">
+              <option value="0">フォントサイズ固定</option>
+              <option value="1">表示行数固定</option>
+            </select>
+          </div>
+        </div>
 
-         <div class="form-group">
-            <label for="comment-font-size" class="form-label">フォントサイズ</label>
-            <input type="text" id="comment-font-size" class="form-control">
-         </div>
+        <div class="form-group">
+          <label for="comment-font-size" class="form-label">フォントサイズ</label>
+          <input type="text" id="comment-font-size" class="form-control">
+        </div>
 
-         <div class="form-group">
-            <label for="comment-rows" class="form-label">表示行数</label>
-            <input type="number" id="comment-rows" class="form-control" max="30" min="1">
-         </div>
+        <div class="form-group">
+          <label for="comment-rows" class="form-label">表示行数</label>
+          <input type="number" id="comment-rows" class="form-control" max="30" min="1">
+        </div>
 
-         <hr>
+        <hr>
 
-         <div class="form-group">
-            <label for="comment-style" class="form-label">コメントCSS<span class="form-desc">コメントに適用するCSSを記述します。例："color: yellow;"</span></label>
-           <textarea id="comment-style" class="form-control form-textarea-mono" rows="8"></textarea>
-         </div>
+        <div class="form-group">
+          <label for="comment-window-bgcolor" class="form-label">背景色</label>
+          <input type="text" id="comment-window-bgcolor" class="form-control">
+          <div class="form-control-right">
+            <input type="checkbox" id="comment-window-bgcolor-transparent"><label for="comment-window-bgcolor-transparent">透明</label>
+          </div>
+        </div>
 
-         <div class="form-group">
-            <label for="comment-bullet-style" class="form-label">弾幕コメントCSS<span class="form-desc">弾幕コメントに適用するCSSを記述します。コメントCSSをベースにCSSが上書きされます。</span></label>
-            <textarea id="comment-bullet-style" class="form-control form-textarea-mono" rows="8"></textarea>
-         </div>
+        <hr>
+
+        <div class="form-group">
+          <label for="comment-style" class="form-label">コメントCSS<span class="form-desc">コメントに適用するCSSを記述します。例："color: yellow;"</span></label>
+          <textarea id="comment-style" class="form-control form-textarea-mono" rows="8"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="comment-bullet-style" class="form-label">弾幕コメントCSS<span class="form-desc">弾幕コメントに適用するCSSを記述します。コメントCSSをベースにCSSが上書きされます。</span></label>
+          <textarea id="comment-bullet-style" class="form-control form-textarea-mono" rows="8"></textarea>
+        </div>
 
       </div>
 

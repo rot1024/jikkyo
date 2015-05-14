@@ -154,6 +154,8 @@
         sizing: 0,
         fontSize: "32px",
         rows: 12,
+        windowBgColor: "#000",
+        windowBgColorTransparent: true,
         style: "",
         bulletStyle: "",
         checkNewVersionAuto: true
@@ -170,6 +172,8 @@
       r.querySelector("#comment-sizing").value = p.sizing;
       r.querySelector("#comment-font-size").value = p.fontSize;
       r.querySelector("#comment-rows").value = p.rows;
+      r.querySelector("#comment-window-bgcolor").value = p.windowBgColor;
+      r.querySelector("#comment-window-bgcolor-transparent").checked = p.windowBgColorTransparent;
       r.querySelector("#comment-style").value = p.style;
       r.querySelector("#comment-bullet-style").value = p.bulletStyle;
       r.querySelector("#about-check-auto").checked = p.checkNewVersionAuto;
@@ -198,6 +202,8 @@
       tmp = parseInt(r.querySelector("#comment-rows").value);
       if (tmp > 0 && tmp < 40) p.rows = tmp;
 
+      p.windowBgColor = r.querySelector("#comment-window-bgcolor").value;
+      p.windowBgColorTransparent = r.querySelector("#comment-window-bgcolor-transparent").checked;
       p.style = r.querySelector("#comment-style").value;
       p.bulletStyle = r.querySelector("#comment-bullet-style").value;
 
