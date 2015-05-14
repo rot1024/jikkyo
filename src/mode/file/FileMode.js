@@ -102,6 +102,7 @@
           nico.readFromFile(path).then(result => {
             that._adapter.clearComment();
             that._adapter.addComment(result);
+            that._adapter.render();
             that._drawSeekbarBackground();
           });
 
