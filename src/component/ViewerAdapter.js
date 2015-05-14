@@ -384,6 +384,26 @@
       if (!this._playing) this.render();
     }
 
+    getInfluence(division) {
+      var influence = new Array(division).fill(0);
+      var length = this._length;
+
+      this._comment.forEach(c => {
+        var start = c.vpos;
+        var end = c.vpos +
+            (c.position === "ue" || c.position === "shita" ?
+             this.durationAlt : this.duration);
+        var s = parseInt(Math.min(1, start / length) * division);
+        var e = parseInt(Math.min(1, end / length) * division);
+
+        for (let i = 0; i <= e - s; i++)
+          influence[s + i]++;
+      }, this);
+
+      if (isNaN(influence[division])) influence.splice(division, 1);
+      return influence;
+    }
+
     _renderCb() {
       if (this._viewer === null) return;
       if (!this._playing) return;

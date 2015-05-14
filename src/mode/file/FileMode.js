@@ -25,7 +25,7 @@
 
       this._playBtn = root.getElementById("file-play");
       this._range = root.querySelector("input[type=range]");
-      this._rangeBg = root.querySelector(".range-bg");
+      this._rangeBg = root.getElementById("file-slider-bg");
       this._pos = root.getElementById("file-pos");
 
       this._adapter.on(((name, val) => {
@@ -102,6 +102,7 @@
           nico.readFromFile(path).then(result => {
             that._adapter.clearComment();
             that._adapter.addComment(result);
+            that._drawSeekbarBackground();
           });
 
           fileInput.value = "";
@@ -150,6 +151,7 @@
       } else {
         this._playBtn.classList.remove("controller-btn-pause");
       }
+      this._drawSeekbarBackground();
     }
 
     getPreferenceView() {
@@ -213,7 +215,33 @@
       this._adapter.seekToEnd();
     }
 
+    _getHeatmapColor(minimum, maximum, value) {
+      var ratio = (value - minimum) / (maximum - minimum);
+      var b = Math.floor(Math.max(0, 255 * (1 - ratio * 2)));
+      var r = Math.floor(Math.max(0, 255 * (ratio * 0.5)));
+      var g = 255 - b - r;
+      return [r, g, b];
+    }
+
+    _drawSeekbarBackground() {
+      const r = this._rangeBg,
+            ctx = r.getContext("2d");
+
+      ctx.clearRect(0, 0, r.width, r.height);
+
+      var influence = this.adapter.getInfluence(r.width);
+      var influenceColor = influence.map(d => {
+        return this._getHeatmapColor(0, 15, d);
+      }, this);
+
+      influenceColor.forEach((c, i) => {
+        ctx.fillStyle = `rgb(${c[0]}, ${c[1]}, ${c[2]})`;
+        ctx.fillRect(i, 0, i + 1, 1);
+      }, this);
+    }
+
   }
+
 
   window.jikkyo.FileMode = document.registerElement("jikkyo-mode-file", {
     prototype: FileMode.prototype
