@@ -222,25 +222,35 @@
     }
 
     _getHeatmapColor(minimum, maximum, value) {
-      var ratio = (value - minimum) / (maximum - minimum);
-      var b = Math.floor(Math.max(0, 255 * (1 - ratio * 2)));
-      var r = Math.floor(Math.max(0, 255 * (ratio * 0.5)));
+      var ratio = (value - minimum) / (maximum - minimum) * 2;
+      var b = Math.floor(Math.max(0, 255 * (1 - ratio)));
+      var r = Math.floor(Math.max(0, 255 * (ratio - 1)));
       var g = 255 - b - r;
-      return [r, g, b, 255];
+      var a = 255 * ratio;
+      return [r, g, b, a];
     }
 
     _drawSeekbarBackground() {
       if (!this.preference.file.heatmap) return;
 
       const r = this._rangeBg,
-            ctx = r.getContext("2d");
+            ctx = r.getContext("2d"),
+            range = 8;
 
       var img = ctx.getImageData(0, 0, r.width, r.height);
       var influence = this.adapter.getInfluence(r.width);
 
+      influence = influence.map((d, i) => {
+        var arr = influence.slice(Math.max(0, i - range), Math.min(influence.length, i + range + 1));
+        return arr.reduce((prev, current) => prev + current, 0) / arr.length;
+      });
+
+      var max = influence.reduce((prev, current) => {
+        return current > prev ? current : prev;
+      }, 10);
+
       influence.map((d, i) => {
-        var hm = this._getHeatmapColor(0, 15, d);
-        img.data.set(hm, i * 4);
+        img.data.set(this._getHeatmapColor(0, max * 0.75, d), i * 4);
       }, this);
 
       ctx.putImageData(img, 0, 0);
