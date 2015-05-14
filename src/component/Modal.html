@@ -162,13 +162,13 @@
       attributeChangedCallback(attrName, oldVal, newVal) {
         if (attrName === "width") {
           if (!newVal) newVal = 400;
-          this.content.style.width = ~~(newVal) + "px";
-          this.content.style.marginLeft = ~~(-newVal / 2) + "px";
+          this.content.style.width = Math.floor(newVal) + "px";
+          this.content.style.marginLeft = Math.floor(-newVal / 2) + "px";
         }
         else if (attrName === "height") {
           if (!newVal) newVal = 300;
-          this.content.style.height = ~~(newVal) + "px";
-          this.content.style.marginTop = ~~(-newVal / 2) + "px";
+          this.content.style.height = Math.floor(newVal) + "px";
+          this.content.style.marginTop = Math.floor(-newVal / 2) + "px";
         }
         else if (attrName === "visible") {
           if (newVal !== null) {

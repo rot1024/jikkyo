@@ -22,11 +22,11 @@ module.exports = (() => {
     set totalMillisecond(v) {
       var ts, tm;
       this._total = v;
-      ts = ~~(this._total / 1000);
+      ts = Math.floor(this._total / 1000);
       this._s = ts % 60;
-      tm = ~~(ts / 60);
+      tm = Math.floor(ts / 60);
       this._m = tm % 60;
-      this._h = ~~(tm / 60);
+      this._h = Math.floor(tm / 60);
     }
 
     constructor() {

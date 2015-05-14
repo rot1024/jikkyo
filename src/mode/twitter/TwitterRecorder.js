@@ -81,7 +81,7 @@ module.exports = (() => {
       return {
         text: escapeHTML(chat.text),
         date: chat.date,
-        vpos: ~~(chat.vpos / 10),
+        vpos: Math.floor(chat.vpos / 10),
         vposm: chat.vpos,
         mail: chat.color,
         userId: chat.userId
