@@ -123,7 +123,10 @@
 
     win.show();
 
-    if (pref.maximized) win.maximize();
+    if (
+      pref.maximized &&
+      process.platform !== "darwin" /* workaround */
+    ) win.maximize();
     else {
       if (typeof pref.x === "number")
         win.x = pref.x;
