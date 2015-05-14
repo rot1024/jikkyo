@@ -32,7 +32,7 @@ var nw = function(cb, platforms) {
     cacheDir: 'cache',
     macCredits: 'Credits.html',
     macIcns: 'src/images/jikkyo.icns',
-    macZip: true,
+    macZip: false,
     winIco: 'src/images/jikkyo.ico',
     winZip: false
   });
