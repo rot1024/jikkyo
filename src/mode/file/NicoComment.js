@@ -59,18 +59,6 @@ module.exports = (() => {
       return deferred.promise;
     }
 
-    write() {
-
-    }
-
-    writeToFile(/*path*/) {
-      var deferred = Promise.defer();
-
-      deferred.reject(new Error("not implemented"));
-
-      return deferred.promise;
-    }
-
     addChat(chat) {
       this.addComment([chat]);
     }
@@ -93,9 +81,11 @@ module.exports = (() => {
 
       margin = margin || 0;
 
+      // vposm is custom attribute for jikkyo
       var chat = {
         text: obj._,
-        vpos: (parseInt(obj.$.vpos) + Math.floor(Math.random() * margin)) * 10
+        vpos: obj.$.vposm ? parseInt(obj.$.vposm) :
+        (parseInt(obj.$.vpos) + Math.floor(Math.random() * margin)) * 10
       };
 
       if ("mail" in obj.$) {
@@ -106,6 +96,8 @@ module.exports = (() => {
             chat.size = this.options.size[command];
           } else if (NicoComment.position.includes(command)) {
             chat.position = command;
+          } else if (/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(command)) {
+            chat.color = command;
           }
         }, this);
       }

@@ -10,7 +10,7 @@
       background-image: url("images/rec.svg");
     }
 
-    .controller-btn-recstop {
+    .controller-btn-rec.on {
       background-image: url("images/recstop.svg");
     }
 
@@ -25,7 +25,7 @@
   </style>
 
   <div class="item">
-    <div id="twitter-rec" class="controller-btn controller-btn-large controller-btn-rec disabled" title="録画"></div>
+    <div id="twitter-rec" class="controller-btn controller-btn-large controller-btn-rec" title="録画"></div>
   </div>
   <div class="item item-grow">
     <input type="text" id="twitter-track" placeholder="検索キーワード（空欄ならUserStreanに接続）">
@@ -38,12 +38,12 @@
 
 <template id="preference">
 
-  <div id="twitter-unauthed" class="form form-end">
+  <div id="twitter-unauthed" class="form-group form-end">
     <p>Twitterアカウントが認証されていません。</p>
     <div id="twitter-auth" class="btn">アカウントを認証する</div>
   </div>
 
-  <div id="twitter-authed" class="form form-end">
+  <div id="twitter-authed" class="form-group form-end">
     <p>Twitterアカウントは認証されています。</p>
     <div id="twitter-unauth" class="btn">認証を取り消す</div>
   </div>
@@ -69,6 +69,16 @@
   <div class="form-group form-end">
     <input type="checkbox" id="twitter-apply-color"><label for="twitter-apply-color">コメントを色付け</label>
   </div>
+
+  <hr>
+
+  <div class="form-group form-end">
+    <label for="twitter-recording-direcotry" class="form-label">録画保存先ディレクトリ</label>
+    <input type="text" id="twitter-recording-direcotry" class="form-control">
+    <div id="twitter-recording-direcotry-ref" class="btn">参照</div>
+  </div>
+
+  <input type="file" id="twitter-recording-file" nwdirectory style="display: none;">
 
   <hr>
 

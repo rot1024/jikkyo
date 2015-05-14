@@ -171,14 +171,18 @@ module.exports = (() => {
 
         const size = "";
         const position = "";
-        const vpos = Date.parse(tweet.created_at) - streamStartAt;
+        const date = Date.parse(tweet.created_at);
+        const vpos = date - streamStartAt;
+        // const date = (tweet.id >> 22) + 1288834974657;
 
         this._event.emit("chat", {
           text: text,
           color: color,
           size: size,
           position: position,
-          vpos: vpos
+          vpos: vpos,
+          userId: tweet.user.id_str,
+          date: Math.round(date / 1000)
         });
 
       }).bind(this));
