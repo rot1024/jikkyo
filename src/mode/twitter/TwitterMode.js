@@ -4,6 +4,7 @@
   var gui = require('nw.gui'),
       TwitterComment = require("./mode/twitter/TwitterComment"),
       TwitterAuth = require("./mode/twitter/TwitterAuth"),
+      TwitterRecorder = require("./mode/twitter/TwitterRecorder"),
       constants = require("./constants"),
       doc = document.currentScript.ownerDocument;
 
@@ -15,6 +16,9 @@
       this.label = "Twitter モード";
       this.preferenceLabel = "Twitter";
       this.preferenceName = "twitter";
+
+      this._recorder = new TwitterRecorder();
+      this._recording = false;
 
       var root = this.createShadowRoot();
       var template = doc.getElementById("main");
@@ -30,31 +34,74 @@
       this._twitterTrack = twitterTrack;
       this._twitterConnect = twitterConnect;
 
+      this._recorder.on("error", (() => {
+        twitterRec.classList.remove("on");
+        this._recording = false;
+      }).bind(this));
+
       twitter.on("stream", (() => {
         this._adapter.clearComment();
         this._adapter.realtime = true;
         this._adapter.start();
-        twitterRec.classList.remove("disabled");
         twitterConnect.classList.remove("disabled");
         twitterConnect.classList.add("on");
+        if (this._recording) {
+          this._recorder.directory = this.preference.twitter.recordingDirecotry;
+          let ok = this._recorder.start();
+          if (!ok) {
+            this._recording = false;
+            twitterRec.classList.remove("on");
+          }
+        }
       }).bind(this));
 
       twitter.on("chat", (chat => {
         chat.vpos = this._adapter.length;
         this._adapter.addChat(chat);
+
+        if (this._recorder.isRecording) {
+          this._recorder.record(chat);
+        }
       }).bind(this));
 
       twitter.on("error", (err => {
         this._adapter.stop();
         this._adapter.realtime = false;
-        twitterRec.classList.add("disabled");
         twitterConnect.classList.remove("disabled");
         twitterConnect.classList.remove("on");
-        if (err) console.error(err);
+        if (this._recording || this._recorder.isRecording) {
+          this._recoding = false;
+          this._recorder.stop();
+          twitterRec.classList.remove("on");
+        }
+        if (err) {
+          console.error(err);
+          console.log(err.stack);
+        }
       }).bind(this));
 
       twitterRec.addEventListener("click", (() => {
         if (twitterRec.classList.contains("diasbled")) return;
+
+        if (!this._recording && !this.preference.twitter.recordingDirecotry) {
+          return window.alert("設定画面で録画保存先ディレクトリを設定してください。");
+        }
+
+        this._recording = !this._recording;
+        if (this._recording) twitterRec.classList.add("on");
+        else twitterRec.classList.remove("on");
+
+        if (this._twitter.isStreaming) {
+          if (this._recording) {
+            this._recorder.directory = this.preference.twitter.recordingDirecotry;
+            let ok = this._recorder.start();
+            if (!ok) {
+              this._recording = false;
+              twitterRec.classList.remove("on");
+            }
+          }
+          else this._recorder.stop();
+        }
       }).bind(this));
 
       twitterTrack.addEventListener("blur", (() => {
@@ -70,6 +117,11 @@
           twitter.destroyStream();
           twitterConnect.classList.remove("on");
           twitterTrack.removeAttribute("disabled");
+          if (this._recording || this._recorder.isRecording) {
+            this._recoding = false;
+            this._recorder.stop();
+            twitterRec.classList.remove("on");
+          }
           return;
         }
 
@@ -147,9 +199,17 @@
     hide() {
       super.hide();
 
+      if (this._recorder.isRecording) {
+        this._recorder.stop();
+      }
+
+      if (this._recording) {
+        this._twitterRec.classList.remove("on");
+        this._recording = false;
+      }
+
       if (this._twitter.isStreaming) {
         this._twitter.destroyStream();
-        this._twitterRec.classList.add("disabled");
         this._twitterTrack.removeAttribute("disabled");
         this._twitterConnect.classList.remove("on");
       }
@@ -259,6 +319,21 @@
         });
       }
 
+      {
+        let refBtn = root.querySelector("#twitter-recording-direcotry-ref"),
+            direcotry = root.querySelector("#twitter-recording-direcotry"),
+            file = root.querySelector("#twitter-recording-file");
+        file.addEventListener("change", () => {
+          if (!this || !this.value) return;
+          direcotry.value = this.value;
+          file.nwworkingdir = this.value;
+          file.value = "";
+        });
+        refBtn.addEventListener("click", () => {
+          file.click();
+        });
+      }
+
       return element;
     }
 
@@ -282,6 +357,9 @@
       r.querySelector("#twitter-exclude-hashtag").checked = t.excludeHashtag;
       r.querySelector("#twitter-exclude-url").checked = t.excludeUrl;
       r.querySelector("#twitter-apply-color").checked = t.applyThemeColor;
+
+      r.querySelector("#twitter-recording-direcotry").value = t.recordingDirecotry;
+      r.querySelector("#twitter-recording-file").nwworkingdir = t.recordingDirecotry;
 
       r.querySelector("#twitter-ng-text").value = t.textNg;
       r.querySelector("#twitter-ng-user").value = t.userNg;
@@ -307,6 +385,8 @@
       p.excludeHashtag = r.querySelector("#twitter-exclude-hashtag").checked;
       p.excludeUrl = r.querySelector("#twitter-exclude-url").checked;
       p.applyThemeColor = r.querySelector("#twitter-apply-color").checked;
+
+      p.recordingDirecotry = r.querySelector("#twitter-recording-direcotry").value;
 
       p.textNg = r.querySelector("#twitter-ng-text").value;
       p.userNg = r.querySelector("#twitter-ng-user").value;
@@ -336,7 +416,8 @@
         excludeRetweet: true,
         excludeHashtag: true,
         excludeUrl: true,
-        applyThemeColor: true
+        applyThemeColor: true,
+        recordingDirecotry: ""
       };
     }
 
