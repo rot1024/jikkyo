@@ -75,6 +75,10 @@
       flex: auto;
     }
 
+    .container /deep/ .form-control-right {
+      padding-left: 10px;
+    }
+
     .container /deep/ .form-end {
       margin-bottom: 20px;
     }
@@ -142,6 +146,9 @@
          <div class="form-group">
             <label for="comment-font-family" class="form-label">フォントファミリー</label>
             <input type="text" id="comment-font-family" class="form-control">
+            <div class="form-control-right">
+              <input type="checkbox" id="comment-font-weight"><label for="comment-font-weight">太字</label>
+            </div>
          </div>
 
          <div class="form-group">

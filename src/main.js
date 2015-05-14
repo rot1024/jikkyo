@@ -99,6 +99,7 @@
 
     var applyPreference = () => {
       var css = `font-family: ${pref.general.fontFamily}; `;
+      if (pref.general.fontWeight) css += `font-weight: bold; `;
       css += `opacity: ${pref.general.opacity}; `;
       css += pref.general.style;
 

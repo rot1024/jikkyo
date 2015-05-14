@@ -146,6 +146,7 @@
     _initGeneralPreference() {
       return {
         fontFamily: process.platform === "darwin" ? "sans-serif" : 'Meiryo, sans-serif',
+        fontWeight: true,
         duration: 4000,
         usDuration: 3000,
         opacity: 1,
@@ -161,6 +162,7 @@
 
     _loadGeneralPreference(r, p) {
       r.querySelector("#comment-font-family").value = p.fontFamily;
+      r.querySelector("#comment-font-weight").checked = p.fontWeight;
       r.querySelector("#comment-duration").value = p.duration;
       r.querySelector("#comment-us-duration").value = p.usDuration;
       r.querySelector("#comment-opacity").value = p.opacity;
@@ -176,6 +178,7 @@
     _saveGeneralPreference(r, p) {
       var tmp;
       p.fontFamily = r.querySelector("#comment-font-family").value;
+      p.fontWeight = r.querySelector("#comment-font-weight").checked;
 
       tmp = parseInt(r.querySelector("#comment-duration").value);
       if (tmp >= 100 && tmp <= 10000) p.duration = tmp;
