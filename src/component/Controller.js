@@ -158,6 +158,14 @@
         this.savePref();
       }).bind(this);
 
+      var modeNext = (() => {
+        this._event.emit("observe", "modeNext");
+      }).bind(this);
+
+      var modePrev = (() => {
+        this._event.emit("observe", "modePrev");
+      }).bind(this);
+
       alwaysontopBtn.addEventListener("click", alwaysontop);
       fixBtn.addEventListener("click", fix);
 
@@ -190,7 +198,9 @@
 
       this.shortcutkeys = [
         { key: "ctrl+t", macKey: "command+t", label: "常に最前面表示", press: alwaysontop },
-        { key: "ctrl+f", macKey: "command+f", label: "コントロールバーを固定", press: fix }
+        { key: "ctrl+f", macKey: "command+f", label: "コントロールバーを固定", press: fix },
+        { key: "ctrl+n", macKey: "command+n", label: "次のモード", press: modeNext },
+        { key: "ctrl+p", macKey: "command+p", label: "前のモード", press: modePrev }
       ];
 
       const mac = process.platform === "darwin";

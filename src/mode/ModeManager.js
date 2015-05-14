@@ -21,9 +21,8 @@
       if (v === this._mode) return;
       if (typeof v !== "number")
         throw new TypeError("mode must be number: " + typeof v);
-      if (v < 0 || v >= this._modeList.length)
-        throw new RangeError("mode is wrong: " + v);
-
+      if (v < 0) v = 0;
+      if(v >= this._modeList.length) v = this._modeList.length - 1;
       this._setMode(v);
 
       if (this._pref && v !== this._pref.mode) {
@@ -222,6 +221,10 @@ vertical-align: middle;
         this.mode = i;
       } else if (type === "showShortcutkeysHelp") {
         this.showShortcutkeysHelp();
+      } else if (type === "modeNext") {
+        this.mode++;
+      } else if (type === "modePrev") {
+        this.mode--;
       }
     }
 
