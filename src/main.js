@@ -34,7 +34,8 @@
         controller = document.querySelector("jikkyo-controller"),
         viewer = document.querySelector("jikkyo-viewer"),
         preferenceDialog = document.querySelector("jikkyo-preference-dialog"),
-        modal = document.querySelector("jikkyo-modal");
+        modal = document.querySelector("jikkyo-modal"),
+        manager = new window.jikkyo.ModeManager();
 
     preferenceDialog.preference = pref;
     controller.preference = pref;
@@ -52,6 +53,7 @@
     });
 
     win.on("close", () => {
+      manager.currentMode.hide();
       win.hide();
 
       pref.maximized = container.classList.contains("maximized");
@@ -87,7 +89,6 @@
         controller.hide();
     });
 
-    var manager = new window.jikkyo.ModeManager();
     manager.viewerView = viewer;
     manager.controllerView = controller;
     manager.preferenceDialogView = preferenceDialog;
