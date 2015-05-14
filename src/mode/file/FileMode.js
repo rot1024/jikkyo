@@ -223,26 +223,24 @@
       var b = Math.floor(Math.max(0, 255 * (1 - ratio * 2)));
       var r = Math.floor(Math.max(0, 255 * (ratio * 0.5)));
       var g = 255 - b - r;
-      return [r, g, b];
+      return [r, g, b, 255];
     }
 
     _drawSeekbarBackground() {
+      if (!this.preference.file.heatmap) return;
+
       const r = this._rangeBg,
             ctx = r.getContext("2d");
 
-      ctx.clearRect(0, 0, r.width, r.height);
-
-      if (!this.preference.file.heatmap) return;
-
+      var img = ctx.getImageData(0, 0, r.width, r.height);
       var influence = this.adapter.getInfluence(r.width);
-      var influenceColor = influence.map(d => {
-        return this._getHeatmapColor(0, 15, d);
+
+      influence.map((d, i) => {
+        var hm = this._getHeatmapColor(0, 15, d);
+        img.data.set(hm, i * 4);
       }, this);
 
-      influenceColor.forEach((c, i) => {
-        ctx.fillStyle = `rgb(${c[0]}, ${c[1]}, ${c[2]})`;
-        ctx.fillRect(i, 0, i + 1, 1);
-      }, this);
+      ctx.putImageData(img, 0, 0);
     }
 
   }
