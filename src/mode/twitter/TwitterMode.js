@@ -16,6 +16,7 @@
       this.label = "Twitter モード";
       this.preferenceLabel = "Twitter";
       this.preferenceName = "twitter";
+      this.droppable = false;
 
       this._recorder = new TwitterRecorder();
       this._recording = false;

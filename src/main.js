@@ -24,6 +24,8 @@
   }
 
   win.on("loaded", () => {
+    window.ondragover = e => { e.preventDefault(); return false; };
+    window.ondrop = e => { e.preventDefault(); return false; };
 
     window.addEventListener("keydown", e => {
       if (e.keyCode === 123) win.showDevTools();
@@ -35,6 +37,7 @@
         viewer = document.querySelector("jikkyo-viewer"),
         preferenceDialog = document.querySelector("jikkyo-preference-dialog"),
         modal = document.querySelector("jikkyo-modal"),
+        holder = document.querySelector("jikkyo-drop-holder"),
         manager = new window.jikkyo.ModeManager();
 
     preferenceDialog.preference = pref;
@@ -94,6 +97,7 @@
     manager.preferenceDialogView = preferenceDialog;
     manager.preference = pref;
     manager.modal = modal;
+    manager.dropHolder = holder;
     manager.addMode(new window.jikkyo.FileMode());
     manager.addMode(new window.jikkyo.TwitterMode());
     manager.setModeFromPref();

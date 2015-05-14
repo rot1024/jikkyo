@@ -11,6 +11,7 @@
       this._viewerView = null;
       this._pref = null;
       this.shortcutkeys = [];
+      this.droppable = false;
     }
 
     get adapter() {
@@ -80,6 +81,9 @@
     }
 
     initPreference() {
+    }
+
+    drop() {
     }
 
     _initPref() {

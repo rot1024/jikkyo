@@ -10,7 +10,9 @@
       this._viewerView = null;
       this._controllerView = null;
       this._preferenceDialogView = null;
+      this._dropHolder = null;
       this._modeChangedCb = this._modeChangedCb.bind(this);
+      this._dropCb = this._dropCb.bind(this);
     }
 
     get mode() {
@@ -89,6 +91,17 @@
           this._pref[m.preferenceName] = m.initPreference();
       });
       this._pref.save();
+    }
+
+    get dropHolder() {
+      return this._dropHolder;
+    }
+
+    set dropHolder(dropHolder) {
+      if (dropHolder === this._dropHolder) return;
+      if (this._dropHolder) this._dropHolder.off("drop", this._dropCb);
+      this._dropHolder = dropHolder;
+      if (dropHolder) dropHolder.on("drop", this._dropCb);
     }
 
     addMode(mode) {
@@ -215,6 +228,9 @@ vertical-align: middle;
         this._controllerView.mode = mode;
       this.currentMode.viewerView = this._viewerView;
       this.currentMode.show();
+
+      if (this._dropHolder)
+        this._dropHolder.enabled = this.currentMode.droppable;
     }
 
     _modeChangedCb(type, i) {
@@ -227,6 +243,10 @@ vertical-align: middle;
       } else if (type === "modePrev") {
         this.mode--;
       }
+    }
+
+    _dropCb(file) {
+      this.currentMode.drop(file);
     }
 
   }

@@ -13,6 +13,7 @@
       this.label = "ファイル モード";
       this.preferenceLabel = "ファイル";
       this.preferenceName = "file";
+      this.droppable = true;
 
       var root = this.createShadowRoot();
       var template = doc.getElementById("main");
@@ -94,20 +95,7 @@
         let that = this;
         fileInput.addEventListener("change", () => {
           if (!this || !this.value) return;
-          var path = this.value;
-
-          var nico = new NicoComment();
-          nico.options.size.big = that.preference.file.bigSize;
-          nico.options.size.small = that.preference.file.smallSize;
-          nico.readFromFile(path).then(result => {
-            that._adapter.clearComment();
-            that._adapter.addComment(result);
-            that._adapter.render();
-            that._drawSeekbarBackground();
-            that._range.removeAttribute("disabled");
-            that._playBtn.classList.remove("disabled");
-          });
-
+          that._open(this.value);
           fileInput.value = "";
         });
       }
@@ -195,6 +183,24 @@
         bigSize: "150%",
         smallSize: "50%"
       };
+    }
+
+    drop(file) {
+      this._open(file);
+    }
+
+    _open(path) {
+      var nico = new NicoComment();
+      nico.options.size.big = this.preference.file.bigSize;
+      nico.options.size.small = this.preference.file.smallSize;
+      nico.readFromFile(path).then((result => {
+        this._adapter.clearComment();
+        this._adapter.addComment(result);
+        this._adapter.render();
+        this._drawSeekbarBackground();
+        this._range.removeAttribute("disabled");
+        this._playBtn.classList.remove("disabled");
+      }).bind(this));
     }
 
     _seekForward() {

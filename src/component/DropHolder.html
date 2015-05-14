@@ -1,0 +1,91 @@
+<template>
+  <style>
+    :host {
+      position: absolute;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      display: block;
+      pointer-events: none;
+    }
+
+    .container {
+      position: absolute;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      border: 10px dotted transparent;
+      transition: all .2s ease-in-out;
+    }
+
+    .hovered {
+      border-color: rgba(255, 190, 70, 0.5);
+      background-color: rgba(255, 205, 92, .1);
+    }
+
+  </style>
+  <div id="container" class="container"></div>
+</template>
+
+<script>
+  (() => {
+    "use strict";
+
+    var EventEmitter = require("events").EventEmitter;
+    var doc = document.currentScript.ownerDocument;
+
+    class DropHolder extends HTMLElement {
+
+      createdCallback() {
+        this._enabled = false;
+        var event = this._event = new EventEmitter();
+        var template = document.importNode(doc.querySelector("template").content, true);
+        var container = template.querySelector("#container");
+
+        window.addEventListener("dragover", (() => {
+          if (this._enabled)
+            container.classList.add("hovered");
+          return false;
+        }).bind(this));
+
+        window.addEventListener("dragleave", () => {
+          container.classList.remove("hovered");
+          return false;
+        });
+
+        window.addEventListener("drop", e => {
+          e.preventDefault();
+          container.classList.remove("hovered");
+          event.emit("drop", e.dataTransfer.files[0].path);
+          return false;
+        });
+
+        this.createShadowRoot().appendChild(template);
+      }
+
+      on(type, listener) {
+        this._event.on(type, listener);
+      }
+
+      off(type, listener) {
+        this._event.removeListener(type, listener);
+      }
+
+      get enabled() {
+        return this._enabled;
+      }
+
+      set enabled(enabled) {
+        this._enabled = enabled;
+      }
+
+    }
+
+    window.jikkyo.DropHolder = document.registerElement("jikkyo-drop-holder", {
+      prototype: DropHolder.prototype
+    });
+
+  })();
+</script>
