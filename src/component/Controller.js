@@ -3,6 +3,7 @@
   "use strict";
 
   var win = require("nw.gui").Window.get();
+  var constants = require("./constants");
   var doc = document.currentScript.ownerDocument;
 
   var EventEmitter = require("events").EventEmitter;
@@ -196,11 +197,20 @@
         this._menu.show(rect.right, rect.top);
       }).bind(this));
 
+      var resetWindow = () => {
+        win.unmaximize();
+        win.x = (window.screen.availWidth - constants.window.width) / 2;
+        win.y = (window.screen.availHeight - constants.window.height) / 2;
+        win.width = constants.window.width;
+        win.height = constants.window.height;
+      };
+
       this.shortcutkeys = [
         { key: "ctrl+t", macKey: "command+t", label: "常に最前面表示", press: alwaysontop },
         { key: "ctrl+f", macKey: "command+f", label: "コントロールバーを固定", press: fix },
         { key: "ctrl+n", macKey: "command+n", label: "次のモード", press: modeNext },
-        { key: "ctrl+p", macKey: "command+p", label: "前のモード", press: modePrev }
+        { key: "ctrl+p", macKey: "command+p", label: "前のモード", press: modePrev },
+        { key: "ctrl+r", macKey: "command+r", label: "ウィンドウの位置・サイズをを初期状態に戻す", press: resetWindow }
       ];
 
       const mac = process.platform === "darwin";

@@ -182,6 +182,7 @@
       });
 
       this.modal.use("alert", str);
+      this.modal.width = 500;
       this.modal.height = 400;
       this.modal.appendStyle(`
 p { vertical-align: middle; }
