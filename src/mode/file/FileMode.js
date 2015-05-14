@@ -169,6 +169,7 @@
           r = e.shadowRoot,
           t = p.file;
 
+      r.querySelector("#file-heatmap").checked = t.heatmap;
       r.querySelector("#file-comment-big-size").value = t.bigSize;
       r.querySelector("#file-comment-small-size").value = t.smallSize;
     }
@@ -180,12 +181,14 @@
           r = e.shadowRoot,
           t = p.file;
 
+      t.heatmap = r.querySelector("#file-heatmap").checked;
       t.bigSize = r.querySelector("#file-comment-big-size").value;
       t.smallSize = r.querySelector("#file-comment-small-size").value;
     }
 
     initPreference() {
       return {
+        heatmap: true,
         bigSize: "150%",
         smallSize: "50%"
       };
@@ -228,6 +231,8 @@
             ctx = r.getContext("2d");
 
       ctx.clearRect(0, 0, r.width, r.height);
+
+      if (!this.preference.file.heatmap) return;
 
       var influence = this.adapter.getInfluence(r.width);
       var influenceColor = influence.map(d => {
