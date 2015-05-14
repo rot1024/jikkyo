@@ -327,7 +327,7 @@
       if (this.isSimpleMode) {
         let getLastIndex = ((position, last) => {
           return this._comment.slice(last).reduce(((prev, chat, index) => {
-            if (chat.vpos >= position) return prev;
+            if (chat.vpos > position) return prev;
             return index + last + 1;
           }).bind(this), last);
         }).bind(this);

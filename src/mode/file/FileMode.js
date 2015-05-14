@@ -67,7 +67,7 @@
       this._rangeBg.addEventListener("click", (e => {
         var rect = this._rangeBg.getBoundingClientRect();
         var pos = (e.clientX - rect.left) / rect.width;
-        this._adapter.position = ~~(pos * this._adapter.length);
+        this._adapter.position = parseInt(pos * this._adapter.length);
         this.refresh();
         if (!this._adapter.playing) this._adapter.render();
       }).bind(this));
