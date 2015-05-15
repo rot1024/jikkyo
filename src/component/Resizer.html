@@ -48,6 +48,17 @@
     .nw:hover, .se:hover { cursor: nwse-resize; }
     .ne:hover, .sw:hover { cursor: nesw-resize; }
 
+    :host(.maximized) .w:hover,
+    :host(.maximized) .n:hover,
+    :host(.maximized) .e:hover,
+    :host(.maximized) .s:hover,
+    :host(.maximized) .nw:hover,
+    :host(.maximized) .ne:hover,
+    :host(.maximized) .sw:hover,
+    :host(.maximized) .se:hover {
+      cursor: default;
+    }
+
   </style>
 
   <div id="w" class="grip w"></div>
@@ -83,8 +94,14 @@
         root.appendChild(document.importNode(template.content, true));
 
         var maximized = false;
-        win.on("maximize", () => maximized = true);
-        win.on("unmaximize", () => maximized = false);
+        win.on("maximize", (() => {
+          this.classList.add("maximized");
+          maximized = true;
+        }).bind(this));
+        win.on("unmaximize", (() => {
+          this.classList.remove("maximized");
+          maximized = false;
+        }).bind(this));
 
         var drag = {
           dragging: false,
@@ -175,7 +192,6 @@
 
         [["nw", "n", "ne"], ["w", null, "e"], ["sw", "s", "se"]]
         .forEach((e, i) => e.forEach((e, j) => on(root.getElementById(e), j, i, e)));
-
       }
 
     };

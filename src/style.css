@@ -20,8 +20,8 @@ body /deep/ textarea {
   position: absolute;
   left: 5px;
   top: 5px;
-  right: 5px;
-  bottom: 5px;
+  width: calc(100% - 10px);
+  height: calc(100% - 10px);
   background-color: transparent;
   border: 1px solid rgba(255, 255, 255, .1);
   border-radius: 5px;
@@ -41,8 +41,8 @@ body /deep/ textarea {
 .container.maximized {
   left: 0;
   top: 0;
-  right: 0;
-  bottom: 0;
+  width: 100%;
+  height: 100%;
   border: none;
   border-radius: 0;
   box-shadow: none;
