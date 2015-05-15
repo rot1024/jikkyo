@@ -23,7 +23,9 @@
     "transparent": true,
     "icon": "images/jikkyo.png",
     "width": 800,
-    "height": 520
+    "height": 520,
+    "min_width": 450,
+    "min_height": 100
   },
   "dependencies": {
     "mousetrap": "^1.5.2",
