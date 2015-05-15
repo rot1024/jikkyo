@@ -7,10 +7,26 @@ var UpdateChecker = {
   getLatestVersion: () => {
     var deferred = Promise.defer();
 
-    https.get("https://api.github.com/repos/rot1024/jikkyo/releases/latest", res => {
+    var options = {
+      hostname: "api.github.com",
+      path: "/repos/rot1024/jikkyo/releases/latest",
+      headers: {
+        "user-agent": "jikkyo"
+      }
+    };
+
+    https.get(options, res => {
       if (res.statusCode !== 200)
         return deferred.reject("status code is " + res.statusCode);
+
+      var arrData = [];
+
       res.on("data", data => {
+        arrData.push(data);
+      });
+
+      res.on("end", () => {
+        var data = Buffer.concat(arrData).toString("utf8");
         try {
           var json = JSON.parse(data);
           if (!("tag_name" in json))
