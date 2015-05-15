@@ -49,18 +49,17 @@
           UpdateChecker.getLatestVersion().then(v => {
             if (v !== UpdateChecker.currentVersion) {
               modal.use(
-                "alert", `新バージョン ${v} が公開されています。公式サイトを開きますか？`,
-                () => modal.hide(),
-                () => {
+                "yesno", `新バージョン ${v} が公開されています。公式サイトを開きますか？`,
+                null, () => {
                   gui.Shell.openExternal(UpdateChecker.homepageURL);
                   modal.hide();
                 });
             } else {
-              modal.use("alert", "最新バージョンをお使いです。", () => modal.hide());
+              modal.use("alert", "最新バージョンをお使いです。");
             }
           }).catch(e => {
             console.error(e);
-            modal.use("alert", "データの取得に失敗しました。", () => modal.hide());
+            modal.use("alert", "データの取得に失敗しました。");
           });
         });
 

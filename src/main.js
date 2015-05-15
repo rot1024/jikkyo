@@ -14,12 +14,13 @@
       var modal = document.querySelector("jikkyo-modal");
       modal.use(
         "yesno", `新バージョン ${v} が公開されています。公式サイトを開きますか？`,
-        () => modal.hide(),
+        null,
         () => {
           gui.Shell.openExternal(UpdateChecker.homepageURL);
           modal.hide();
         }
       );
+      modal.show();
     });
   }
 
