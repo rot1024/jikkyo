@@ -11,6 +11,7 @@
       this._viewerView = null;
       this._pref = null;
       this.shortcutkeys = [];
+      this.shortcutKeysAvailable = true;
       this.droppable = false;
     }
 
@@ -54,8 +55,10 @@
 
       const mac = process.platform === "darwin";
       this.shortcutkeys.forEach(k => {
-        Mousetrap.bind(mac && k.macKey ? k.macKey : k.key, k.press);
-      });
+        Mousetrap.bind(mac && k.macKey ? k.macKey : k.key, (() => {
+          if (this.shortcutKeysAvailable) k.press();
+        }).bind(this));
+      }, this);
     }
 
     hide() {

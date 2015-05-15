@@ -13,6 +13,7 @@
       this._dropHolder = null;
       this._modeChangedCb = this._modeChangedCb.bind(this);
       this._dropCb = this._dropCb.bind(this);
+      this.shortcutKeysAvailable = true;
     }
 
     get mode() {
@@ -71,12 +72,20 @@
 
     set preferenceDialogView(v) {
       this._preferenceDialogView = v;
-      if (v) this._modeList.forEach(mode => {
-        var view = mode.getPreferenceView();
-        if (view) this._preferenceDialogView.addModePreference(
-          view, mode.preferenceLabel || mode.label,
-          mode.initPreferenceView.bind(mode), mode.savePreferenceView.bind(mode));
-      });
+      if (v) {
+        this._modeList.forEach(mode => {
+          var view = mode.getPreferenceView();
+          if (view) this._preferenceDialogView.addModePreference(
+            view, mode.preferenceLabel || mode.label,
+            mode.initPreferenceView.bind(mode), mode.savePreferenceView.bind(mode));
+        });
+        v.on("show", (() => {
+          this.setShortcutkeysAvailable(false);
+        }).bind(this));
+        v.on("hide", (() => {
+          this.setShortcutkeysAvailable(true);
+        }).bind(this));
+      }
     }
 
     get preference() {
@@ -129,6 +138,14 @@
     setModeFromPref() {
       if (!this._pref || typeof this._pref.mode !== "number") return;
       this.mode = this._pref.mode;
+    }
+
+    setShortcutkeysAvailable(available) {
+      this.shortcutKeysAvailable = available;
+      if (this._controllerView)
+        this._controllerView.shortcutKeysAvailable = available;
+      if (this._modeList.length > 0)
+        this.currentMode.shortcutKeysAvailable = available;
     }
 
     setDuration(duration) {
@@ -199,7 +216,10 @@
         });
       });
 
-      this.modal.use("alert", str);
+      this.modal.use("alert", str, (() => {
+        this.setShortcutkeysAvailable(true);
+        this.modal.hide();
+      }).bind(this));
       this.modal.width = 500;
       this.modal.height = 400;
       this.modal.appendStyle(`
@@ -218,6 +238,7 @@ border: 1px solid #666;
 border-radius: 2px;
 vertical-align: middle;
 }`);
+      this.setShortcutkeysAvailable(false);
       this.modal.show();
     }
 

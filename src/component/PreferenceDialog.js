@@ -101,6 +101,7 @@
         this._loadGeneralPreference(this.content, this.preference.general);
       }
 
+      this._event.emit("show");
       super.show();
     }
 
@@ -110,10 +111,9 @@
         this._modePrefs.forEach((p, i) => this._savePrefCb[i](p), this);
         this._saveGeneralPreference(this.content, this.preference.general);
         pr.save();
-
-        this._event.emit("hide");
       }
 
+      this._event.emit("hide");
       super.hide();
     }
 

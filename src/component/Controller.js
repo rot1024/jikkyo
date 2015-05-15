@@ -137,6 +137,8 @@
       root.appendChild(document.importNode(template.content, true));
       root.addEventListener("click", e => e.stopPropagation());
 
+      this.shortcutKeysAvailable = true;
+
       this._event = new EventEmitter();
       this._alwaysOnTop = false;
       this._isFixed = false;
@@ -215,8 +217,10 @@
 
       const mac = process.platform === "darwin";
       this.shortcutkeys.forEach(k => {
-        Mousetrap.bind(mac && k.macKey ? k.macKey : k.key, k.press);
-      });
+        Mousetrap.bind(mac && k.macKey ? k.macKey : k.key, (() => {
+          if (this.shortcutKeysAvailable) k.press();
+        }).bind(this));
+      }, this);
     }
 
   };
