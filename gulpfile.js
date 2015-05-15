@@ -13,7 +13,7 @@ gulp.task('sync', function() {
   srcPackage.repository = package.repository;
   srcPackage.homepage = package.homepage;
   try {
-    fs.writeFileSync('src/package.json', JSON.stringify(srcPackage, null, "  "), 'utf8');
+    fs.writeFileSync('src/package.json', JSON.stringify(srcPackage, null, "  ") + "\n", 'utf8');
   } catch(e) {
     console.error("Failed to sync package.json");
   }
@@ -67,5 +67,5 @@ gulp.task('nw:linux', function(cb) {
 });
 
 gulp.task('clean', ['clean:build']);
-gulp.task('release', ['clean', 'sync', 'nw:release']);
+gulp.task('release', ['clean', 'nw:release']);
 gulp.task('default', ['build']);
