@@ -200,6 +200,8 @@
         this._drawSeekbarBackground();
         this._range.removeAttribute("disabled");
         this._playBtn.classList.remove("disabled");
+
+        if ("gc" in window) window.gc();
       }).bind(this));
     }
 

@@ -175,6 +175,8 @@
           twitter.userStream();
         }
 
+        if ("gc" in window) window.gc();
+
       }).bind(this);
 
       twitterConnect.addEventListener("click", connect);

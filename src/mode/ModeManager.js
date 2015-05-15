@@ -32,6 +32,8 @@
         this._pref.mode = v;
         this._pref.save();
       }
+
+      if ("gc" in window) window.gc();
     }
 
     get modes() {

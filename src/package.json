@@ -14,7 +14,7 @@
   },
   "homepage": "https://rot1024.github.io/jikkyo",
   "main": "index.html",
-  "js-flags": "--es_staging --harmony_arrow_functions --harmony_arrays --harmony_array_includes",
+  "js-flags": "--expose_gc --es_staging --harmony_arrow_functions --harmony_arrays --harmony_array_includes",
   "window": {
     "frame": false,
     "resizable": false,
