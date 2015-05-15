@@ -149,6 +149,7 @@
         fontWeight: true,
         duration: 4000,
         usDuration: 3000,
+        limit: 100,
         opacity: 1,
         bulletOpacity: 1,
         sizing: 0,
@@ -167,6 +168,7 @@
       r.querySelector("#comment-font-weight").checked = p.fontWeight;
       r.querySelector("#comment-duration").value = p.duration;
       r.querySelector("#comment-us-duration").value = p.usDuration;
+      r.querySelector("#comment-limit").value = p.limit;
       r.querySelector("#comment-opacity").value = p.opacity;
       r.querySelector("#comment-bullet-opacity").value = p.bulletOpacity;
       r.querySelector("#comment-sizing").value = p.sizing;
@@ -189,6 +191,9 @@
 
       tmp = parseInt(r.querySelector("#comment-us-duration").value);
       if (tmp >= 100 && tmp <= 10000) p.usDuration = tmp;
+
+      tmp = parseInt(r.querySelector("#comment-limit").value);
+      if (tmp >= 1) p.limit = tmp;
 
       tmp = parseFloat(r.querySelector("#comment-opacity").value);
       if (tmp >= 0 && tmp <= 1) p.opacity = tmp;
