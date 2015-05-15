@@ -73,11 +73,12 @@ body /deep/ .btn:active {
 }
 
 body /deep/ .btn.btn-primary {
-  background-color: #a26200;
+  background-color: #c78214;
+  color: #fff;
 }
 
 body /deep/ .btn.btn-primary:active {
-  background-color: #885800;
+  background-color: #ba7b07;
 }
 
 body /deep/ input[type=text],
