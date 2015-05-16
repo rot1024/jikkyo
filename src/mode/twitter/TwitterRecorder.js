@@ -86,10 +86,10 @@ module.exports = (() => {
     _convertChat(chat) {
       return {
         text: escapeHTML(chat.text),
-        date: chat.date,
-        vpos: Math.floor((chat.datem - this._startAt.getTime()) / 10),
+        date: chat.data.date,
+        vpos: Math.floor((chat.data.datem - this._startAt.getTime()) / 10),
         mail: chat.color,
-        userId: chat.userId
+        userId: chat.data.userId
       };
     }
 

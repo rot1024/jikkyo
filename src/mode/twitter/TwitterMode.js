@@ -435,23 +435,48 @@
       };
     }
 
+    menu(e) {
+      super.menu();
+
+      var chat = e.relatedTarget.chat;
+      console.log(e);
+
+      var ngCb = ((value, name) => {
+        return (() => {
+          var pref = this.preference;
+          var ng = pref.twitter[name].split("\n").filter(value => value !== "");
+          ng.push(value);
+          pref.twitter[name] = ng.join("\n");
+          pref.save();
+        }).bind(this);
+      }).bind(this);
+
+      this._customMenu.clear();
+      this._customMenu.add({ label: chat.text.length > 25 ? chat.text.slice(0, 25) + "...　" : chat.text });
+      this._customMenu.add({ type: "separator"});
+      this._customMenu.add({ label: `この内容を含むツイートをNG登録する　`,
+                             click: ngCb(chat.text.split("\n")[0], "textNg") });
+      this._customMenu.add({label: `ユーザー @${chat.data.screenName} をNG登録する　`,
+                            click: ngCb(chat.data.screenName, "userNg") });
+      this._customMenu.add({label: `クライアント ${chat.data.source} をNG登録する　`,
+                            click: ngCb(chat.data.source, "sourceNg") });
+      this._customMenu.show(e.x, e.y);
+    }
+
     _getNgList(ng) {
       if (ng === "") return [];
       return ng.split("\n").map(n => {
         var m = n.match(/\/(.+)\/([igmy]*)/);
+        if (!m) return n;
+
         var result;
-        if (m) {
-          try {
-            result = new RegExp(m[1], m[2]);
-          } catch(e) {
-            result = null;
-          }
-        } else {
-          if (n === "") result = null;
-          else result = n;
+        try {
+          result = new RegExp(m[1], m[2]);
+        } catch(e) {
+          result = n;
         }
         return result;
-      });
+      }).filter(n => n !== "");
     }
 
   }

@@ -210,7 +210,8 @@
           position: obj.position || 0,
           width: 0,
           height: 0,
-          bullet: false
+          bullet: false,
+          data: obj.data || {}
         };
 
         var search = this._binarySearch(chat, this._comment);

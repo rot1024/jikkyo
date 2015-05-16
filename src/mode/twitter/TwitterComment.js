@@ -181,9 +181,13 @@ module.exports = (() => {
           size: size,
           position: position,
           vpos: vpos,
-          userId: tweet.user.id_str,
-          date: Math.round(date / 1000),
-          datem: date
+          data: {
+            userId: tweet.user.id_str,
+            screenName: tweet.user.screen_name,
+            source: source,
+            date: Math.round(date / 1000),
+            datem: date
+          }
         });
 
       }).bind(this));

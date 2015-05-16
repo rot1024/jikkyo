@@ -183,6 +183,11 @@
       }
     }
 
+    clear() {
+      this._items.forEach((menuItem => this._menu.removeChild(menuItem.el)).bind(this));
+      this._items = [];
+    }
+
     show(x, y) {
       var left = x, top = y;
       document.body.appendChild(this);

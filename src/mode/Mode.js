@@ -10,6 +10,7 @@
       this._preferenceLabel = "";
       this._viewerView = null;
       this._pref = null;
+      this._customMenu = document.createElement("jikkyo-menu");
       this.shortcutkeys = [];
       this.shortcutKeysAvailable = true;
       this.droppable = false;
@@ -64,6 +65,8 @@
     hide() {
       this._adapter.stop();
       this._adapter.hideComment();
+
+      this._customMenu.hide();
 
       const mac = process.platform === "darwin";
       this.shortcutkeys.forEach(k => {
