@@ -8,8 +8,8 @@
 
 html {
   font-family: sans-serif; /* 1 */
-  -webkit-text-size-adjust: 100%; /* 2 */
   -ms-text-size-adjust: 100%; /* 2 */
+  -webkit-text-size-adjust: 100%; /* 2 */
 }
 
 /**
@@ -30,19 +30,8 @@ body {
  * Correct `block` display not defined for `main` in IE 11.
  */
 
-article,
-aside,
-details,
-figcaption,
-figure,
-footer,
-header,
-hgroup,
-main,
-menu,
-nav,
-section,
-summary {
+article, aside, details, figcaption, figure, footer,
+header, hgroup, main, menu, nav, section, summary {
   display: block;
 }
 
@@ -51,10 +40,7 @@ summary {
  * 2. Normalize vertical alignment of `progress` in Chrome, Firefox, and Opera.
  */
 
-audio,
-canvas,
-progress,
-video {
+audio, canvas, progress, video {
   display: inline-block; /* 1 */
   vertical-align: baseline; /* 2 */
 }
@@ -74,8 +60,7 @@ audio:not([controls]) {
  * Hide the `template` element in IE 8/9/11, Safari, and Firefox < 22.
  */
 
-[hidden],
-template {
+[hidden], template {
   display: none;
 }
 
@@ -94,8 +79,7 @@ a {
  * Improve readability when focused and also mouse hovered in all browsers.
  */
 
-a:active,
-a:hover {
+a:active, a:hover {
   outline: 0;
 }
 
@@ -114,8 +98,7 @@ abbr[title] {
  * Address style set to `bolder` in Firefox 4+, Safari, and Chrome.
  */
 
-b,
-strong {
+b, strong {
   font-weight: bold;
 }
 
@@ -133,8 +116,8 @@ dfn {
  */
 
 h1 {
-  margin: 0.67em 0;
   font-size: 2em;
+  margin: 0.67em 0;
 }
 
 /**
@@ -142,8 +125,8 @@ h1 {
  */
 
 mark {
-  color: #000;
   background: #ff0;
+  color: #000;
 }
 
 /**
@@ -158,11 +141,10 @@ small {
  * Prevent `sub` and `sup` affecting `line-height` in all browsers.
  */
 
-sub,
-sup {
-  position: relative;
+sub, sup {
   font-size: 75%;
   line-height: 0;
+  position: relative;
   vertical-align: baseline;
 }
 
@@ -182,7 +164,7 @@ sub {
  */
 
 img {
-  border: 0;
+  border: none;
 }
 
 /**
@@ -209,9 +191,8 @@ figure {
  */
 
 hr {
-  height: 0;
-  -moz-box-sizing: content-box;
   box-sizing: content-box;
+  height: 0;
 }
 
 /**
@@ -226,11 +207,8 @@ pre {
  * Address odd `em`-unit font size rendering in all browsers.
  */
 
-code,
-kbd,
-pre,
-samp {
-  font-family: monospace, monospace;
+code, kbd, pre, samp {
+  font-family: monospace;
   font-size: 1em;
 }
 
@@ -249,14 +227,10 @@ samp {
  * 3. Address margins set differently in Firefox 4+, Safari, and Chrome.
  */
 
-button,
-input,
-optgroup,
-select,
-textarea {
-  margin: 0; /* 3 */
-  font: inherit; /* 2 */
-  color: inherit; /* 1 */
+button, input, optgroup, select, textarea {
+  color: inherit;
+  font: inherit;
+  margin: 0;
 }
 
 /**
@@ -274,8 +248,7 @@ button {
  * Correct `select` style inheritance in Firefox.
  */
 
-button,
-select {
+button, select {
   text-transform: none;
 }
 
@@ -310,8 +283,8 @@ html input[disabled] {
 
 button::-moz-focus-inner,
 input::-moz-focus-inner {
-  padding: 0;
   border: 0;
+  padding: 0;
 }
 
 /**
@@ -355,10 +328,9 @@ input[type="number"]::-webkit-outer-spin-button {
  */
 
 input[type="search"] {
-  -webkit-box-sizing: content-box; /* 2 */
-  -moz-box-sizing: content-box;
+  -webkit-appearance: textfield;
+  -webkit-box-sizing: content-box;
   box-sizing: content-box;
-  -webkit-appearance: textfield; /* 1 */
 }
 
 /**
@@ -377,9 +349,9 @@ input[type="search"]::-webkit-search-decoration {
  */
 
 fieldset {
-  padding: 0.35em 0.625em 0.75em;
-  margin: 0 2px;
   border: 1px solid #c0c0c0;
+  margin: 0 2px;
+  padding: 0.35em 0.625em 0.75em;
 }
 
 /**
@@ -388,8 +360,8 @@ fieldset {
  */
 
 legend {
-  padding: 0; /* 2 */
-  border: 0; /* 1 */
+  border: 0;
+  padding: 0;
 }
 
 /**
@@ -417,347 +389,16 @@ optgroup {
  */
 
 table {
-  border-spacing: 0;
   border-collapse: collapse;
+  border-spacing: 0;
 }
 
-td,
-th {
+td, th {
   padding: 0;
 }
 
-/* LAYOUT STYLES */
-body {
-  font-family: 'Helvetica Neue', Helvetica, Arial, serif;
-  font-size: 15px;
-  font-weight: 400;
-  line-height: 1.5;
-  color: #666;
-  background: #fafafa url(../images/body-bg.jpg) 0 0 repeat;
-}
+/* -------------------------------------------------------------------------- */
 
-p {
-  margin-top: 0;
-}
-
-a {
-  color: #2879d0;
-}
-a:hover {
-  color: #2268b2;
-}
-
-header {
-  padding-top: 40px;
-  padding-bottom: 40px;
-  font-family: 'Architects Daughter', 'Helvetica Neue', Helvetica, Arial, serif;
-  background: #2e7bcf url(../images/header-bg.jpg) 0 0 repeat-x;
-  border-bottom: solid 1px #275da1;
-}
-
-header h1 {
-  width: 540px;
-  margin-top: 0;
-  margin-bottom: 0.2em;
-  font-size: 72px;
-  font-weight: normal;
-  line-height: 1;
-  color: #fff;
-  letter-spacing: -1px;
-}
-
-header h2 {
-  width: 540px;
-  margin-top: 0;
-  margin-bottom: 0;
-  font-size: 26px;
-  font-weight: normal;
-  line-height: 1.3;
-  color: #9ddcff;
-  letter-spacing: 0;
-}
-
-.inner {
-  position: relative;
-  width: 940px;
-  margin: 0 auto;
-}
-
-#content-wrapper {
-  padding-top: 30px;
-  border-top: solid 1px #fff;
-}
-
-#main-content {
-  float: left;
-  width: 690px;
-}
-
-#main-content img {
-  max-width: 100%;
-}
-
-aside#sidebar {
-  float: right;
-  width: 200px;
-  min-height: 504px;
-  padding-left: 20px;
-  font-size: 12px;
-  line-height: 1.3;
-  background: transparent url(../images/sidebar-bg.jpg) 0 0 no-repeat;
-}
-
-aside#sidebar p.repo-owner,
-aside#sidebar p.repo-owner a {
-  font-weight: bold;
-}
-
-#downloads {
-  margin-bottom: 40px;
-}
-
-a.button {
-  width: 134px;
-  height: 58px;
-  padding-top: 22px;
-  padding-left: 68px;
-  font-family: 'Architects Daughter', 'Helvetica Neue', Helvetica, Arial, serif;
-  font-size: 23px;
-  line-height: 1.2;
-  color: #fff;
-}
-a.button small {
-  display: block;
-  font-size: 11px;
-}
-header a.button {
-  position: absolute;
-  top: 0;
-  right: 0;
-  background: transparent url(../images/github-button.png) 0 0 no-repeat;
-}
-aside a.button {
-  display: block;
-  width: 138px;
-  padding-left: 64px;
-  margin-bottom: 20px;
-  font-size: 21px;
-  background: transparent url(../images/download-button.png) 0 0 no-repeat;
-}
-
-code, pre {
-  margin-bottom: 30px;
-  font-family: Monaco, "Bitstream Vera Sans Mono", "Lucida Console", Terminal, monospace;
-  font-size: 13px;
-  color: #222;
-}
-
-code {
-  padding: 0 3px;
-  background-color: #f2f8fc;
-  border: solid 1px #dbe7f3;
-}
-
-pre {
-  padding: 20px;
-  overflow: auto;
-  text-shadow: none;
-  background: #fff;
-  border: solid 1px #f2f2f2;
-}
-pre code {
-  padding: 0;
-  color: #2879d0;
-  background-color: #fff;
-  border: none;
-}
-
-ul, ol, dl {
-  margin-bottom: 20px;
-}
-
-
-/* COMMON STYLES */
-
-hr {
-  height: 0;
-  margin-top: 1em;
-  margin-bottom: 1em;
-  border: 0;
-  border-top: solid 1px #ddd;
-}
-
-table {
-  width: 100%;
-  border: 1px solid #ebebeb;
-}
-
-th {
-  font-weight: 500;
-}
-
-td {
-  font-weight: 300;
-  text-align: center;
-  border: 1px solid #ebebeb;
-}
-
-form {
-  padding: 20px;
-  background: #f2f2f2;
-
-}
-
-
-/* GENERAL ELEMENT TYPE STYLES */
-
-#main-content h1 {
-  margin-top: 0;
-  margin-bottom: 0;
-  font-family: 'Architects Daughter', 'Helvetica Neue', Helvetica, Arial, serif;
-  font-size: 2.8em;
-  font-weight: normal;
-  color: #474747;
-  text-indent: 6px;
-  letter-spacing: -1px;
-}
-
-#main-content h1:before {
-  padding-right: 0.3em;
-  margin-left: -0.9em;
-  color: #9ddcff;
-  content: "/";
-}
-
-#main-content h2 {
-  margin-bottom: 8px;
-  font-family: 'Architects Daughter', 'Helvetica Neue', Helvetica, Arial, serif;
-  font-size: 22px;
-  font-weight: bold;
-  color: #474747;
-  text-indent: 4px;
-}
-#main-content h2:before {
-  padding-right: 0.3em;
-  margin-left: -1.5em;
-  content: "//";
-  color: #9ddcff;
-}
-
-#main-content h3 {
-  margin-top: 24px;
-  margin-bottom: 8px;
-  font-family: 'Architects Daughter', 'Helvetica Neue', Helvetica, Arial, serif;
-  font-size: 18px;
-  font-weight: bold;
-  color: #474747;
-  text-indent: 3px;
-}
-
-#main-content h3:before {
-  padding-right: 0.3em;
-  margin-left: -2em;
-  content: "///";
-  color: #9ddcff;
-}
-
-#main-content h4 {
-  margin-bottom: 8px;
-  font-family: 'Architects Daughter', 'Helvetica Neue', Helvetica, Arial, serif;
-  font-size: 15px;
-  font-weight: bold;
-  color: #474747;
-  text-indent: 3px;
-}
-
-h4:before {
-  padding-right: 0.3em;
-  margin-left: -2.8em;
-  content: "////";
-  color: #9ddcff;
-}
-
-#main-content h5 {
-  margin-bottom: 8px;
-  font-family: 'Architects Daughter', 'Helvetica Neue', Helvetica, Arial, serif;
-  font-size: 14px;
-  color: #474747;
-  text-indent: 3px;
-}
-h5:before {
-  padding-right: 0.3em;
-  margin-left: -3.2em;
-  content: "/////";
-  color: #9ddcff;
-}
-
-#main-content h6 {
-  margin-bottom: 8px;
-  font-family: 'Architects Daughter', 'Helvetica Neue', Helvetica, Arial, serif;
-  font-size: .8em;
-  color: #474747;
-  text-indent: 3px;
-}
-h6:before {
-  padding-right: 0.3em;
-  margin-left: -3.7em;
-  content: "//////";
-  color: #9ddcff;
-}
-
-p {
-  margin-bottom: 20px;
-}
-
-a {
-  text-decoration: none;
-}
-
-p a {
-  font-weight: 400;
-}
-
-blockquote {
-  padding: 0 0 0 30px;
-  margin-bottom: 20px;
-  font-size: 1.6em;
-  border-left: 10px solid #e9e9e9;
-}
-
-ul {
-  list-style-position: inside;
-  list-style: disc;
-  padding-left: 20px;
-}
-
-ol {
-  list-style-position: inside;
-  list-style: decimal;
-  padding-left: 3px;
-}
-
-dl dd {
-  font-style: italic;
-  font-weight: 100;
-}
-
-footer {
-  padding-top: 20px;
-  padding-bottom: 30px;
-  margin-top: 40px;
-  font-size: 13px;
-  color: #aaa;
-  background: transparent url('../images/hr.png') 0 0 no-repeat;
-}
-
-footer a {
-  color: #666;
-}
-footer a:hover {
-  color: #444;
-}
-
-/* MISC */
 .clearfix:after {
   display: block;
   height: 0;
@@ -766,116 +407,286 @@ footer a:hover {
   content: '.';
 }
 
-.clearfix {display: inline-block;}
-* html .clearfix {height: 1%;}
-.clearfix {display: block;}
+/* -------------------------------------------------------------------------- */
 
-/* #Media Queries
-================================================== */
+@font-face {
+  font-family: 'icomoon';
+  src:url('../fonts/icon.eot?gi24au');
+  src:url('../fonts/icon.eot?#iefixgi24au') format('embedded-opentype'),
+      url('../fonts/icon.woff?gi24au') format('woff'),
+      url('../fonts/icon.ttf?gi24au') format('truetype'),
+      url('../fonts/icon.svg?gi24au#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+  font-family: 'icomoon';
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-comment:before   { content: "\f04f"; }
+.icon-screen:before    { content: "\f27c"; }
+.icon-github:before    { content: "\f00a"; }
+.icon-megaphone:before { content: "\f077"; }
+
+/* -------------------------------------------------------------------------- */
+
+body {
+  font-family: "Hiragino Kaku Gothic ProN", "メイリオ", Meiryo, Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #666;
+}
+
+p {
+  margin-top: 0;
+}
+
+a {
+  color: orange;
+  transition: color .2s ease-in-out;
+}
+
+a:hover {
+  color: #ffbb3f;
+}
+
+h1 {
+  margin: 0;
+  font-weight: normal;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+::selection {
+  background-color: orange;
+  color: #fff;
+}
+
+::-moz-selection {
+  background-color: orange;
+  color: #fff;
+}
+
+/* -------------------------------------------------------------------------- */
+
+.inner {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.row {
+  display: block;
+}
+
+.row .column {
+  display: inline-block;
+  width: 32%;
+  margin: 0;
+  padding: 0 30px 0 0;
+  vertical-align: top;
+  box-sizing: border-box;
+}
+
+.row .column:last-child {
+  padding-right: 0;
+}
+
+.row .column h2 {
+  margin: 0 0 0.5rem;
+  color: orange;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.row .column h2 span {
+  margin-right: 0.8rem;
+  font-size: 1.5rem;
+  vertical-align: middle;
+}
+
+.row .column p {
+  margin: 0 0 0.5rem;
+}
+
+/* -------------------------------------------------------------------------- */
+
+header {
+  padding: 20px 0;
+  background-color: #fafafa;
+}
+
+header h1 {
+  display: inline-block;
+  color: #888;
+  font-family: Chivo, sans-serif;
+  font-size: 1.2rem;
+}
+
+header h1:before {
+  display: inline-block;
+  content: "";
+  width: 2rem;
+  height: 2rem;
+  margin-right: 0.5rem;
+  background: transparent url("../images/jikkyo.svg") no-repeat center center;
+  background-size: contain;
+  vertical-align: middle;
+}
+
+header .repo {
+  float: right;
+  display: inline-block;
+  color: #bbb;
+  font-size: 1.8rem;
+  text-decoration: none;
+}
+
+header .repo:hover {
+  color: #666;
+}
+
+/* -------------------------------------------------------------------------- */
+
+.hero {
+  padding: 100px 0;
+  background: orange url("../images/bg.gif") repeat;
+  background-attachment: fixed;
+  color: #fff;
+}
+
+.hero p {
+  text-align: center;
+}
+
+.hero h1 {
+  margin: 0 0 10px 0;
+  font-size: 3.5rem;
+  text-align: center;
+}
+
+.hero .lead {
+  width: 70%;
+  margin: 0 auto 50px;
+  font-size: 1.2rem;
+}
+
+.hero .btn-dl {
+  display: inline-block;
+  margin: 0 auto;
+  padding: 15px 30px;
+  color: #fff;
+  font-family: Chivo, sans-serif;
+  font-size: 1.2rem;
+  border: 2px solid #fff;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: background-color .2s ease-in-out;
+}
+
+.hero .btn-dl:hover {
+  background-color: rgba(255, 226, 0, 0.35);
+}
+
+.hero img {
+  margin-top: 50px;
+}
+
+/* -------------------------------------------------------------------------- */
+
+.subhero {
+  padding: 100px 0;
+}
+
+.subhero .intro {
+  margin: 0 0 70px 0;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+/* -------------------------------------------------------------------------- */
+
+footer {
+  padding: 40px 0;
+  background-color: #2b251e;
+  color: #aaa;
+  font-family: Chivo, sans-serif;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+footer a {
+  color: #eee;
+  text-decoration: none;
+}
+
+footer a:hover {
+  color: orange;
+}
+
+/* -------------------------------------------------------------------------- */
 
 /* Smaller than standard 960 (devices and browsers) */
-@media only screen and (max-width: 959px) { }
+@media only screen and (max-width: 959px) {
+}
 
 /* Tablet Portrait size to standard 960 (devices and browsers) */
 @media only screen and (min-width: 768px) and (max-width: 959px) {
-  .inner {
-    width: 740px;
-  }
-  header h1, header h2 {
-    width: 340px;
-  }
-  header h1 {
-    font-size: 60px;
-  }
-  header h2 {
-    font-size: 30px;
-  }
-  #main-content {
-    width: 490px;
-  }
-  #main-content h1:before,
-  #main-content h2:before,
-  #main-content h3:before,
-  #main-content h4:before,
-  #main-content h5:before,
-  #main-content h6:before {
-    padding-right: 0;
-    margin-left: 0;
-    content: none;
-  }
 }
 
 /* All Mobile Sizes (devices and browser) */
 @media only screen and (max-width: 767px) {
-  .inner {
-    width: 93%;
-  }
-  header {
-    padding: 20px 0;
-  }
-  header .inner {
-    position: relative;
-  }
-  header h1, header h2 {
-    width: 100%;
-  }
-  header h1 {
-    font-size: 48px;
-  }
-  header h2 {
-    font-size: 24px;
-  }
-  header a.button {
-    position: relative;
-    display: inline-block;
+
+  .row .column {
+    display: block;
     width: auto;
-    height: auto;
-    padding: 5px 10px;
-    margin-top: 15px;
-    font-size: 13px;
-    line-height: 1;
-    color: #2879d0;
-    text-align: center;
-    background-color: #9ddcff;
-    background-image: none;
-    border-radius: 5px;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
+    padding: 10px 0;
   }
-  header a.button small {
-    display: inline;
-    font-size: 13px;
-  }
-  #main-content,
-  aside#sidebar {
-    float: none;
-    width: 100% ! important;
-  }
-  aside#sidebar {
-    min-height: 0;
-    padding: 20px 0;
-    margin-top: 20px;
-    background-image: none;
-    border-top: solid 1px #ddd;
-  }
-  aside#sidebar a.button {
-    display: none;
-  }
-  #main-content h1:before,
-  #main-content h2:before,
-  #main-content h3:before,
-  #main-content h4:before,
-  #main-content h5:before,
-  #main-content h6:before {
-    padding-right: 0;
-    margin-left: 0;
-    content: none;
-  }
+
 }
 
 /* Mobile Landscape Size to Tablet Portrait (devices and browsers) */
-@media only screen and (min-width: 480px) and (max-width: 767px) { }
+@media only screen and (min-width: 480px) and (max-width: 767px) {
+
+}
 
 /* Mobile Portrait Size to Mobile Landscape Size (devices and browsers) */
-@media only screen and (max-width: 479px) { }
+@media only screen and (max-width: 479px) {
 
+
+  .hero {
+    padding: 50px 0;
+  }
+
+  .hero h1 {
+    font-size: 2rem;
+  }
+
+  .hero .lead {
+    width: auto;
+    font-size: 1rem;
+    margin-bottom: 30px;
+  }
+
+  .subhero {
+    padding: 50px 0;
+  }
+
+  .subhero .intro {
+    margin-bottom: 30px;
+    font-size: 1.3rem;
+  }
+
+}
