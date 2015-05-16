@@ -11,12 +11,17 @@
     clickthrough = true;
   }
 
-  window.WindowWrapper = {
+  var WindowWrapper = {
     defaultWidth: 800,
     defaultHeight: 520,
     minWidth: 450,
     minHeight: 100,
     clickthrough: clickthrough,
+    xBeforeMaximize: 0,
+    yBeforeMaximize: 0,
+    wBeforeMaximize: 0,
+    hBeforeMaximize: 0,
+    maximized: false,
     get x() {
       return clickthrough ? parseInt(winp.style.left) : win.x;
     },
@@ -87,11 +92,46 @@
           Math.max(this.minHeight, h) + win.height);
       }
     },
+    resize(x, y, w, h) {
+      this.moveTo(x, y);
+      this.resizeTo(w, h);
+    },
+    maximize() {
+      if (this.maximized) return;
+      this.xBeforeMaximize = this.x;
+      this.yBeforeMaximize = this.y;
+      this.wBeforeMaximize = this.width;
+      this.hBeforeMaximize = this.height;
+      if (clickthrough) {
+        this.resize(0, 0, window.screen.availWidth, window.screen.availHeight);
+        win.emit("maximize");
+      } else {
+        win.maximize();
+      }
+    },
+    unmaximize() {
+      if (!this.maximized) return;
+      if (clickthrough) {
+        this.resize(
+          this.xBeforeMaximize,
+          this.yBeforeMaximize,
+          this.wBeforeMaximize,
+          this.hBeforeMaximize
+        );
+        win.emit("unmaximize");
+      } else {
+        win.unmaximize();
+      }
+    },
+    toggleMaximized() {
+      if (this.maximized) this.unmaximize();
+      else this.maximize();
+    },
     refresh() {
       win.emit("resize", this.width, this.height);
     },
     reset() {
-      win.unmaximize();
+      this.unmaximize();
       this.moveTo(
         (window.screen.availWidth - this.defaultWidth) / 2,
         (window.screen.availHeight - this.defaultHeight) / 2
@@ -100,4 +140,8 @@
     }
   };
 
+  win.on("maximize", () => WindowWrapper.maximized = true);
+  win.on("unmaximize", () => WindowWrapper.maximized = false);
+
+  window.WindowWrapper = WindowWrapper;
 })();

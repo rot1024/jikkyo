@@ -201,25 +201,20 @@
         var container = root.getElementById("container");
         container.classList.add(process.platform);
 
-        var maximized = () => container.classList.contains("maximized");
         win.on("maximize", () => container.classList.add("maximized"));
         win.on("unmaximize", () => container.classList.remove("maximized"));
 
         root.getElementById("minimize").addEventListener("click", e => {
-          if (process.platform === "darwin") {
-            if (maximized()) win.unmaximize();
-            else win.maximize();
-            return;
-          } else {
+          if (process.platform === "darwin")
+            return window.WindowWrapper.toggleMaximized();
+          else
             win.minimize();
-          }
           e.stopPropagation();
         });
 
         root.getElementById("maximize").addEventListener("click", (e => {
           if (process.platform === "darwin") return win.minimize();
-          if (maximized()) win.unmaximize();
-          else win.maximize();
+          else window.WindowWrapper.toggleMaximized();
           e.stopPropagation();
         }).bind(this));
 
