@@ -40,8 +40,7 @@
       if (e.keyCode === 123) win.showDevTools();
     });
 
-    var winp = document.getElementById("windowp"),
-        container = document.getElementById("window"),
+    var container = document.getElementById("window"),
         titlebar = document.querySelector("jikkyo-titlebar"),
         controller = document.querySelector("jikkyo-controller"),
         viewer = document.querySelector("jikkyo-viewer"),
@@ -73,16 +72,7 @@
     win.on("close", () => {
       manager.currentMode.hide();
       win.hide();
-
-      pref.maximized = container.classList.contains("maximized");
-      if (!pref.maximized) {
-        pref.x = window.WindowWrapper.x;
-        pref.y = window.WindowWrapper.y;
-        pref.width = window.WindowWrapper.width;
-        pref.height = window.WindowWrapper.height;
-      }
-      pref.save();
-
+      window.WindowWrapper.save(pref);
       win.close(true);
     });
 
@@ -141,50 +131,7 @@
     preferenceDialog.on("hide", applyPreference);
 
     win.show();
-
-    if (window.WindowWrapper.clickthrough) {
-      if (
-        pref.maximized &&
-        process.platform !== "darwin" /* workaround */
-      ) {
-        winp.style.left = "0";
-        winp.style.top = "0";
-        winp.style.width = win.width + "px";
-        winp.style.height = win.height + "px";
-      } else {
-        if (typeof pref.x === "number")
-          winp.style.left = pref.x + "px";
-        if (typeof pref.y === "number")
-          winp.style.top = pref.y + "px";
-        if (typeof pref.width === "number" && pref.width >= 100)
-          winp.style.width = pref.width + "px";
-        else
-          winp.style.width = "800px";
-        if (typeof pref.height === "number" && pref.height >= 100)
-          winp.style.height = pref.height + "px";
-        else
-          winp.style.height = "800px";
-      }
-    } else {
-      if (
-        pref.maximized &&
-        process.platform !== "darwin" /* workaround */
-      ) win.maximize();
-      else {
-        if (typeof pref.x === "number")
-          win.x = pref.x;
-        if (typeof pref.y === "number")
-          win.y = pref.y;
-        if (typeof pref.width === "number" && pref.width >= 100)
-          win.width = pref.width;
-        else
-          win.width = 800;
-        if (typeof pref.height === "number" && pref.height >= 100)
-          win.height = pref.height;
-        else
-          win.height = 520;
-      }
-    }
+    window.WindowWrapper.init(pref);
 
     setTimeout(() => {
       container.classList.remove("attention");

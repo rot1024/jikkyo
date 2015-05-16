@@ -17,6 +17,7 @@
     minWidth: 450,
     minHeight: 100,
     clickthrough: clickthrough,
+    beforeMaximize: false,
     xBeforeMaximize: 0,
     yBeforeMaximize: 0,
     wBeforeMaximize: 0,
@@ -50,7 +51,7 @@
       if (clickthrough)
         winp.style.width = Math.max(this.minWidth, w) + "px";
       else
-        win.x = w;
+        win.width = w;
     },
     set height(h) {
       if (clickthrough)
@@ -98,6 +99,7 @@
     },
     maximize() {
       if (this.maximized) return;
+      this.beforeMaximize = true;
       this.xBeforeMaximize = this.x;
       this.yBeforeMaximize = this.y;
       this.wBeforeMaximize = this.width;
@@ -112,12 +114,16 @@
     unmaximize() {
       if (!this.maximized) return;
       if (clickthrough) {
-        this.resize(
-          this.xBeforeMaximize,
-          this.yBeforeMaximize,
-          this.wBeforeMaximize,
-          this.hBeforeMaximize
-        );
+        if (this.beforeMaximize) {
+          this.resize(
+            this.xBeforeMaximize,
+            this.yBeforeMaximize,
+            this.wBeforeMaximize,
+            this.hBeforeMaximize
+          );
+        } else {
+          this.reset();
+        }
         win.emit("unmaximize");
       } else {
         win.unmaximize();
@@ -132,16 +138,47 @@
     },
     reset() {
       this.unmaximize();
-      this.moveTo(
+      this.resize(
         (window.screen.availWidth - this.defaultWidth) / 2,
-        (window.screen.availHeight - this.defaultHeight) / 2
+        (window.screen.availHeight - this.defaultHeight) / 2,
+        this.defaultWidth,
+        this.defaultHeight
       );
-      this.resizeTo(this.defaultWidth, this.defaultHeight);
+    },
+    init(pref) {
+      this.reset();
+      if (typeof pref.x === "number") this.x = pref.x;
+      if (typeof pref.y === "number") this.y = pref.y;
+      if (typeof pref.width === "number") this.width = pref.width;
+      if (typeof pref.height === "number") this.height = pref.height;
+      if (pref.maximized && process.platform !== "darwin" /* workaround */) {
+        this.maximize();
+      }
+    },
+    save(pref) {
+      pref.maximized = this.maximized;
+      if (this.maximized && !this.beforeMaximize) {
+        pref.x = null;
+        pref.y = null;
+        pref.width = null;
+        pref.height = null;
+      } else {
+        pref.x = this.beforeMaximize ? this.xBeforeMaximize : this.x;
+        pref.y = this.beforeMaximize ? this.yBeforeMaximize : this.y;
+        pref.width = this.beforeMaximize ? this.wBeforeMaximize : this.width;
+        pref.height = this.beforeMaximize ? this.hBeforeMaximize : this.height;
+      }
+      pref.save();
     }
   };
 
-  win.on("maximize", () => WindowWrapper.maximized = true);
-  win.on("unmaximize", () => WindowWrapper.maximized = false);
+  win.on("maximize", () => {
+    WindowWrapper.maximized = true;
+  });
+  win.on("unmaximize", () => {
+    WindowWrapper.maximized = false;
+    WindowWrapper.beforeMaximize = false;
+  });
 
   window.WindowWrapper = WindowWrapper;
 })();
