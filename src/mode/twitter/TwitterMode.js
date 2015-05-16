@@ -2,6 +2,7 @@
   "use strict";
 
   var gui = require('nw.gui'),
+      FilenameSanitizer = require("./util/FilenameSanitizer"),
       TwitterComment = require("./mode/twitter/TwitterComment"),
       TwitterAuth = require("./mode/twitter/TwitterAuth"),
       TwitterRecorder = require("./mode/twitter/TwitterRecorder"),
@@ -48,6 +49,7 @@
         twitterConnect.classList.add("on");
         if (this._recording) {
           this._recorder.directory = this.preference.twitter.recordingDirecotry;
+          this._recorder.filename = this.preference.twitter.recordingFilename;
           let ok = this._recorder.start();
           if (!ok) {
             this._recording = false;
@@ -95,6 +97,7 @@
         if (this._twitter.isStreaming) {
           if (this._recording) {
             this._recorder.directory = this.preference.twitter.recordingDirecotry;
+            this._recorder.filename = this.preference.twitter.recordingFilename;
             let ok = this._recorder.start();
             if (!ok) {
               this._recording = false;
@@ -364,6 +367,12 @@
       r.querySelector("#twitter-recording-direcotry").value = t.recordingDirecotry;
       r.querySelector("#twitter-recording-file").nwworkingdir = t.recordingDirecotry;
 
+      var fn = r.querySelector("#twitter-recording-filename");
+      fn.value = t.recordingFilename;
+      fn.addEventListener("blur", () => {
+        fn.value = FilenameSanitizer(fn.value);
+      });
+
       r.querySelector("#twitter-ng-text").value = t.textNg;
       r.querySelector("#twitter-ng-user").value = t.userNg;
       r.querySelector("#twitter-ng-source").value = t.sourceNg;
@@ -390,6 +399,7 @@
       p.applyThemeColor = r.querySelector("#twitter-apply-color").checked;
 
       p.recordingDirecotry = r.querySelector("#twitter-recording-direcotry").value;
+      p.recordingFilename = FilenameSanitizer(r.querySelector("#twitter-recording-filename").value);
 
       p.textNg = r.querySelector("#twitter-ng-text").value;
       p.userNg = r.querySelector("#twitter-ng-user").value;
@@ -420,7 +430,8 @@
         excludeHashtag: true,
         excludeUrl: true,
         applyThemeColor: true,
-        recordingDirecotry: ""
+        recordingDirecotry: "",
+        recordingFilename: "YYYY-MM-DD_hh-mm-ss.xml"
       };
     }
 
