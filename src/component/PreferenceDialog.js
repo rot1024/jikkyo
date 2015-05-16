@@ -156,7 +156,7 @@
 
     _initGeneralPreference() {
       return {
-        fontFamily: process.platform === "darwin" ? "sans-serif" : 'Meiryo, sans-serif',
+        fontFamily: process.platform === "darwin" ? "sans-serif" : 'Meiryo, Segoe UI Symbol, sans-serif',
         fontWeight: true,
         duration: 4000,
         usDuration: 3000,
