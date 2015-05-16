@@ -71,8 +71,20 @@
 
     set preference(v) {
       this._preference = v;
-      if (!v.general)
-        v.general = this._initGeneralPreference();
+      var init = this._initGeneralPreference();
+      if (!v.general) {
+        v.general = init;
+        v.save();
+      } else {
+        let count = 0;
+        Object.keys(init).forEach(key => {
+          if (v.general[key] === void(0)) {
+            v.general[key] = init[key];
+            count++;
+          }
+        });
+        if (count > 0) v.save();
+      }
     }
 
     on(type, listener) {

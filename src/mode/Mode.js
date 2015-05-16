@@ -90,9 +90,22 @@
     }
 
     _initPref() {
-      if (this._pref && this.preferenceName && !this._pref[this.preferenceName]) {
-        this._pref[this.preferenceName] = this.initPreference();
+      if (!this._pref || !this.preferenceName) return;
+
+      var init = this.initPreference();
+
+      if (!this._pref[this.preferenceName]) {
+        this._pref[this.preferenceName] = init;
         this._pref.save();
+      } else {
+        let c = false;
+        Object.keys(init).forEach(key => {
+          if (this._pref[this.preferenceName][key] === void(0)) {
+            this._pref[this.preferenceName][key] = init[key];
+            c = true;
+          }
+        }, this);
+        if (c) this._pref.save();
       }
     }
 
