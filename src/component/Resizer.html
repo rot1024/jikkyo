@@ -155,8 +155,8 @@
               window.WindowWrapper.height + height
             );
 
-          drag.oldX = drag.x - (drag.horizontal === 0 ? diffX : 0);
-          drag.oldY = drag.y - (drag.vertical === 0 ? diffY : 0);
+          drag.oldX = drag.x - (drag.horizontal === 0 && !window.WindowWrapper.clickthrough ? diffX : 0);
+          drag.oldY = drag.y - (drag.vertical === 0 && !window.WindowWrapper.clickthrough ? diffY : 0);
 
           window.requestAnimationFrame(tick);
         };
