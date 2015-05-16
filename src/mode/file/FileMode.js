@@ -202,7 +202,10 @@
         this._playBtn.classList.remove("disabled");
 
         if ("gc" in window) window.gc();
-      }).bind(this));
+      }).bind(this), err => {
+        console.error(err);
+        window.alert("パースエラーのためファイルを読み込めませんでした。");
+      });
     }
 
     _seekForward() {
