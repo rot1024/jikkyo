@@ -59,7 +59,14 @@
 
     win.on("maximize", () => container.classList.add("maximized"));
     win.on("unmaximize", () => container.classList.remove("maximized"));
-    win.on("focus", () => container.classList.add("hover"));
+
+    win.on("focus", () => {
+      if (window.WindowWrapper.clickthrough) {
+        titlebar.show();
+        controller.show();
+      }
+      container.classList.add("hover");
+    });
 
     win.on("blur", () => {
       titlebar.hide();
@@ -77,10 +84,12 @@
     });
 
     container.addEventListener("mouseover", () => {
+      if (window.WindowWrapper.clickthrough) return;
       container.classList.add("hover");
     });
 
     container.addEventListener("mouseout", () => {
+      if (window.WindowWrapper.clickthrough) return;
       titlebar.hide();
       if (!controller.isFixed) {
         controller.hide();
@@ -89,6 +98,7 @@
     });
 
     container.addEventListener("mousemove", e => {
+      if (window.WindowWrapper.clickthrough) return;
       if (e.clientY < 70) titlebar.show();
       else titlebar.hide();
       if (win.height - 150 < e.clientY)
