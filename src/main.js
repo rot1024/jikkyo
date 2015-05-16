@@ -24,7 +24,15 @@
     });
   }
 
+  if (window.WindowWrapper.clickthrough) {
+    win.x = 0;
+    win.y = 0;
+    win.width = window.screen.availWidth;
+    win.height = window.screen.availHeight;
+  }
+
   win.on("loaded", () => {
+
     window.ondragover = e => { e.preventDefault(); return false; };
     window.ondrop = e => { e.preventDefault(); return false; };
 
@@ -32,7 +40,8 @@
       if (e.keyCode === 123) win.showDevTools();
     });
 
-    var container = document.getElementById("window"),
+    var winp = document.getElementById("windowp"),
+        container = document.getElementById("window"),
         titlebar = document.querySelector("jikkyo-titlebar"),
         controller = document.querySelector("jikkyo-controller"),
         viewer = document.querySelector("jikkyo-viewer"),
@@ -40,6 +49,11 @@
         modal = document.querySelector("jikkyo-modal"),
         holder = document.querySelector("jikkyo-drop-holder"),
         manager = new window.jikkyo.ModeManager();
+
+    if (window.WindowWrapper.clickthrough) {
+      window.document.body.classList.add("clickthrough");
+      titlebar.setAttribute("clickthrough", "");
+    }
 
     preferenceDialog.preference = pref;
     controller.preference = pref;
@@ -62,10 +76,10 @@
 
       pref.maximized = container.classList.contains("maximized");
       if (!pref.maximized) {
-        pref.x = win.x;
-        pref.y = win.y;
-        pref.width = win.width;
-        pref.height = win.height;
+        pref.x = window.WindowWrapper.x;
+        pref.y = window.WindowWrapper.y;
+        pref.width = window.WindowWrapper.width;
+        pref.height = window.WindowWrapper.height;
       }
       pref.save();
 
@@ -128,19 +142,48 @@
 
     win.show();
 
-    if (
-      pref.maximized &&
-      process.platform !== "darwin" /* workaround */
-    ) win.maximize();
-    else {
-      if (typeof pref.x === "number")
-        win.x = pref.x;
-      if (typeof pref.y === "number")
-        win.y = pref.y;
-      if (typeof pref.width === "number" && pref.width >= 100)
-        win.width = pref.width;
-      if (typeof pref.height === "number" && pref.height >= 100)
-        win.height = pref.height;
+    if (window.WindowWrapper.clickthrough) {
+      if (
+        pref.maximized &&
+        process.platform !== "darwin" /* workaround */
+      ) {
+        winp.style.left = "0";
+        winp.style.top = "0";
+        winp.style.width = win.width + "px";
+        winp.style.height = win.height + "px";
+      } else {
+        if (typeof pref.x === "number")
+          winp.style.left = pref.x + "px";
+        if (typeof pref.y === "number")
+          winp.style.top = pref.y + "px";
+        if (typeof pref.width === "number" && pref.width >= 100)
+          winp.style.width = pref.width + "px";
+        else
+          winp.style.width = "800px";
+        if (typeof pref.height === "number" && pref.height >= 100)
+          winp.style.height = pref.height + "px";
+        else
+          winp.style.height = "800px";
+      }
+    } else {
+      if (
+        pref.maximized &&
+        process.platform !== "darwin" /* workaround */
+      ) win.maximize();
+      else {
+        if (typeof pref.x === "number")
+          win.x = pref.x;
+        if (typeof pref.y === "number")
+          win.y = pref.y;
+        if (typeof pref.width === "number" && pref.width >= 100)
+          win.width = pref.width;
+        else
+          win.width = 800;
+        if (typeof pref.height === "number" && pref.height >= 100)
+          win.height = pref.height;
+        else
+          win.height = 520;
+      }
     }
 
     setTimeout(() => {

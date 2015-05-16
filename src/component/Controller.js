@@ -3,7 +3,6 @@
   "use strict";
 
   var win = require("nw.gui").Window.get();
-  var constants = require("./constants");
   var doc = document.currentScript.ownerDocument;
 
   var EventEmitter = require("events").EventEmitter;
@@ -200,11 +199,7 @@
       }).bind(this));
 
       var resetWindow = () => {
-        win.unmaximize();
-        win.x = (window.screen.availWidth - constants.window.width) / 2;
-        win.y = (window.screen.availHeight - constants.window.height) / 2;
-        win.width = constants.window.width;
-        win.height = constants.window.height;
+        window.WindowWrapper.reset();
       };
 
       this.shortcutkeys = [

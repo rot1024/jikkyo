@@ -4,7 +4,8 @@
   "description": "Jikkyo App",
   "scripts": {
     "start": "cd .. && npm start",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "ct": "cd .. && npm run ct"
   },
   "author": "rot1024",
   "license": "MIT",
@@ -22,8 +23,8 @@
     "toolbar": false,
     "transparent": true,
     "icon": "images/jikkyo.png",
-    "width": 800,
-    "height": 520,
+    "width": 1920,
+    "height": 1080,
     "min_width": 450,
     "min_height": 100
   },

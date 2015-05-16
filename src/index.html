@@ -9,15 +9,18 @@
     <script src="node_modules/mousetrap/mousetrap.min.js"></script>
   </head>
   <body>
-    <div id="window" class="container attention">
-      <jikkyo-viewer></jikkyo-viewer>
-      <jikkyo-controller></jikkyo-controller>
-      <jikkyo-titlebar></jikkyo-titlebar>
-      <jikkyo-preference-dialog></jikkyo-preference-dialog>
-      <jikkyo-modal></jikkyo-modal>
-      <jikkyo-drop-holder></jikkyo-drop-holder>
+    <div id="windowp">
+      <div id="window" class="container attention">
+        <jikkyo-viewer></jikkyo-viewer>
+        <jikkyo-controller></jikkyo-controller>
+        <jikkyo-titlebar></jikkyo-titlebar>
+        <jikkyo-preference-dialog></jikkyo-preference-dialog>
+        <jikkyo-modal></jikkyo-modal>
+        <jikkyo-drop-holder></jikkyo-drop-holder>
+      </div>
+      <jikkyo-resizer></jikkyo-resizer>
     </div>
-    <jikkyo-resizer></jikkyo-resizer>
+    <script src="WindowWrapper.js"></script>
     <script src="preference/Preference.js"></script>
     <script src="main.js"></script>
   </body>

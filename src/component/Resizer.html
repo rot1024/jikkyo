@@ -147,11 +147,12 @@
           if (drag.vertical === 0)
             y = diffY;
 
-          if (x || y) win.moveBy(x, y);
+          if (x || y)
+            window.WindowWrapper.moveBy(x, y);
           if (width || height)
-            win.resizeTo(
-              Math.max(450, win.width + width),
-              Math.max(100, win.height + height)
+            window.WindowWrapper.resizeTo(
+              window.WindowWrapper.width + width,
+              window.WindowWrapper.height + height
             );
 
           drag.oldX = drag.x - (drag.horizontal === 0 ? diffX : 0);
