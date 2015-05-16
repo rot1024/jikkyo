@@ -14,6 +14,8 @@
       this._modeChangedCb = this._modeChangedCb.bind(this);
       this._dropCb = this._dropCb.bind(this);
       this.shortcutKeysAvailable = true;
+
+      window.addEventListener("custom_menu", this._menuCb.bind(this));
     }
 
     get mode() {
@@ -275,6 +277,10 @@ vertical-align: middle;
 
     _dropCb(file) {
       this.currentMode.drop(file);
+    }
+
+    _menuCb(e) {
+      this.currentMode.menu(e);
     }
 
   }

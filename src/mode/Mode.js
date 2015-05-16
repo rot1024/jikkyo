@@ -83,11 +83,11 @@
       this._initPref();
     }
 
-    initPreference() {
-    }
+    initPreference() {}
 
-    drop() {
-    }
+    drop() {}
+
+    menu() {}
 
     _initPref() {
       if (!this._pref || !this.preferenceName) return;
