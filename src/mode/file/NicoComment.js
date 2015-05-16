@@ -86,11 +86,9 @@ module.exports = (() => {
 
       margin = margin || 0;
 
-      // vposm is custom attribute for jikkyo
       var chat = {
         text: obj._,
-        vpos: obj.$.vposm ? parseInt(obj.$.vposm) :
-        (parseInt(obj.$.vpos) + Math.floor(Math.random() * margin)) * 10
+        vpos: (parseInt(obj.$.vpos) + Math.floor(Math.random() * margin)) * 10
       };
 
       if ("mail" in obj.$) {

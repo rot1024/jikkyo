@@ -23,6 +23,7 @@ module.exports = (() => {
       this._filename = "YYYY-MM-DD_hh-mm-ss.xml";
       this._open = false;
       this._counter = 0;
+      this._startAt = null;
     }
 
     get directory() {
@@ -48,7 +49,8 @@ module.exports = (() => {
     start() {
       if (!this._directory || !this._filename)
         return false;
-      var filename = this._formatDate(new Date(), this._filename);
+      this._startAt = new Date();
+      var filename = this._formatDate(this._startAt, this._filename);
       var stream = this._stream = fs.createWriteStream(path.join(this._directory, filename));
       stream.on("error", (err => {
         console.error(err);
@@ -66,13 +68,14 @@ module.exports = (() => {
     record(chat) {
       if (!this._open || chat.text === "") return;
       chat = this._convertChat(chat);
-      this._stream.write(`<chat user_id="${chat.userId}" date="${chat.date}" vpos="${chat.vpos}" vposm="${chat.vposm}" no="${this._counter++}"${chat.mail ? ` mail="${chat.mail}"` : ""}>${chat.text}</chat>\n`);
+      this._stream.write(`<chat user_id="${chat.userId}" date="${chat.date}" vpos="${chat.vpos}" no="${this._counter++}"${chat.mail ? ` mail="${chat.mail}"` : ""}>${chat.text}</chat>\n`);
     }
 
     stop() {
       if (!this._open) return;
       this._stream.write("</packet>\n");
       this._stream.end();
+      this._startAt = null;
       this._counter = 0;
       this._open = false;
     }
@@ -81,8 +84,7 @@ module.exports = (() => {
       return {
         text: escapeHTML(chat.text),
         date: chat.date,
-        vpos: Math.floor(chat.vpos / 10),
-        vposm: chat.vpos,
+        vpos: Math.floor((chat.datem - this._startAt.getTime()) / 10),
         mail: chat.color,
         userId: chat.userId
       };
