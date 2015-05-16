@@ -206,14 +206,14 @@
 
         root.getElementById("minimize").addEventListener("click", e => {
           if (process.platform === "darwin")
-            return window.WindowWrapper.toggleMaximized();
+            window.WindowWrapper.toggleMaximized();
           else
             win.minimize();
           e.stopPropagation();
         });
 
         root.getElementById("maximize").addEventListener("click", (e => {
-          if (process.platform === "darwin") return win.minimize();
+          if (process.platform === "darwin") win.minimize();
           else window.WindowWrapper.toggleMaximized();
           e.stopPropagation();
         }).bind(this));
@@ -222,6 +222,35 @@
           win.close();
           e.stopPropagation();
         });
+
+        {
+          let x = 0, y = 0, dragging = false, mm;
+
+          let mu = () => {
+            dragging = false;
+            window.removeEventListener("mousemove", mm, true);
+            window.removeEventListener("mouseup", mu, true);
+          };
+
+          mm = e => {
+            if (!dragging) mu();
+            var diffX = e.screenX - x;
+            var diffY = e.screenY - y;
+            window.WindowWrapper.moveBy(diffX, diffY);
+            x = e.screenX;
+            y = e.screenY;
+          };
+
+          root.addEventListener("mousedown", e => {
+            if (!window.WindowWrapper.clickthrough) return;
+            x = e.screenX;
+            y = e.screenY;
+            dragging = true;
+            window.addEventListener("mousemove", mm, true);
+            window.addEventListener("mouseup", mu, true);
+          });
+
+        }
       }
 
     };
