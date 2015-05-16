@@ -29,6 +29,7 @@
 
       this._renderComment = [];
       this._renderDate = 0;
+      this._renderRemoved = 0;
       this._renderCb = this._renderCb.bind(this);
 
       this._resizeCb = this._resizeCb.bind(this);
@@ -285,6 +286,8 @@
 
           if (this._realtime)
             this._comment.splice(this._comment.indexOf(chat), 1);
+
+          ++this._renderRemoved;
         }
       }, this);
 
@@ -300,12 +303,19 @@
 
           if (this._realtime)
             this._comment.shift();
+
+          ++this._renderRemoved;
         }
 
         chat.visibility = true;
         this._viewer.createChat(chat);
         this._renderComment.splice(this._binarySearch(chat, this._renderComment), 0, chat);
       }, this);
+
+      if (this._renderRemoved > Math.min(Math.max(this._comment.length / 10, 100), 10000)) {
+        if ("gc" in window) window.gc();
+        this._renderRemoved = 0;
+      }
     }
 
     refresh(index) {
