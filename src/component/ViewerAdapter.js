@@ -495,6 +495,7 @@
           if (current.position !== chat.position) return false;
           if (chat.vpos - current.vpos > duration) return false;
           if (y >= currentY + current.height || currentY >= y + chat.height) return false;
+          if (current.height === 0) return false;
 
           if (isUe || isShita) {
             y += current.height;
