@@ -33,6 +33,8 @@
         visibility: false,
         bullet:     false
       };
+
+      this.addEventListener("contextmenu", this._menuCb.bind(this));
     }
 
     detachedCallback() {
@@ -224,6 +226,17 @@
       notifier.performChange(name in chat ? "update" : "add", () => {
         chat[name] = value;
       });
+    }
+
+    _menuCb(e) {
+      var event = new MouseEvent("custom_menu", {
+        screenX: e.screenX,
+        screenY: e.screenY,
+        clientX: e.clientX,
+        clientY: e.clientY,
+        relatedTarget: this
+      });
+      window.dispatchEvent(event);
     }
 
   }
