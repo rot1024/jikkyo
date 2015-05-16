@@ -25,10 +25,11 @@ module.exports = (() => {
 
       fs.readFile(path, "utf8", ((err, data) => {
         if (err) return deferred.reject(err);
-        this.read(data).then(r => deferred.resolve(r));
-      }).bind(this), err => {
-        deferred.reject(err);
-      });
+        this.read(data).then(
+          r => deferred.resolve(r),
+          e => deferred.reject(e)
+        );
+      }).bind(this));
 
       return deferred.promise;
     }
@@ -44,7 +45,7 @@ module.exports = (() => {
         if (result === null ||
             typeof result.packet !== "object" ||
             !("chat" in result.packet)) {
-          return deferred.reject("parse error");
+          return deferred.reject(new Error("parse error"));
         }
 
         var margin = result.packet.chat.reduce((margin, obj) => {
