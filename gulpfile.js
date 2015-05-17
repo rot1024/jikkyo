@@ -1,4 +1,5 @@
 var fs = require('fs');
+var path = require('path');
 var gulp = require('gulp');
 var gutil = require('gulp-util');
 var del = require('del');
@@ -39,7 +40,22 @@ var nw = function(cb, platforms) {
   nw.on('log', function(msg) {
     gutil.log('node-webkit-builder', msg);
   });
-  nw.build(cb);
+  nw.build().then(function() {
+    platforms.forEach(function(platform) {
+      switch (platform) {
+        case "win":
+        case "win32":
+        case "win64":
+          var text = fs.readFileSync(path.join(__dirname, "attachment", "jikkyo_ct.cmd"));
+          var targets = platform === "win" ? ["win32", "win64"] : [platform];
+          targets.forEach(function(target) {
+            fs.writeFileSync(path.join(__dirname, "build", "jikkyo", target, "jikkyo_ct.cmd"), text);
+          });
+          break;
+      }
+    });
+    cb();
+  });
 };
 
 gulp.task('nw:release', ['clean', 'sync'], function(cb) {
