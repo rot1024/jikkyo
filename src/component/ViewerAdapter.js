@@ -1,7 +1,8 @@
 (() => {
   "use strict";
 
-  var EventEmitter = require("events").EventEmitter;
+  var EventEmitter = require("events").EventEmitter,
+      win = require("nw.gui").Window.get();
 
   class Adapter {
 
@@ -34,7 +35,7 @@
 
       this._resizeCb = this._resizeCb.bind(this);
 
-      window.addEventListener("resize", this._resizeCb);
+      win.on("resize", this._resizeCb);
     }
 
     get viewer() {

@@ -79,6 +79,7 @@
       if (clickthrough) {
         this.width = w;
         this.height = h;
+        win.emit("resize", w, h);
       } else {
         win.resizeTo(Math.max(this.minWidth, w), Math.max(this.minHeight, h));
       }
@@ -87,6 +88,7 @@
       if (clickthrough) {
         this.width += w;
         this.height += h;
+        win.emit("resize", w, h);
       } else {
         win.resizeTo(
           Math.max(this.minWidth, w) + win.width,

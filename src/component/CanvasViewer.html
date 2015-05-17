@@ -20,7 +20,8 @@
   (() => {
     "use strict";
 
-    var doc = document.currentScript.ownerDocument;
+    var win = require("nw.gui").Window.get(),
+        doc = document.currentScript.ownerDocument;
 
     var viewer = class extends HTMLElement {
 
@@ -61,7 +62,7 @@
       attachedCallback() {
         this._canvas = this.shadowRoot.querySelector("canvas");
         this._ctx = this._canvas.getContext("2d");
-        window.addEventListener("resize", this._resizeCallback);
+        win.on("resize", this._resizeCallback);
         this._resizeCallback();
       }
 
