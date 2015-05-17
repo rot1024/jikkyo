@@ -226,17 +226,30 @@
         {
           let x = 0, y = 0, dragging = false, mm;
 
-          let mu = () => {
+          let mu = e => {
             dragging = false;
             window.removeEventListener("mousemove", mm, true);
             window.removeEventListener("mouseup", mu, true);
+
+            if (e.screenY < 10) {
+              window.WindowWrapper.maximize();
+            }
           };
 
           mm = e => {
             if (!dragging) mu();
-            var diffX = e.screenX - x;
-            var diffY = e.screenY - y;
-            window.WindowWrapper.moveBy(diffX, diffY);
+
+            if (window.WindowWrapper.maximized) {
+              window.WindowWrapper.unmaximize();
+              window.WindowWrapper.moveTo(
+                e.screenX - window.WindowWrapper.width / 2,
+                e.screenY - 10);
+            } else {
+              let diffX = e.screenX - x,
+                  diffY = e.screenY - y;
+              window.WindowWrapper.moveBy(diffX, diffY);
+            }
+
             x = e.screenX;
             y = e.screenY;
           };
@@ -249,6 +262,10 @@
             window.addEventListener("mousemove", mm, true);
             window.addEventListener("mouseup", mu, true);
           });
+
+          root.addEventListener("dblclick", e => {
+            window.WindowWrapper.toggleMaximized();
+          }, true);
 
         }
       }
