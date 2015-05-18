@@ -21,6 +21,11 @@
 
       this._time = new Time();
       this._isOpen = false;
+      this._HeatmapList = [
+        {color: [  0,   0,   0, 255], ratio: 0.00},
+        {color: [  0, 255,   0, 255], ratio: 0.50},
+        {color: [255,   0,   0, 255], ratio: 1.00}
+      ];
 
       var fileInput = root.getElementById("file"),
           fileOpenBtn = root.getElementById("file-open");
@@ -243,12 +248,26 @@
     }
 
     _getHeatmapColor(minimum, maximum, value) {
-      var ratio = (value - minimum) / (maximum - minimum) * 2;
-      var b = Math.floor(Math.max(0, 255 * (1 - ratio)));
-      var r = Math.floor(Math.max(0, 255 * (ratio - 1)));
-      var g = 255 - b - r;
-      var a = 255 * ratio;
-      return [r, g, b, a];
+      var ratio = Math.min((value - minimum) / (maximum - minimum), 1);
+
+      var color;
+      this._HeatmapList.reduce((prev, item) => {
+        if (prev === null) return null;
+        if (ratio > item.ratio) return item;
+
+        var colorRatio = (ratio - prev.ratio) / (item.ratio - prev.ratio);
+
+        color = [
+          Math.floor(item.color[0] * colorRatio + prev.color[0] * (1 - colorRatio)),
+          Math.floor(item.color[1] * colorRatio + prev.color[1] * (1 - colorRatio)),
+          Math.floor(item.color[2] * colorRatio + prev.color[2] * (1 - colorRatio)),
+          Math.floor(item.color[3] * colorRatio + prev.color[3] * (1 - colorRatio))
+        ];
+
+        return null;
+      });
+
+      return color;
     }
 
     _drawSeekbarBackground() {
@@ -271,7 +290,7 @@
       }, 10);
 
       influence.map((d, i) => {
-        img.data.set(this._getHeatmapColor(0, max * 0.75, d), i * 4);
+        img.data.set(this._getHeatmapColor(0, max * 0.8, d), i * 4);
       }, this);
 
       ctx.putImageData(img, 0, 0);
