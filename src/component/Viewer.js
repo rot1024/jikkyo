@@ -80,8 +80,6 @@
         return;
       }
 
-      text = text.toString().trim();
-
       this.innerHTML = escapeHTML(text);
 
       this._update("text", text);
