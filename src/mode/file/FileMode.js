@@ -95,6 +95,10 @@
         let that = this;
         fileInput.addEventListener("change", () => {
           if (!this || !this.value) return;
+          if (that._adapter.playing) {
+            that._playBtn.classList.remove("controller-btn-pause");
+            that._adapter.stop();
+          }
           that._open(this.value);
           fileInput.value = "";
         });
