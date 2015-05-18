@@ -42,15 +42,23 @@ var nw = function(cb, platforms) {
   });
   nw.build().then(function() {
     platforms.forEach(function(platform) {
-      var targets =
+      var jikkyo_ct,
+          targets =
           platform === "win" ? ["win32", "win64"] :
           platform === "osx" ? ["osx32", "osx64"] :
           platform === "linux" ? ["linux32", "linux64"] : [platform];
 
       if (platform.indexOf("win") !== -1) {
-        var jikkyo_ct = fs.readFileSync(path.join(__dirname, "attachment", "jikkyo_ct.cmd"));
+        jikkyo_ct = fs.readFileSync(path.join(__dirname, "attachment", "jikkyo_ct.cmd"));
         targets.forEach(function(target) {
           fs.writeFileSync(path.join(__dirname, "build", "jikkyo", target, "jikkyo_ct.cmd"), jikkyo_ct);
+        });
+      }
+
+      if (platform.indexOf("osx") !== -1) {
+        jikkyo_ct = fs.readFileSync(path.join(__dirname, "attachment", "jikkyo_ct.command"));
+        targets.forEach(function(target) {
+          fs.writeFileSync(path.join(__dirname, "build", "jikkyo", target, "jikkyo_ct.command"), jikkyo_ct);
         });
       }
 
