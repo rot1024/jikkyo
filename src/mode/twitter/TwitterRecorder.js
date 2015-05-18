@@ -68,10 +68,8 @@ module.exports = (() => {
     record(chat) {
       if (!this._open || chat.text === "") return;
 
-      if (this._counter === 0 && chat.data.datem - this._startAt.getTime() < 0) {
-        console.log(chat.data.datem, this._startAt.getTime());
+      if (this._counter === 0 && chat.data.datem - this._startAt.getTime() < 0)
         this._startAt = new Date(chat.data.datem);
-      }
       chat = this._convertChat(chat);
       this._stream.write(`<chat user_id="${chat.userId}" date="${chat.date}" vpos="${chat.vpos}" no="${this._counter++}"${chat.mail ? ` mail="${chat.mail}"` : ""}>${chat.text}</chat>\n`);
     }
