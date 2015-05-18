@@ -49,7 +49,7 @@ module.exports = (() => {
     start() {
       if (!this._directory || !this._filename)
         return false;
-      this._startAt = new Date();
+      this._startAt = new Date(Math.floor(Date.now() / 1000) * 1000);
       var filename = this._formatDate(this._startAt, this._filename);
       var stream = this._stream = fs.createWriteStream(path.join(this._directory, filename));
       stream.on("error", (err => {
@@ -68,8 +68,10 @@ module.exports = (() => {
     record(chat) {
       if (!this._open || chat.text === "") return;
 
-      if (this._counter === 0 && chat.datem - this._startAt.getTime() < 0)
-        this._startAt = new Date(chat.datem);
+      if (this._counter === 0 && chat.data.datem - this._startAt.getTime() < 0) {
+        console.log(chat.data.datem, this._startAt.getTime());
+        this._startAt = new Date(chat.data.datem);
+      }
       chat = this._convertChat(chat);
       this._stream.write(`<chat user_id="${chat.userId}" date="${chat.date}" vpos="${chat.vpos}" no="${this._counter++}"${chat.mail ? ` mail="${chat.mail}"` : ""}>${chat.text}</chat>\n`);
     }
