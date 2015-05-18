@@ -73,6 +73,12 @@ module.exports = (() => {
     }
 
     _streamCb(stream) {
+      const table = {
+        '&amp;': '&',
+        '&lt;': '<',
+        '&gt;': '>'
+      };
+
       var streamStartAt;
 
       var setup = (() => {
@@ -159,6 +165,8 @@ module.exports = (() => {
             text = text.replace(url.url, "");
           });
         }
+
+        text = text.replace(/\&(amp|lt|gt);/g, m => table[m]);
 
         text = text.trim();
 
