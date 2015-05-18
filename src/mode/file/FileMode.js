@@ -20,6 +20,7 @@
       root.appendChild(document.importNode(template.content, true));
 
       this._time = new Time();
+      this._isOpen = false;
 
       var fileInput = root.getElementById("file"),
           fileOpenBtn = root.getElementById("file-open");
@@ -135,6 +136,11 @@
       super.hide();
     }
 
+    applyPreference(p) {
+      super.applyPreference(p);
+      this._drawSeekbarBackground();
+    }
+
     refresh() {
       super.refresh();
       this._range.max = this._adapter.length;
@@ -146,7 +152,6 @@
       } else {
         this._playBtn.classList.remove("controller-btn-pause");
       }
-      this._drawSeekbarBackground();
     }
 
     getPreferenceView() {
@@ -198,13 +203,14 @@
       nico.options.size.big = this.preference.file.bigSize;
       nico.options.size.small = this.preference.file.smallSize;
       nico.readFromFile(path).then((result => {
+        this._isOpen = true;
         this._adapter.clearComment();
         this._adapter.addComment(result);
         this._adapter.render();
         this._drawSeekbarBackground();
         this._range.removeAttribute("disabled");
         this._playBtn.classList.remove("disabled");
-
+        this._drawSeekbarBackground();
         if ("gc" in window) window.gc();
       }).bind(this), err => {
         console.error(err);
@@ -246,7 +252,7 @@
     }
 
     _drawSeekbarBackground() {
-      if (!this.preference.file.heatmap) return;
+      if (!this._isOpen || !this.preference.file.heatmap) return;
 
       const r = this._rangeBg,
             ctx = r.getContext("2d"),

@@ -184,14 +184,8 @@
       var p = this._pref;
       if (!p) return;
       this._modeList.forEach(m => {
-        m.adapter.duration = p.general.duration;
-        m.adapter.durationAlt = p.general.usDuration;
-        m.adapter.limit = p.general.limit;
-        m.adapter.sizingMode = p.general.sizing;
-        m.adapter.baseFontSize = p.general.fontSize;
-        m.adapter.rows = p.general.rows;
+        m.applyPreference(p);
       });
-
     }
 
     showShortcutkeysHelp() {

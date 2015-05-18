@@ -46,6 +46,15 @@
       this._initPref();
     }
 
+    applyPreference(p) {
+      this.adapter.duration = p.general.duration;
+      this.adapter.durationAlt = p.general.usDuration;
+      this.adapter.limit = p.general.limit;
+      this.adapter.sizingMode = p.general.sizing;
+      this.adapter.baseFontSize = p.general.fontSize;
+      this.adapter.rows = p.general.rows;
+    }
+
     refresh() {
       this._adapter.refresh();
       this._adapter.render();
