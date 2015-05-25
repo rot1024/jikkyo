@@ -38,7 +38,7 @@ var nw = function(cb, platforms) {
     winZip: false
   });
   nw.on('log', function(msg) {
-    gutil.log('node-webkit-builder', msg);
+    gutil.log('nw-builder', msg);
   });
   nw.build().then(function() {
     platforms.forEach(function(platform) {
@@ -76,12 +76,40 @@ gulp.task('nw:release', ['clean', 'sync'], function(cb) {
   nw(cb, ['win', 'osx', 'linux']);
 });
 
+gulp.task('nw', function(cb) {
+  var platform = "", arch = "";
+
+  if (process.platform === "win32") platform = "win";
+  else if (process.platform === "darwin") platform = "osx";
+  else if (process.platform !== "linux") {
+    console.error("Cannot build for " + process.platform);
+    return;
+  }
+
+  if (process.arch === "x64") arch = "64";
+  else if (process.arch === "ia32") arch = "32";
+  else {
+    console.error("Cannot build for " + process.arch);
+    return;
+  }
+
+  nw(cb, [platform + arch]);
+});
+
+gulp.task('nw:win', function(cb) {
+  nw(cb, ['win']);
+});
+
 gulp.task('nw:win32', function(cb) {
   nw(cb, ['win32']);
 });
 
 gulp.task('nw:win64', function(cb) {
   nw(cb, ['win64']);
+});
+
+gulp.task('nw:osx', function(cb) {
+  nw(cb, ['osx']);
 });
 
 gulp.task('nw:osx32', function(cb) {
@@ -96,6 +124,14 @@ gulp.task('nw:linux', function(cb) {
   nw(cb, ['linux']);
 });
 
+gulp.task('nw:linux32', function(cb) {
+  nw(cb, ['linux32']);
+});
+
+gulp.task('nw:linux64', function(cb) {
+  nw(cb, ['linux64']);
+});
+
 gulp.task('clean', ['clean:build']);
 gulp.task('release', ['clean', 'nw:release']);
-gulp.task('default', ['build']);
+gulp.task('default', ['nw']);
