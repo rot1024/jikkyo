@@ -186,6 +186,10 @@
       this._modeList.forEach(m => {
         m.applyPreference(p);
       });
+      if (this._viewerView) {
+        this._viewerView.applyPreference(p);
+      }
+      this.refresh();
     }
 
     showShortcutkeysHelp() {

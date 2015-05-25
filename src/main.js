@@ -123,19 +123,7 @@
       } else {
         container.style.backgroundColor = pref.general.windowBgColor;
       }
-
-      var css = `font-family: ${pref.general.fontFamily}; `;
-      if (pref.general.fontWeight) css += `font-weight: bold; `;
-      css += `opacity: ${pref.general.opacity}; `;
-      css += pref.general.style;
-
-      var bulletCss = `opacity: ${pref.general.bulletOpacity}; `;
-      bulletCss += pref.general.bulletStyle;
       manager.applyPreference();
-      viewer.setChatStyle(css);
-      viewer.setBulletChatStyle(bulletCss);
-
-      manager.refresh();
     };
     applyPreference();
     preferenceDialog.on("hide", applyPreference);

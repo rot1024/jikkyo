@@ -273,6 +273,19 @@
       return this.clientHeight;
     }
 
+    applyPreference(pref) {
+      var css = `font-family: ${pref.general.fontFamily}; `;
+      if (pref.general.fontWeight) css += `font-weight: bold; `;
+      css += `opacity: ${pref.general.opacity}; `;
+      css += pref.general.style;
+
+      var bulletCss = `opacity: ${pref.general.bulletOpacity}; `;
+      bulletCss += pref.general.bulletStyle;
+
+      this.setChatStyle(css);
+      this.setBulletChatStyle(bulletCss);
+    }
+
     createChat(chat) {
       if (typeof chat !== "object")
         throw new TypeError("chat must be object: " + typeof chat);
