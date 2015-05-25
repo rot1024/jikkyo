@@ -11,14 +11,14 @@
 * Windows / Mac / Linux で動作します。
 * 透明なウィンドウに好きな動画を重ねて実況が楽しめます。
 * コメントの速度や文字サイズなどを細かく設定できます。
-* 透明ウィンドウの後ろをクリックできる状態でも利用可能です（Windows/Macのみ）。
+* 透明ウィンドウの後ろをクリックできる状態でも利用可能（Windows/Macのみ）。
+* ニコニコ動画コメントの表示方法を忠実に再現 & 各種コマンドに対応。
 
 ### ファイルモード
 
 * ニコニコ動画のコメントファイル（XML）が読み込めます。
-* コメントの盛り上がりをシークバーの背景に色で可視化します。
-* ドラッグアンドドロップでコメントファイルを読み込めます。
-* ニコニコ動画コメントの各種コマンドに対応。
+* コメントの盛り上がりをシークバーの色で可視化します。
+* ドラッグ・アンド・ドロップでコメントファイルを読み込めます。
 
 ### Twitterモード
 
@@ -35,22 +35,21 @@
 
 ## 更新履歴
 
-* v1.1.0 (2015/05/18)
-  * Windows / Macで、透明ウィンドウの後ろをクリックできる状態（ClickThrough）で起動できるようになりました（`jikkyo_ct.cmd` または `jikkyo_ct.command` から起動してください）
-  * Twitterモード時に、コメントを右クリックしてメニューからNG登録ができるようになりました
-  * Windowsで、初期設定でコメントに絵文字が表示されるようになりました（前バージョンから継続して使用中の方は、設定でフォントファミリーに `Segoe UI Symbol` を追加して下さい）
-  * 録画ファイル名の設定を追加
-  * 様々なバグフィックス・パフォーマンス向上
-* v1.0.1 (2015/05/15)
-  * 最新バージョン確認機能などのバグフィックス
-* v1.0.0 (2015/05/15)
-  * 公開
+[Releases](https://github.com/rot1024/jikkyo/releases) をご覧下さい。
 
-## GitHub
+## ライセンス
 
 このアプリケーションはオープンソースで、 [MIT License](LICENSE) の下 [GitHub](https://github.com/rot1024/jikkyo) にてソースコードを公開しています。
 
-バグ等が見つかりましたら、作者の Twitter [@aayh](http://twitter.com/aayh) にお知らせいただくか、 GitHub の issues に投げてください。
+バグや要望等がありましたら、作者の Twitter [@aayh](http://twitter.com/aayh) にお知らせいただくか、 GitHub の issues に投げてください。
+
+## 今後の予定
+
+* つぶあにで過去のアニメ実況を楽しめる機能
+* ニコニコ実況対応
+* ニコニコ動画コメント取得機能
+
+...etc
 
 ## For Developers
 
@@ -66,14 +65,10 @@ npm start
 gulp release
 ```
 
-## Contributing
+### Contributing
 
 1. Fork this repository
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
-
-## License
-
-[MIT License](LICENSE)
