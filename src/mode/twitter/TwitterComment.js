@@ -3,7 +3,7 @@ module.exports = (() => {
 
   var EventEmitter = require("events").EventEmitter,
       util = require("util"),
-      Twitter = require("twitter");
+      Twit = require("twit");
 
   class TwitterComment {
 
@@ -42,10 +42,10 @@ module.exports = (() => {
     }
 
     auth(auth) {
-      this.twitter = new Twitter({
+      this.twitter = new Twit({
         consumer_key: auth.consumer_key,
         consumer_secret: auth.consumer_secret,
-        access_token_key: auth.access_token_key,
+        access_token: auth.access_token_key,
         access_token_secret: auth.access_token_secret
       });
     }
@@ -54,25 +54,27 @@ module.exports = (() => {
       this.destroyStream();
       this._streamType = "user";
       this._streaming = true;
-      this.twitter.stream("user", {}, this._streamCb.bind(this));
+      this._registerStreamCallback(
+        this.twitter.stream("user", {}));
     }
 
     filterStream(track) {
       this.destroyStream();
       this._streamType = "filter";
       this._streaming = true;
-      this.twitter.stream("statuses/filter", { track: track }, this._streamCb.bind(this));
+      this._registerStreamCallback(
+        this.twitter.stream("statuses/filter", { track: track }));
     }
 
     destroyStream() {
       if (!this._streaming) return;
-      this._stream.destroy();
+      this._stream.stop();
       this._stream = null;
       this._streamType = "";
       this._streaming = false;
     }
 
-    _streamCb(stream) {
+    _registerStreamCallback(stream) {
       const table = {
         '&amp;': '&',
         '&lt;': '<',
@@ -93,18 +95,21 @@ module.exports = (() => {
 
       this._stream = stream;
 
-      stream.on("data", (tweet => {
+      stream.on("connect", () => {
+        console.log("connect");
+        setup();
+      });
 
-        if (tweet.friends && this._streamType === "user") {
-          setup();
-          return;
-        }
+      stream.on("disconnect", () => {
+        console.log("disconnect");
+        destroy();
+      });
 
-        if (tweet.disconnect) {
-          destroy();
-          return;
-        }
+      stream.on("reconnect", () => {
+        console.log("reconnect");
+      });
 
+      stream.on("tweet", (tweet => {
         var getKey = (obj, args) => {
           return args.reduce((obj, current) => {
             if (obj === void(0)) return;
@@ -203,11 +208,6 @@ module.exports = (() => {
       stream.on("error", error => {
         destroy(error);
       });
-
-      if (this._streamType !== "user") {
-        setup();
-      }
-
     }
 
   }
