@@ -441,7 +441,6 @@
       super.menu();
 
       var chat = e.relatedTarget.chat;
-      console.log(e);
 
       var ngCb = ((value, name) => {
         return (() => {
