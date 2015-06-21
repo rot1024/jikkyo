@@ -166,7 +166,27 @@ gulp.task('package', function(cb) {
     });
   });
 
-  Promise.all(dirs).then(cb).catch(cb);
+  /*
+  .reduce(function(promise, dir) {
+    return promise.then(function() {
+      return new Promise(function(resolve, reject) {
+        console.log("Zipping v" + version + "-" + dir + "...");
+        zip(dir, version, function(err) {
+          if (err) return reject(err);
+          console.log("Complete zipping v" + version + "-" + dir + "!");
+          resolve();
+        });
+      });
+    });
+  }, Promise.resolve()).then(function() {
+  */
+
+  Promise.all(dirs).then(function() {
+    cb();
+  }).catch(function(err) {
+    console.error(err);
+    cb();
+  });
 });
 
 gulp.task('release', ['clean', 'nw:release', 'package']);
