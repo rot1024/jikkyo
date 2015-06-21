@@ -4,6 +4,7 @@ var gulp = require('gulp');
 var gutil = require('gulp-util');
 var del = require('del');
 var NwBuilder = require('nw-builder');
+var archiver = require("archiver");
 
 gulp.task('sync', function() {
   var package = JSON.parse(fs.readFileSync('package.json', 'utf8'));
@@ -133,5 +134,41 @@ gulp.task('nw:linux64', function(cb) {
 });
 
 gulp.task('clean', ['clean:build']);
-gulp.task('release', ['clean', 'nw:release']);
+
+var zip = function(platform, version, cb) {
+  var archive = archiver('zip');
+  var dir = path.join("build", "jikkyo", platform);
+  var name = "jikkyo-v" + version + "-" + platform;
+  var out = path.join("build", "jikkyo", name + ".zip");
+
+  var output = fs.createWriteStream(out);
+
+  output.on('close', cb);
+  archive.on('error', cb);
+
+  archive.pipe(output);
+  archive.directory(dir, name).finalize();
+};
+
+gulp.task('package', function(cb) {
+  var version = JSON.parse(fs.readFileSync('package.json', 'utf8')).version;
+
+  var dirs = fs.readdirSync("build/jikkyo").filter(function(file) {
+    return fs.statSync("build/jikkyo/" + file).isDirectory();
+  }).map(function(dir) {
+    return new Promise(function(resolve, reject) {
+      console.log("Zipping v" + version + "-" + dir + "...");
+      zip(dir, version, function(err) {
+        if (err) return reject(err);
+        console.log("Complete zipping v" + version + "-" + dir + "!");
+        resolve();
+      });
+    });
+  });
+
+  Promise.all(dirs).then(cb).catch(cb);
+});
+
+gulp.task('release', ['clean', 'nw:release', 'package']);
+
 gulp.task('default', ['nw']);
