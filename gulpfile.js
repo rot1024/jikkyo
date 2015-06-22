@@ -5,6 +5,7 @@ var gutil = require('gulp-util');
 var del = require('del');
 var NwBuilder = require('nw-builder');
 var archiver = require("archiver");
+var runSequence = require('run-sequence');
 
 gulp.task('sync', function() {
   var package = JSON.parse(fs.readFileSync('package.json', 'utf8'));
@@ -21,7 +22,7 @@ gulp.task('sync', function() {
   }
 });
 
-gulp.task('clean:build', function(cb) {
+gulp.task('clean', function(cb) {
   del(['build'], cb);
 });
 
@@ -73,7 +74,7 @@ var nw = function(cb, platforms) {
   });
 };
 
-gulp.task('nw:release', ['clean', 'sync'], function(cb) {
+gulp.task('nw:all', function(cb) {
   nw(cb, ['win', 'osx', 'linux']);
 });
 
@@ -133,8 +134,6 @@ gulp.task('nw:linux64', function(cb) {
   nw(cb, ['linux64']);
 });
 
-gulp.task('clean', ['clean:build']);
-
 var zip = function(platform, version, cb) {
   var archive = archiver('zip');
   var dir = path.join("build", "jikkyo", platform);
@@ -149,6 +148,60 @@ var zip = function(platform, version, cb) {
   archive.pipe(output);
   archive.directory(dir, name).finalize();
 };
+
+gulp.task('copy', ['copy:win', 'copy:osx', 'copy:linux']);
+
+gulp.task('copy:win', ['copy:win32', 'copy:win64']);
+
+gulp.task('copy:win32', function() {
+  return gulp.src([
+    "README.md",
+    "LICENSE",
+    "attachment/jikkyo_ct.cmd"
+  ]).pipe(gulp.dest("build/jikkyo/win32"));
+});
+
+gulp.task('copy:win64', function() {
+  return gulp.src([
+    "README.md",
+    "LICENSE",
+    "attachment/jikkyo_ct.cmd"
+  ]).pipe(gulp.dest("build/jikkyo/win64"));
+});
+
+gulp.task('copy:osx', ['copy:osx32', 'copy:osx64']);
+
+gulp.task('copy:osx32', function() {
+  return gulp.src([
+    "README.md",
+    "LICENSE",
+    "attachment/jikkyo_ct.command"
+  ]).pipe(gulp.dest("build/jikkyo/osx32"));
+});
+
+gulp.task('copy:osx64', function() {
+  return gulp.src([
+    "README.md",
+    "LICENSE",
+    "attachment/jikkyo_ct.command"
+  ]).pipe(gulp.dest("build/jikkyo/osx64"));
+});
+
+gulp.task('copy:linux', ['copy:linux32', 'copy:linux64']);
+
+gulp.task('copy:linux32', function() {
+  return gulp.src([
+    "README.md",
+    "LICENSE"
+  ]).pipe(gulp.dest("build/jikkyo/linux32"));
+});
+
+gulp.task('copy:linux64', function() {
+  return gulp.src([
+    "README.md",
+    "LICENSE"
+  ]).pipe(gulp.dest("build/jikkyo/linux64"));
+});
 
 gulp.task('package', function(cb) {
   var version = JSON.parse(fs.readFileSync('package.json', 'utf8')).version;
@@ -189,6 +242,8 @@ gulp.task('package', function(cb) {
   });
 });
 
-gulp.task('release', ['clean', 'nw:release', 'package']);
+gulp.task('release', function(cb) {
+  runSequence('clean', 'nw:all', 'copy', 'package', cb);
+});
 
 gulp.task('default', ['nw']);
