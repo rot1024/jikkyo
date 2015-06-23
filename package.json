@@ -25,6 +25,6 @@
     "nw-builder": "git://github.com/rot1024/nw-builder.git"
   },
   "dependencies": {
-    "nw": "^0.12.1"
+    "nw": "^0.12.2"
   }
 }

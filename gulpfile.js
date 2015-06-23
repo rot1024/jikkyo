@@ -29,7 +29,7 @@ gulp.task('clean', function(cb) {
 var nw = function(cb, platforms) {
   var nw = new NwBuilder({
     files: 'src/**',
-    version: '0.12.1',
+    version: '0.12.2',
     platforms: platforms,
     build: 'build',
     cacheDir: 'cache',
