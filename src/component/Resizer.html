@@ -11,6 +11,23 @@
       pointer-events: none;
     }
 
+    .indicator {
+      position: absolute;
+      left: 5px;
+      top: 5px;
+      right: 4px;
+      bottom: 4px;
+      background-color: rgba(255, 165, 0, 0.1);
+      border-radius: 5px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease-in-out;
+    }
+
+    .indicator.on {
+      opacity: 1;
+    }
+
     .grip {
       position: absolute;
       pointer-events: auto;
@@ -61,6 +78,7 @@
 
   </style>
 
+  <div id="indicator" class="indicator"></div>
   <div id="w" class="grip w"></div>
   <div id="n" class="grip n"></div>
   <div id="e" class="grip e"></div>
@@ -92,6 +110,8 @@
         var root = this.createShadowRoot();
         var template = doc.querySelector("template");
         root.appendChild(document.importNode(template.content, true));
+
+        var indicator = root.getElementById("indicator");
 
         var maximized = false;
         win.on("maximize", (() => {
@@ -128,6 +148,7 @@
           window.removeEventListener("mousemove", mousemove);
           window.removeEventListener("mouseup", mouseup);
           window.document.body.style.cursor = null;
+          indicator.classList.remove("on");
         };
 
         var tick = () => {
@@ -166,6 +187,8 @@
 
           t.addEventListener("mousedown", e => {
             if (maximized) return;
+            e.stopPropagation();
+
             drag.x = drag.oldX = e.clientX;
             drag.y = drag.oldY = e.clientY;
             drag.horizontal = hor;
@@ -184,8 +207,10 @@
 
             if (cursorName)
               window.document.body.style.cursor = cursorName;
+
+            indicator.classList.add("on");
+
             window.requestAnimationFrame(tick);
-            e.stopPropagation();
           });
 
           t.addEventListener("click", e => e.stopPropagation());
