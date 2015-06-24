@@ -91,8 +91,8 @@
         win.emit("resize", this.width, this.height);
       } else {
         win.resizeTo(
-          Math.max(this.minWidth, w) + win.width,
-          Math.max(this.minHeight, h) + win.height);
+          Math.max(this.minWidth, win.width + w),
+          Math.max(this.minHeight, win.height + h));
       }
     },
     resize(x, y, w, h) {
