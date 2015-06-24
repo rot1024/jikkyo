@@ -35,6 +35,12 @@
     get height() {
       return clickthrough ? parseInt(winp.style.height) : win.height;
     },
+    get right() {
+      return this.x + this.width;
+    },
+    get bottom() {
+      return this.y + this.height;
+    },
     set x(x) {
       if (clickthrough)
         winp.style.left = x + "px";
