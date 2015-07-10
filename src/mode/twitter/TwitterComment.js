@@ -81,15 +81,18 @@ module.exports = (() => {
         '&gt;': '>'
       };
 
-      var streamStartAt;
+      var streamStartAt, streaming = false;
 
       var setup = (() => {
+        if (streaming) return;
+        streaming = true;
         streamStartAt = Date.now();
         this._event.emit("stream");
       }).bind(this);
 
       var destroy = (err => {
         this.destroyStream();
+        streaming = false;
         this._event.emit("error", err);
       }).bind(this);
 
