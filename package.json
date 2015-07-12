@@ -5,7 +5,9 @@
   "scripts": {
     "start": "nw src",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "ct": "nw src --disable-gpu --force-cpu-draw"
+    "ct": "nw src --disable-gpu --force-cpu-draw",
+    "nw": "gulp nw",
+    "release": "gulp release"
   },
   "repository": {
     "type": "git",
