@@ -2,7 +2,7 @@
   "use strict";
 
   var gui = require('nw.gui'),
-      FilenameSanitizer = require("./util/FilenameSanitizer"),
+      filenameSanitizer = require("./util/FilenameSanitizer"),
       TwitterComment = require("./mode/twitter/TwitterComment"),
       TwitterAuth = require("./mode/twitter/TwitterAuth"),
       TwitterRecorder = require("./mode/twitter/TwitterRecorder"),
@@ -372,7 +372,7 @@
       var fn = r.querySelector("#twitter-recording-filename");
       fn.value = t.recordingFilename;
       fn.addEventListener("blur", () => {
-        fn.value = FilenameSanitizer(fn.value);
+        fn.value = filenameSanitizer(fn.value);
       });
 
       r.querySelector("#twitter-ng-text").value = t.textNg;
@@ -401,7 +401,7 @@
       p.applyThemeColor = r.querySelector("#twitter-apply-color").checked;
 
       p.recordingDirecotry = r.querySelector("#twitter-recording-direcotry").value;
-      p.recordingFilename = FilenameSanitizer(r.querySelector("#twitter-recording-filename").value);
+      p.recordingFilename = filenameSanitizer(r.querySelector("#twitter-recording-filename").value);
 
       p.textNg = r.querySelector("#twitter-ng-text").value;
       p.userNg = r.querySelector("#twitter-ng-user").value;
