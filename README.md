@@ -62,7 +62,7 @@ npm i
 npm start
 
 # Building
-gulp release
+npm run release
 ```
 
 ### Contributing
