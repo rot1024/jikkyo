@@ -177,6 +177,7 @@
           t = p.file;
 
       r.querySelector("#file-heatmap").checked = t.heatmap;
+      r.querySelector("#file-auto-coloring").checked = t.autoColoring;
       r.querySelector("#file-comment-big-size").value = t.bigSize;
       r.querySelector("#file-comment-small-size").value = t.smallSize;
     }
@@ -189,6 +190,7 @@
           t = p.file;
 
       t.heatmap = r.querySelector("#file-heatmap").checked;
+      t.autoColoring = r.querySelector("#file-auto-coloring").checked;
       t.bigSize = r.querySelector("#file-comment-big-size").value;
       t.smallSize = r.querySelector("#file-comment-small-size").value;
     }
@@ -196,6 +198,7 @@
     initPreference() {
       return {
         heatmap: true,
+        autoColoring: false,
         bigSize: "150%",
         smallSize: "50%"
       };
@@ -207,6 +210,7 @@
 
     _open(path) {
       var nico = new NicoComment();
+      nico.options.autoColoring = this.preference.file.autoColoring;
       nico.options.size.big = this.preference.file.bigSize;
       nico.options.size.small = this.preference.file.smallSize;
       nico.readFromFile(path).then((result => {

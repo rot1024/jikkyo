@@ -4,11 +4,14 @@ module.exports = (() => {
   var fs = require("fs"),
       xml = require("xml2js").parseString;
 
+  var colorRegExp = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
+
   class NicoComment {
 
     constructor() {
       this._comment = [];
       this.options = {
+        autoColoring: false,
         size: {
           big: NicoComment.defaultSize.big,
           small: NicoComment.defaultSize.small
@@ -54,8 +57,14 @@ module.exports = (() => {
           return margin2;
         }, -1);
 
+        var autoColoring =
+          this.options.autoColoring ? !result.packet.chat.some(obj => {
+            if (!("mail" in obj.$)) return false;
+            return obj.$.mail.split(" ").some(m => colorRegExp.test(m));
+          }) : false;
+
         this._comment = result.packet.chat.map(obj => {
-          return this._parseChat(obj, margin);
+          return this._parseChat(obj, margin, autoColoring);
         }, this).filter(obj => obj !== null);
 
         deferred.resolve(this._comment);
@@ -81,7 +90,7 @@ module.exports = (() => {
       this._comment = [];
     }
 
-    _parseChat(obj, margin) {
+    _parseChat(obj, margin, autoColoring) {
       if (!obj._) return null;
 
       margin = margin || 0;
@@ -99,13 +108,36 @@ module.exports = (() => {
             chat.size = this.options.size[command];
           } else if (NicoComment.position.includes(command)) {
             chat.position = command;
-          } else if (/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(command)) {
+          } else if (colorRegExp.test(command)) {
             chat.color = command;
           }
         }, this);
       }
 
+      if (autoColoring && !chat.color) {
+        let id = obj.$.user_id;
+        let hash = id ? this._hashCode(id) : Math.random() * 0xFFFFFF;
+        let r = (hash & 0xFF0000) >> 16;
+        let g = (hash & 0x00FF00) >> 8;
+        let b = hash & 0x0000FF;
+        chat.color = "#" + this._toHex(r) + this._toHex(g) + this._toHex(b);
+      }
+
       return chat;
+    }
+
+    _hashCode(str) {
+      var hash = 0, i, len;
+      if (str.length === 0) return hash;
+      for (i = 0, len = str.length; i < len; i++) {
+        hash = ((hash << 5) - hash) + str.charCodeAt(i);
+        hash |= 0;
+      }
+      return hash;
+    }
+
+    _toHex(num) {
+      return ("0" + Number(num).toString(16)).slice(-2);
     }
 
   }
