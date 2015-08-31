@@ -1,66 +1,68 @@
-var fs = require('fs');
-var path = require('path');
-var gulp = require('gulp');
-var gutil = require('gulp-util');
-var del = require('del');
-var NwBuilder = require('nw-builder');
-var archiver = require("archiver");
-var runSequence = require('run-sequence');
+"use strict";
 
-gulp.task('sync', function() {
-  var package = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-  var srcPackage = JSON.parse(fs.readFileSync('src/package.json', 'utf8'));
-  srcPackage.name = package.name;
-  srcPackage.version = package.version;
-  srcPackage.description = package.description;
-  srcPackage.repository = package.repository;
-  srcPackage.homepage = package.homepage;
+var fs = require("fs");
+var path = require("path");
+var gulp = require("gulp");
+var gutil = require("gulp-util");
+var del = require("del");
+var NwBuilder = require("nw-builder");
+var archiver = require("archiver");
+var runSequence = require("run-sequence");
+
+gulp.task("sync", function() {
+  var json = JSON.parse(fs.readFileSync("package.json", "utf8"));
+  var srcPackage = JSON.parse(fs.readFileSync("src/package.json", "utf8"));
+  srcPackage.name = json.name;
+  srcPackage.version = json.version;
+  srcPackage.description = json.description;
+  srcPackage.repository = json.repository;
+  srcPackage.homepage = json.homepage;
   try {
-    fs.writeFileSync('src/package.json', JSON.stringify(srcPackage, null, "  ") + "\n", 'utf8');
+    fs.writeFileSync("src/package.json", JSON.stringify(srcPackage, null, "  ") + "\n", "utf8");
   } catch(e) {
     console.error("Failed to sync package.json");
   }
 });
 
-gulp.task('clean', function(cb) {
-  del(['build'], cb);
+gulp.task("clean", function(cb) {
+  del(["build"], cb);
 });
 
 var nw = function(cb, platforms) {
-  var nw = new NwBuilder({
-    files: 'src/**',
-    version: '0.12.2',
+  var nwb = new NwBuilder({
+    files: "src/**",
+    version: "0.12.2",
     platforms: platforms,
-    build: 'build',
-    cacheDir: 'cache',
-    macCredits: 'Credits.html',
-    macIcns: 'src/images/jikkyo.icns',
+    build: "build",
+    cacheDir: "cache",
+    macCredits: "Credits.html",
+    macIcns: "src/images/jikkyo.icns",
     macZip: false,
-    winIco: 'src/images/jikkyo.ico',
+    winIco: "src/images/jikkyo.ico",
     winZip: false
   });
-  nw.on('log', function(msg) {
-    gutil.log('nw-builder', msg);
+  nwb.on("log", function(msg) {
+    gutil.log("nw-builder", msg);
   });
-  nw.build().then(function() {
+  nwb.build().then(function() {
     platforms.forEach(function(platform) {
-      var jikkyo_ct,
+      var jikkyoCt,
           targets =
           platform === "win" ? ["win32", "win64"] :
           platform === "osx" ? ["osx32", "osx64"] :
           platform === "linux" ? ["linux32", "linux64"] : [platform];
 
       if (platform.indexOf("win") !== -1) {
-        jikkyo_ct = fs.readFileSync(path.join(__dirname, "attachment", "jikkyo_ct.cmd"));
+        jikkyoCt = fs.readFileSync(path.join(__dirname, "attachment", "jikkyo_ct.cmd"));
         targets.forEach(function(target) {
-          fs.writeFileSync(path.join(__dirname, "build", "jikkyo", target, "jikkyo_ct.cmd"), jikkyo_ct);
+          fs.writeFileSync(path.join(__dirname, "build", "jikkyo", target, "jikkyo_ct.cmd"), jikkyoCt);
         });
       }
 
       if (platform.indexOf("osx") !== -1) {
-        jikkyo_ct = fs.readFileSync(path.join(__dirname, "attachment", "jikkyo_ct.command"));
+        jikkyoCt = fs.readFileSync(path.join(__dirname, "attachment", "jikkyo_ct.command"));
         targets.forEach(function(target) {
-          fs.writeFileSync(path.join(__dirname, "build", "jikkyo", target, "jikkyo_ct.command"), jikkyo_ct);
+          fs.writeFileSync(path.join(__dirname, "build", "jikkyo", target, "jikkyo_ct.command"), jikkyoCt);
         });
       }
 
@@ -74,11 +76,11 @@ var nw = function(cb, platforms) {
   });
 };
 
-gulp.task('nw:all', function(cb) {
-  nw(cb, ['win', 'osx', 'linux']);
+gulp.task("nw:all", function(cb) {
+  nw(cb, ["win", "osx", "linux"]);
 });
 
-gulp.task('nw', function(cb) {
+gulp.task("nw", function(cb) {
   var platform = "", arch = "";
 
   if (process.platform === "win32") platform = "win";
@@ -98,62 +100,62 @@ gulp.task('nw', function(cb) {
   nw(cb, [platform + arch]);
 });
 
-gulp.task('nw:win', function(cb) {
-  nw(cb, ['win']);
+gulp.task("nw:win", function(cb) {
+  nw(cb, ["win"]);
 });
 
-gulp.task('nw:win32', function(cb) {
-  nw(cb, ['win32']);
+gulp.task("nw:win32", function(cb) {
+  nw(cb, ["win32"]);
 });
 
-gulp.task('nw:win64', function(cb) {
-  nw(cb, ['win64']);
+gulp.task("nw:win64", function(cb) {
+  nw(cb, ["win64"]);
 });
 
-gulp.task('nw:osx', function(cb) {
-  nw(cb, ['osx']);
+gulp.task("nw:osx", function(cb) {
+  nw(cb, ["osx"]);
 });
 
-gulp.task('nw:osx32', function(cb) {
-  nw(cb, ['osx32']);
+gulp.task("nw:osx32", function(cb) {
+  nw(cb, ["osx32"]);
 });
 
-gulp.task('nw:osx64', function(cb) {
-  nw(cb, ['osx64']);
+gulp.task("nw:osx64", function(cb) {
+  nw(cb, ["osx64"]);
 });
 
-gulp.task('nw:linux', function(cb) {
-  nw(cb, ['linux']);
+gulp.task("nw:linux", function(cb) {
+  nw(cb, ["linux"]);
 });
 
-gulp.task('nw:linux32', function(cb) {
-  nw(cb, ['linux32']);
+gulp.task("nw:linux32", function(cb) {
+  nw(cb, ["linux32"]);
 });
 
-gulp.task('nw:linux64', function(cb) {
-  nw(cb, ['linux64']);
+gulp.task("nw:linux64", function(cb) {
+  nw(cb, ["linux64"]);
 });
 
 var zip = function(platform, version, cb) {
-  var archive = archiver('zip');
+  var archive = archiver("zip");
   var dir = path.join("build", "jikkyo", platform);
   var name = "jikkyo-v" + version + "-" + platform;
   var out = path.join("build", "jikkyo", name + ".zip");
 
   var output = fs.createWriteStream(out);
 
-  output.on('close', cb);
-  archive.on('error', cb);
+  output.on("close", cb);
+  archive.on("error", cb);
 
   archive.pipe(output);
   archive.directory(dir, name).finalize();
 };
 
-gulp.task('copy', ['copy:win', 'copy:osx', 'copy:linux']);
+gulp.task("copy", ["copy:win", "copy:osx", "copy:linux"]);
 
-gulp.task('copy:win', ['copy:win32', 'copy:win64']);
+gulp.task("copy:win", ["copy:win32", "copy:win64"]);
 
-gulp.task('copy:win32', function() {
+gulp.task("copy:win32", function() {
   return gulp.src([
     "README.md",
     "LICENSE",
@@ -161,7 +163,7 @@ gulp.task('copy:win32', function() {
   ]).pipe(gulp.dest("build/jikkyo/win32"));
 });
 
-gulp.task('copy:win64', function() {
+gulp.task("copy:win64", function() {
   return gulp.src([
     "README.md",
     "LICENSE",
@@ -169,9 +171,9 @@ gulp.task('copy:win64', function() {
   ]).pipe(gulp.dest("build/jikkyo/win64"));
 });
 
-gulp.task('copy:osx', ['copy:osx32', 'copy:osx64']);
+gulp.task("copy:osx", ["copy:osx32", "copy:osx64"]);
 
-gulp.task('copy:osx32', function() {
+gulp.task("copy:osx32", function() {
   return gulp.src([
     "README.md",
     "LICENSE",
@@ -179,7 +181,7 @@ gulp.task('copy:osx32', function() {
   ]).pipe(gulp.dest("build/jikkyo/osx32"));
 });
 
-gulp.task('copy:osx64', function() {
+gulp.task("copy:osx64", function() {
   return gulp.src([
     "README.md",
     "LICENSE",
@@ -187,24 +189,24 @@ gulp.task('copy:osx64', function() {
   ]).pipe(gulp.dest("build/jikkyo/osx64"));
 });
 
-gulp.task('copy:linux', ['copy:linux32', 'copy:linux64']);
+gulp.task("copy:linux", ["copy:linux32", "copy:linux64"]);
 
-gulp.task('copy:linux32', function() {
+gulp.task("copy:linux32", function() {
   return gulp.src([
     "README.md",
     "LICENSE"
   ]).pipe(gulp.dest("build/jikkyo/linux32"));
 });
 
-gulp.task('copy:linux64', function() {
+gulp.task("copy:linux64", function() {
   return gulp.src([
     "README.md",
     "LICENSE"
   ]).pipe(gulp.dest("build/jikkyo/linux64"));
 });
 
-gulp.task('package', function(cb) {
-  var version = JSON.parse(fs.readFileSync('package.json', 'utf8')).version;
+gulp.task("package", function(cb) {
+  var version = JSON.parse(fs.readFileSync("package.json", "utf8")).version;
 
   var dirs = fs.readdirSync("build/jikkyo").filter(function(file) {
     return fs.statSync("build/jikkyo/" + file).isDirectory();
@@ -242,8 +244,8 @@ gulp.task('package', function(cb) {
   });
 });
 
-gulp.task('release', function(cb) {
-  runSequence('clean', 'nw:all', 'copy', 'package', cb);
+gulp.task("release", function(cb) {
+  runSequence("clean", "nw:all", "copy", "package", cb);
 });
 
-gulp.task('default', ['nw']);
+gulp.task("default", ["nw"]);

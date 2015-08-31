@@ -51,7 +51,7 @@
       if (typeof chat !== "object")
         throw new TypeError("chat must be object: " + typeof chat);
 
-      if (this._chat !== void(0)) {
+      if (this._chat !== void 0) {
         Object.unobserve(this._chat, this._observer);
       }
       Object.observe(chat, this._observer);

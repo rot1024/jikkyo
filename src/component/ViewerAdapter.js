@@ -1,8 +1,8 @@
 (() => {
   "use strict";
 
-  var EventEmitter = require("events").EventEmitter,
-      win = require("nw.gui").Window.get();
+  var EventEmitter = require("events").EventEmitter;
+  var win = require("nw.gui").Window.get();
 
   class Adapter {
 
@@ -325,8 +325,8 @@
 
       this._calcBaseFontSize();
 
-      var refresh = ((start, end) => {
-        this._comment.slice(start, end).forEach(chat => {
+      var refresh = ((start2, end2) => {
+        this._comment.slice(start2, end2).forEach(chat => {
           var size = this._calcSize(chat);
           chat.width = size.width;
           chat.height = size.height;
@@ -338,22 +338,22 @@
 
       if (this.isSimpleMode) {
         let getLastIndex = ((position, last) => {
-          return this._comment.slice(last).reduce(((prev, chat, index) => {
+          return this._comment.slice(last).reduce((prev, chat, index2) => {
             if (chat.vpos > position) return prev;
-            return index + last + 1;
-          }).bind(this), last);
+            return index2 + last + 1;
+          }, last);
         }).bind(this);
 
-        let refreshCb = this._refreshCb = ((start, array) => {
+        let refreshCb = this._refreshCb = ((start2, array) => {
           if (refreshCb !== this._refreshCb) return;
 
-          var end = getLastIndex(this._position + 500, start);
-          refresh(start, end);
+          var end2 = getLastIndex(this._position + 500, start2);
+          refresh(start2, end2);
 
-          if (end === array.length) {
+          if (end2 === array.length) {
             this._refreshCb = null;
           } else {
-            setTimeout(refreshCb, 100, end, array);
+            setTimeout(refreshCb, 100, end2, array);
           }
         }).bind(this);
 
@@ -476,7 +476,7 @@
     }
 
     _calcX(chat, position) {
-      if (position === void(0))
+      if (position === void 0)
         position = this._position;
 
       if (chat.position === "ue" || chat.position === "shita") {
@@ -531,7 +531,7 @@
 
             if ((chatStartX >= currentStartX + current.width || currentStartX >= chatStartX + chat.width) &&
                 (chatEndX >= currentEndX + current.width || currentEndX >= chatEndX + chat.width))
-                return;
+                return false;
 
             y += current.height;
 
@@ -559,7 +559,7 @@
     _isVisible(chat, position) {
       const duration = (chat.position === "ue" || chat.position === "shita") ? this._durationAlt : this._duration;
 
-      if (position === void(0))
+      if (position === void 0)
         position = this._position;
 
       return chat.vpos <= position && position <= chat.vpos + duration;

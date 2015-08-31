@@ -1,8 +1,9 @@
 (() => {
   "use strict";
 
-  var gui = require("nw.gui"),
-      win = gui.Window.get(),
+  var gui = require("nw.gui");
+
+  var win = gui.Window.get(),
       winp = document.getElementById("windowp"),
       clickthrough = false;
 

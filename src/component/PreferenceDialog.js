@@ -3,8 +3,9 @@
 
   var gui = require("nw.gui"),
       EventEmitter = require("events").EventEmitter,
-      UpdateChecker = require("./util/UpdateChecker"),
-      doc = document.currentScript.ownerDocument;
+      UpdateChecker = require("./util/UpdateChecker");
+
+  var doc = document.currentScript.ownerDocument;
 
   class PreferenceDialog extends window.jikkyo.Modal {
 
@@ -78,7 +79,7 @@
       } else {
         let count = 0;
         Object.keys(init).forEach(key => {
-          if (v.general[key] === void(0)) {
+          if (v.general[key] === void 0) {
             v.general[key] = init[key];
             count++;
           }

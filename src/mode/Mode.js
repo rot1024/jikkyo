@@ -112,7 +112,7 @@
       } else {
         let c = false;
         Object.keys(init).forEach(key => {
-          if (this._pref[this.preferenceName][key] === void(0)) {
+          if (this._pref[this.preferenceName][key] === void 0) {
             this._pref[this.preferenceName][key] = init[key];
             c = true;
           }

@@ -2,8 +2,9 @@
   "use strict";
 
   var gui = require("nw.gui"),
-      win = gui.Window.get(),
       UpdateChecker = require("./util/UpdateChecker");
+
+  var win = gui.Window.get();
 
   var pref = new window.jikkyo.Preference();
   pref.load();

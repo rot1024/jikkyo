@@ -47,10 +47,10 @@
         ["w", null, "e"],
         ["sw", "s", "se"]
       ]
-      .forEach((el, ver) => el.forEach((el, hor) => {
-        if (!el) return;
+      .forEach((el, ver) => el.forEach((el2, hor) => {
+        if (!el2) return;
 
-        Kefir.fromEvents(root.getElementById(el), "mousedown")
+        Kefir.fromEvents(root.getElementById(el2), "mousedown")
         .filter(() => !maximized)
         .map(e => {
           e.preventDefault();
@@ -65,7 +65,7 @@
           .beforeEnd(() => ({ type: "mouseup" })))
         .onValue(v => {
           if (v.type === "mousedown") {
-            window.document.body.style.cursor = getCursorName(el);
+            window.document.body.style.cursor = getCursorName(el2);
             indicator.classList.add("on");
             return;
           }
@@ -76,28 +76,28 @@
             return;
           }
 
-          var win = window.WindowWrapper,
+          var winw = window.WindowWrapper,
               x = 0, y = 0, w = 0, h = 0;
 
           if (hor === 0) {
-            x = v.x - win.x;
+            x = v.x - winw.x;
             w = -x;
-            if (win.width + w < win.minWidth)
+            if (winw.width + w < winw.minWidth)
               x = w = 0;
           }
 
           if (ver === 0) {
-            y = v.y - win.y;
+            y = v.y - winw.y;
             h = -y;
-            if (win.height + h < win.minHeight)
+            if (winw.height + h < winw.minHeight)
               y = h = 0;
           }
 
-          if (hor === 2) w = v.x - win.right;
-          if (ver === 2) h = v.y - win.bottom;
+          if (hor === 2) w = v.x - winw.right;
+          if (ver === 2) h = v.y - winw.bottom;
 
-          if (x || y) win.moveBy(x, y);
-          if (w || h) win.resizeBy(w, h);
+          if (x || y) winw.moveBy(x, y);
+          if (w || h) winw.resizeBy(w, h);
         });
 
       }));

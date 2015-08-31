@@ -48,10 +48,10 @@ module.exports = (() => {
           return deferred.reject(new Error("parse error"));
         }
 
-        var margin = result.packet.chat.reduce((margin, obj) => {
-          if (margin === -1) margin = 100;
-          for (; parseInt(obj.$.vpos) % margin !== 0; margin /= 10);
-          return margin;
+        var margin = result.packet.chat.reduce((margin2, obj) => {
+          if (margin2 === -1) margin2 = 100;
+          for (; parseInt(obj.$.vpos) % margin2 !== 0; ) margin2 /= 10;
+          return margin2;
         }, -1);
 
         this._comment = result.packet.chat.map(obj => {
@@ -137,7 +137,7 @@ module.exports = (() => {
     marineblue:     "#3399FF",
     purple2:        "#6633CC",
     nobleviolet:    "#6633CC",
-    black2:         "#666666",
+    black2:         "#666666"
   };
 
   NicoComment.defaultSize = {

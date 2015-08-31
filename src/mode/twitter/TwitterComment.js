@@ -114,9 +114,9 @@ module.exports = (() => {
 
       stream.on("tweet", (tweet => {
         var getKey = (obj, args) => {
-          return args.reduce((obj, current) => {
-            if (obj === void(0)) return;
-            return obj[current];
+          return args.reduce((obj2, current) => {
+            if (obj2 === void 0) return;
+            return obj2[current];
           }, obj);
         };
 
@@ -181,7 +181,7 @@ module.exports = (() => {
         var color = "";
 
         var link_color = getKey(tweet, ["user", "profile_link_color"]);
-        if (this.options.applyThemeColor && link_color !== void(0) && link_color !== "0084B4") {
+        if (this.options.applyThemeColor && link_color !== void 0 && link_color !== "0084B4") {
           color = "#" + tweet.user.profile_link_color;
         }
 

@@ -54,14 +54,14 @@ class TwitterAuth {
       this.oAuthToken,
       this.oAuthTokenSecret,
       oauthVerifier,
-      ((err, oAuthAccessToken, oAuthAccessTokenSecret) => {
-      if (err) deferred.reject(err);
-
-      deferred.resolve({
-        accessToken: oAuthAccessToken,
-        accessTokenSecret: oAuthAccessTokenSecret
-      });
-    }).bind(this));
+      (err, oAuthAccessToken, oAuthAccessTokenSecret) => {
+        if (err) deferred.reject(err);
+        deferred.resolve({
+          accessToken: oAuthAccessToken,
+          accessTokenSecret: oAuthAccessTokenSecret
+        });
+      }
+    );
 
     return deferred.promise;
   }

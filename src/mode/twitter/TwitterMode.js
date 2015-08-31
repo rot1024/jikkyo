@@ -6,8 +6,9 @@
       TwitterComment = require("./mode/twitter/TwitterComment"),
       TwitterAuth = require("./mode/twitter/TwitterAuth"),
       TwitterRecorder = require("./mode/twitter/TwitterRecorder"),
-      constants = require("./constants"),
-      doc = document.currentScript.ownerDocument;
+      constants = require("./constants");
+
+  var doc = document.currentScript.ownerDocument;
 
   class TwitterMode extends window.jikkyo.Mode {
 
@@ -87,7 +88,8 @@
         if (twitterRec.classList.contains("diasbled")) return;
 
         if (!this._recording && !this.preference.twitter.recordingDirecotry) {
-          return window.alert("設定画面で録画保存先ディレクトリを設定してください。");
+          window.alert("設定画面で録画保存先ディレクトリを設定してください。");
+          return;
         }
 
         this._recording = !this._recording;
@@ -445,7 +447,7 @@
       var ngCb = ((value, name) => {
         return (() => {
           var pref = this.preference;
-          var ng = pref.twitter[name].split("\n").filter(value => value !== "");
+          var ng = pref.twitter[name].split("\n").filter(val => val !== "");
           ng.push(value);
           pref.twitter[name] = ng.join("\n");
           pref.save();
@@ -455,12 +457,18 @@
       this._customMenu.clear();
       this._customMenu.add({ label: chat.text.length > 25 ? chat.text.slice(0, 25) + "...　" : chat.text });
       this._customMenu.add({ type: "separator"});
-      this._customMenu.add({ label: `この内容を含むツイートをNG登録する　`,
-                             click: ngCb(chat.text.split("\n")[0], "textNg") });
-      this._customMenu.add({label: `ユーザー @${chat.data.screenName} をNG登録する　`,
-                            click: ngCb(chat.data.screenName, "userNg") });
-      this._customMenu.add({label: `クライアント ${chat.data.source} をNG登録する　`,
-                            click: ngCb(chat.data.source, "sourceNg") });
+      this._customMenu.add({
+        label: `この内容を含むツイートをNG登録する`,
+        click: ngCb(chat.text.split("\n")[0], "textNg")
+      });
+      this._customMenu.add({
+        label: `ユーザー @${chat.data.screenName} をNG登録する`,
+        click: ngCb(chat.data.screenName, "userNg")
+      });
+      this._customMenu.add({
+        label: `クライアント ${chat.data.source} をNG登録する`,
+        click: ngCb(chat.data.source, "sourceNg")
+      });
       this._customMenu.show(e.x, e.y);
     }
 
