@@ -157,6 +157,8 @@
       } else {
         this._playBtn.classList.remove("controller-btn-pause");
       }
+
+      this._rangeBg.style.display = !this.preference.file.heatmap ? "none" : null;
     }
 
     getPreferenceView() {
@@ -271,7 +273,7 @@
     }
 
     _drawSeekbarBackground() {
-      if (!this._isOpen || !this.preference.file.heatmap) return;
+      if (!this._isOpen) return;
 
       const r = this._rangeBg,
             ctx = r.getContext("2d"),
