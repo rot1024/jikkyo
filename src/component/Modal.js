@@ -23,20 +23,20 @@
       this.attributeChangedCallback("visible", null, this.getAttribute("visible"));
 
       this._stopCb = e => e.stopPropagation();
+
+      this._width = 400;
+      this._height = 300;
+      this._relative = false;
+      this._top = 0;
+      this._left = 0;
+      this._right = 0;
+      this._bottom = 0;
+
+      this.refreshSize();
     }
 
     attributeChangedCallback(attrName, oldVal, newVal) {
-      if (attrName === "width") {
-        if (!newVal) newVal = 400;
-        this.content.style.width = Math.floor(newVal) + "px";
-        this.content.style.marginLeft = Math.floor(-newVal / 2) + "px";
-      }
-      else if (attrName === "height") {
-        if (!newVal) newVal = 300;
-        this.content.style.height = Math.floor(newVal) + "px";
-        this.content.style.marginTop = Math.floor(-newVal / 2) + "px";
-      }
-      else if (attrName === "visible") {
+      if (attrName === "visible") {
         if (newVal !== null) {
           this._modalBg.classList.remove("hidden");
           this.addEventListener("mousemove", this._stopCb, true);
@@ -102,9 +102,11 @@
       this.emptyStyle();
       this.emptyContent();
       this.appendContent(root);
+      this.refreshSize();
     }
 
     show() {
+      this.refreshSize();
       this.setAttribute("visible", "visible");
     }
 
@@ -113,19 +115,85 @@
     }
 
     get width() {
-      return this.getAttribute("width") || 0;
+      return this._width;
     }
 
-    set width(v) {
-      return this.setAttribute("width", v);
+    set width(value) {
+      this._width = Math.floor(value);
     }
 
     get height() {
-      return this.getAttribute("height") || 0;
+      return this._height;
     }
 
-    set height(v) {
-      return this.setAttribute("height", v);
+    set height(value) {
+      this._height = Math.floor(value);
+    }
+
+    get relative() {
+      return this._relative;
+    }
+
+    set relative(value) {
+      this._relative = !!value;
+    }
+
+    get top() {
+      return this._top;
+    }
+
+    set top(value) {
+      this._top = value;
+    }
+
+    get left() {
+      return this._left;
+    }
+
+    set left(value) {
+      this._left = value;
+    }
+
+    get right() {
+      return this._right;
+    }
+
+    set right(value) {
+      this._right = value;
+    }
+
+    get bottom() {
+      return this._bottom;
+    }
+
+    set bottom(value) {
+      this._bottom = value;
+    }
+
+    refreshSize() {
+      function style(v) {
+        return typeof v === "number" ? Math.floor(v) + "px" : v;
+      }
+
+      if (this._relative) {
+        this.content.style.width = null;
+        this.content.style.height = null;
+        this.content.style.top = style(this._top);
+        this.content.style.left = style(this._left);
+        this.content.style.right = style(this._right);
+        this.content.style.bottom = style(this._bottom);
+        this.content.style.marginLeft = null;
+        this.content.style.marginTop = null;
+      } else {
+        this.content.style.top = "50%";
+        this.content.style.left = "50%";
+        this.content.style.right = null;
+        this.content.style.bottom = null;
+        this.content.style.width = this._width + "px";
+        this.content.style.height = this._height + "px";
+        this.content.style.marginLeft = (-this._width / 2) + "px";
+        this.content.style.marginTop = (-this._height / 2) + "px";
+      }
     }
 
   }
