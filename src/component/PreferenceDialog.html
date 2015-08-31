@@ -56,6 +56,10 @@
       border-color: rgba(255, 255, 255, .2);
     }
 
+    .container /deep/ .form-group + hr {
+      margin-top: 20px;
+    }
+
     .container /deep/ .form {
       margin-bottom: 10px;
     }
@@ -79,6 +83,10 @@
       padding-left: 10px;
     }
 
+    .container /deep/ .form-start {
+      margin-top: 10px;
+    }
+
     .container /deep/ .form-end {
       margin-bottom: 20px;
     }
@@ -89,7 +97,14 @@
 
     .container /deep/ .form-desc {
       display: block;
-      margin: 5px 0 0 0;
+      margin: 5px 0 10px 0;
+      color: #777;
+      font-size: 85%;
+    }
+
+    .container /deep/ .form-desc-check {
+      display: block;
+      margin: -5px 0 15px 24px;
       color: #777;
       font-size: 85%;
     }
@@ -101,6 +116,7 @@
     .about {
       display: flex;
       align-items: center;
+      margin-top: 10px;
       margin-bottom: 20px;
     }
 
