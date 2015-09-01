@@ -116,10 +116,19 @@ module.exports = (() => {
 
       if (autoColoring && !chat.color) {
         let id = obj.$.user_id;
-        let hash = id ? this._hashCode(id) : Math.random() * 0xFFFFFF;
+        let hash;
+
+        if (!id)
+          hash = Math.random() * 0xFFFFFF;
+        else if (/^[0-9]{1,}$/.test(id))
+          hash = parseInt(id);
+        else
+          hash = this._hashCode(id);
+
         let r = (hash & 0xFF0000) >> 16;
         let g = (hash & 0x00FF00) >> 8;
         let b = hash & 0x0000FF;
+
         chat.color = "#" + this._toHex(r) + this._toHex(g) + this._toHex(b);
       }
 
