@@ -5,11 +5,11 @@
   var fs = require("fs"),
       path = require("path"),
       tsubuani = require("./mode/file/tsubuani"),
-      filenameSanitizer = require("./util/FilenameSanitizer");
+      filenameSanitizer = require("./util/FilenameSanitizer"),
+      nicoComment = require("./mode/file/NicoComment"),
+      Time = require("./util/Time");
 
   var doc = document.currentScript.ownerDocument;
-  var NicoComment = require("./mode/file/NicoComment");
-  var Time = require("./util/Time");
 
   class FileMode extends window.jikkyo.Mode {
 
@@ -41,6 +41,7 @@
       this._rangeBg = root.getElementById("file-slider-bg");
       this._pos = root.getElementById("file-pos");
       this._menuBtn = root.getElementById("file-menu");
+      this._modal = document.querySelector("jikkyo-modal");
 
       this._adapter.on(((name, val) => {
         if (name === "position") {
@@ -108,7 +109,7 @@
         let that = this;
         fileInput.addEventListener("change", () => {
           if (!this || !this.value) return;
-          that._open(this.value);
+          that._openFromFile(this.value);
           fileInput.value = "";
         });
       }
@@ -263,30 +264,98 @@
     }
 
     drop(file) {
-      this._open(file);
+      this._openFromFile(file);
     }
 
-    _open(cpath) {
+    _open(data) {
+      function hashCode(str) {
+        var hash = 0, i, len;
+        if (str.length === 0) return hash;
+        for (i = 0, len = str.length; i < len; i++) {
+          hash = ((hash << 5) - hash) + str.charCodeAt(i);
+          hash |= 0;
+        }
+        return hash;
+      }
+
+      function toHex(num) {
+        return ("0" + Number(num).toString(16)).slice(-2);
+      }
+
       if (this._adapter.playing) {
         this._playBtn.classList.remove("controller-btn-pause");
         this._adapter.stop();
       }
-      var nico = new NicoComment();
-      nico.options.autoColoring = this.preference.file.autoColoring;
-      nico.options.size.big = this.preference.file.bigSize;
-      nico.options.size.small = this.preference.file.smallSize;
-      nico.readFromFile(cpath).then((result => {
-        this._isOpen = true;
-        this._adapter.clearComment();
-        this._adapter.addComment(result);
-        this._adapter.render();
-        this._range.removeAttribute("disabled");
-        this._playBtn.classList.remove("disabled");
-        this._drawSeekbarBackground();
-        if ("gc" in window) window.gc();
+
+      var size = {
+        big: this.preference.file.bigSize,
+        small: this.preference.file.smallSize
+      };
+      var autoColoring = this.preference.file.autoColoring;
+
+      var margin = data.reduce((m, chat) => {
+        for (; chat.vpos % m !== 0; ) m /= 10;
+        return m;
+      }, 100);
+
+      var ac = autoColoring && !data.some(c => c.color);
+
+      var comment = data.map(datum => {
+        var chat = {
+          text: datum.text,
+          vpos: 10 * (datum.vpos +
+            (margin === 0 ? 0 : Math.floor(Math.random() * margin)))
+        };
+
+        if (datum.size in size)
+          chat.size = size[datum.size];
+
+        if (datum.position)
+          chat.position = datum.position;
+
+        if (datum.color)
+          chat.color = datum.color;
+
+        if (ac && !chat.color) {
+          let id = datum.user_id;
+          let hash;
+
+          if (!id)
+            hash = Math.random() * 0xFFFFFF;
+          else if (/^[0-9]{1,}$/.test(id))
+            hash = parseInt(id);
+          else
+            hash = hashCode(id);
+
+          let r = (hash & 0xFF0000) >> 16;
+          let g = (hash & 0x00FF00) >> 8;
+          let b = hash & 0x0000FF;
+
+          chat.color = "#" + toHex(r) + toHex(g) + toHex(b);
+        }
+
+        return chat;
+      });
+
+      this._isOpen = true;
+      this._adapter.clearComment();
+      this._adapter.addComment(comment);
+      this._adapter.render();
+      this._range.removeAttribute("disabled");
+      this._playBtn.classList.remove("disabled");
+      this._drawSeekbarBackground();
+      if ("gc" in window) window.gc();
+    }
+
+    _openFromFile(cpath) {
+      this._modal.use("loading");
+      this._modal.show();
+      nicoComment.readFromFile(cpath).then((result => {
+        this._open(result);
+        this._modal.hide();
       }).bind(this), err => {
         console.error(err);
-        window.alert("パースエラーのためファイルを読み込めませんでした。");
+        this._modal.use("alert", "パースエラーのためファイルを読み込めませんでした。");
       });
     }
 
@@ -404,11 +473,13 @@
             ), tsubuani.toXml(result.comment), "utf8");
           }
 
-          console.log(result);
+          that._open(result.comment);
           tmodal.hide();
           modal.hide();
         }).catch(e => {
-          if (e === "episode_not_found")
+          if (e === "status_code_wrong")
+            tmodal.use("alert", "つぶあにに接続できませんでした。");
+          else if (e === "episode_not_found")
             tmodal.use("alert", "存在しないエピソードです。話数が正しいかどうか確認して下さい。");
           else if (e === "not_broadcasted")
             tmodal.use("alert", "このエピソードはまだ放送されていないようです。");
@@ -476,7 +547,6 @@
     }
 
   }
-
 
   window.jikkyo.FileMode = document.registerElement("jikkyo-mode-file", {
     prototype: FileMode.prototype

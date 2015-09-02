@@ -29,6 +29,9 @@ function parseDate(d) {
 function getEpisodeInfo(id, episode) {
   return cheerio.fetch(`${root}/anime/${id}/${episode}`).then(result => {
     if (result.error) throw result.error;
+    if (result.response.statusCode !== 200)
+      throw "status_code_wrong";
+
     var $ = result.$;
 
     var subtitle = $("#main > div.anime_info_area.box > h1 > span")
@@ -83,19 +86,39 @@ module.exports = {
     ])).then(results => {
       var info = results[0];
       delete results[0];
+
+      var error;
+      if (results.some(r => {
+        if (r.error) {
+          error = r.error;
+          return true;
+        }
+        return false;
+      }))
+        throw error;
+      if (results.some(r => r.response.statusCode !== 200))
+        throw "status_code_wrong";
+
+      var firstTime = 0;
       var comment = results.map(r => JSON.parse(r.body))
         .reduce((a, b) => a.concat(b), [])
         .map(e => e.l)
         .reduce((a, b) => a.concat(b), [])
-        .map(e => ({
-          text: decode(e.t),
-          date: parseDate(e.d),
-          user_id: e.id,
-          screenname: e.s,
-          user_name: decode(e.n),
-          image: e.i.replace(/\\\//g, "/"),
-          ci: e.ci
-        }))
+        .map((e, i) => {
+          var text = decode(e.t).replace(/http:\/\/.+?(\s|$)|#.+?(\s|$)|\n/ig, "").trim();
+          var date = parseDate(e.d);
+          if (i === 0) firstTime = date.getTime();
+          return {
+            text: text,
+            date: date,
+            user_id: e.id,
+            screenname: e.s,
+            user_name: decode(e.n),
+            image: e.i.replace(/\\\//g, "/"),
+            ci: e.ci,
+            vpos: Math.round((date.getTime() - firstTime) / 10)
+          };
+        })
         .filter(e => e.text.length > 0);
       return {
         subtitle: info.subtitle,
@@ -108,18 +131,17 @@ module.exports = {
   },
 
   toXml(comment) {
-    var firstDate = new Date(comment[0].date);
+    var firstTime = new Date(comment[0].date).getTime();
     // new Date(tweets.map(e => e.date).sort((a, b) => a - b)[0])
     var output = "";
-    comment.forEach((value, index) => {
-      var vpos = Math.round((value.date.getTime() - firstDate.getTime()) / 10);
-      var date = Math.round(value.date.getTime() / 1000);
-      var text = value.text
+    comment.forEach((c, i) => {
+      var vpos = c.vpos || Math.round((c.date.getTime() - firstTime) / 10);
+      var date = Math.round(c.date.getTime() / 1000);
+      var text = c.text
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .trim();
-      output += `<chat user_id="${value.user_id}" date="${date}" vpos="${vpos}" no="${index + 1}">${text}</chat>\r\n`;
+        .replace(/>/g, "&gt;");
+      output += `<chat user_id="${c.user_id}" date="${date}" vpos="${vpos}" no="${i + 1}">${text}</chat>\r\n`;
     });
     return `<?xml version="1.0" encoding="UTF-8"?>\r\n<packet>\r\n<thread last_res="${comment.length}" ticket=""/>\r\n<view_counter video="0"/>\r\n${output}</packet>\r\n`;
   },
