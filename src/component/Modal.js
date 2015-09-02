@@ -84,6 +84,7 @@
       if (!template) return;
       var root = document.importNode(template.content, true);
 
+      this.relative = false;
       this.width = parseInt(template.dataset.width);
       this.height = parseInt(template.dataset.height);
 
