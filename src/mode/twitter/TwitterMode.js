@@ -3,6 +3,7 @@
 
   var gui = require('nw.gui'),
       filenameSanitizer = require("./util/FilenameSanitizer"),
+      tsubuani = require("./util/tsubuani"),
       TwitterComment = require("./mode/twitter/TwitterComment"),
       TwitterAuth = require("./mode/twitter/TwitterAuth"),
       TwitterRecorder = require("./mode/twitter/TwitterRecorder"),
@@ -27,10 +28,12 @@
       var template = doc.getElementById("main");
       root.appendChild(document.importNode(template.content, true));
 
-      var twitter = new TwitterComment(),
+      var modal = document.querySelector("jikkyo-modal"),
+          twitter = new TwitterComment(),
           twitterRec = root.getElementById("twitter-rec"),
           twitterTrack = root.getElementById("twitter-track"),
-          twitterConnect = root.getElementById("twitter-connect");
+          twitterConnect = root.getElementById("twitter-connect"),
+          twitterTextMenu = root.getElementById("twitter-text-menu");
 
       this._twitter = twitter;
       this._twitterRec = twitterRec;
@@ -112,11 +115,13 @@
 
       twitterRec.addEventListener("click", record);
 
-      twitterTrack.addEventListener("blur", (() => {
+      var twitterTrackChanged = (() => {
         if (!this.preference) return;
         this.preference.twitter.track = twitterTrack.value;
         this.preference.save();
-      }).bind(this));
+      }).bind(this);
+
+      twitterTrack.addEventListener("blur", twitterTrackChanged);
 
       var connect = (() => {
         if (twitterConnect.classList.contains("diasbled")) return;
@@ -191,6 +196,39 @@
       var focusTrack = () => {
         twitterTrack.focus();
       };
+
+      // menu
+      var menu = document.createElement("jikkyo-menu");
+      var hashtags = null;
+      menu.add({
+        label: "アニメハッシュタグ一覧",
+        click() {
+          modal.use("loading");
+          modal.show();
+          (hashtags ? Promise.resolve(hashtags) : tsubuani.fetchHashtags()).then(data => {
+            hashtags = data;
+            modal.use(
+              "list",
+              "今期放送のアニメのハッシュタグの一覧 by つぶあに",
+              data.map(d => d.title),
+              index => {
+                twitterTrack.value = data[index].hashtag.join(",");
+                twitterTrackChanged();
+                modal.hide();
+              }
+            );
+          }).catch(e => {
+            console.log("tsubuani hashtags error");
+            console.log(e.stack || e);
+            modal.use("alert", "ハッシュタグ一覧の取得に失敗しました。");
+          });
+        }
+      });
+
+      twitterTextMenu.addEventListener("click", () => {
+        var rect = twitterTextMenu.getBoundingClientRect();
+        menu.show(rect.right, rect.top);
+      });
 
       this.shortcutkeys = [
         { key: "ctrl+q", macKey: "command+q", label: "キーワード入力", press: focusTrack },
