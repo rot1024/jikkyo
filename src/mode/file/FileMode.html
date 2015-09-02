@@ -101,6 +101,8 @@
     <div id="file-open" class="controller-btn controller-btn-open" title="コメントファイルを開く"></div>
   </div>
 
+  <div id="file-menu" class="item item-menu"></div>
+
 </template>
 
 <template id="preference">
@@ -128,6 +130,68 @@
   </div>
 
   <p class="form-desc">設定を反映させるには、コメントファイルの読み込み直しが必要です。</p>
+
+  <hr>
+
+  <div class="form-group">
+    <label for="file-tsubuani-path" class="form-label">つぶあに 保存先</label>
+    <input type="text" id="file-tsubuani-path" class="form-control">
+    <button id="file-tsubuani-refer" class="btn">参照</button>
+  </div>
+
+  <div class="form-group">
+    <label for="file-tsubuani-filename" class="form-label">つぶあに ファイル名</label>
+    <input type="text" id="file-tsubuani-filename" class="form-control">
+  </div>
+
+  <p class="form-desc">${title}：タイトル ${episode}：話数 ${episode2}:2桁の話数 ${subtitle}:サブタイトル</p>
+
+  <input id="file-file" type="file" style="display: none;" nwdirectory>
+
+</template>
+
+<template id="tsubuani">
+
+  <style>
+    .episode {
+      flex-basis: 100px;
+      text-align: right;
+    }
+
+    .episode-label {
+      align-self: center;
+    }
+  </style>
+
+  <div class="modal-content">
+    <p class="form-desc">つぶあにから過去のTwitterアニメ実況を取得します。<br>フル取得は、クイック取得よりも時間がかかりますが、全ての実況コメントを取得することができます。</p>
+
+    <div class="form-group">
+      <input type="text" id="tsubuani-title" class="form-control" placeholder="アニメタイトル">
+      <button id="tsubuani-search" class="btn" disabled>検索</button>
+    </div>
+
+    <div class="form-group">
+      <select id="tsubuani-list" class="form-control" size="5"></select>
+    </div>
+
+    <div class="form-group">
+      <input type="number" id="tsubuani-episode" value="1" min="1" class="episode">
+      <div class="form-control-right episode-label">話</div>
+      <div class="form-control"></div>
+      <input type="checkbox" id="tsubuani-save" checked>
+      <label for="tsubuani-save">保存</label>
+      <button id="tsubuani-quick" class="btn form-control-right" disabled>クイック取得</button>
+      <button id="tsubuani-full" class="btn form-control-right" disabled>フル取得</button>
+    </div>
+
+  </div>
+
+  <div class="modal-footer">
+    <div id="ok" class="btn" tabindex="0">閉じる</div>
+  </div>
+
+  <jikkyo-modal id="tsubuani-modal"></jikkyo-modal>
 
 </template>
 

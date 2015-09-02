@@ -1,5 +1,11 @@
+/* globals Kefir */
 (() => {
   "use strict";
+
+  var fs = require("fs"),
+      path = require("path"),
+      tsubuani = require("./mode/file/tsubuani"),
+      filenameSanitizer = require("./util/FilenameSanitizer");
 
   var doc = document.currentScript.ownerDocument;
   var NicoComment = require("./mode/file/NicoComment");
@@ -34,6 +40,7 @@
       this._range = root.querySelector("input[type=range]");
       this._rangeBg = root.getElementById("file-slider-bg");
       this._pos = root.getElementById("file-pos");
+      this._menuBtn = root.getElementById("file-menu");
 
       this._adapter.on(((name, val) => {
         if (name === "position") {
@@ -101,10 +108,6 @@
         let that = this;
         fileInput.addEventListener("change", () => {
           if (!this || !this.value) return;
-          if (that._adapter.playing) {
-            that._playBtn.classList.remove("controller-btn-pause");
-            that._adapter.stop();
-          }
           that._open(this.value);
           fileInput.value = "";
         });
@@ -120,6 +123,37 @@
       this._seekToEnd = this._seekToEnd.bind(this);
 
       fileOpenBtn.addEventListener("click", open);
+
+      // tsubuani
+
+      var modal = document.querySelector("jikkyo-modal");
+      var tsubuaniElement = document.createElement("div");
+      var tsubuaniRoot = tsubuaniElement.createShadowRoot();
+      tsubuaniRoot.appendChild(
+        document.importNode(doc.getElementById("tsubuani").content, true));
+
+      this._initTsubuaniDialog(tsubuaniRoot, modal);
+
+      // Menu
+
+      var menu = document.createElement("jikkyo-menu");
+      var menuBtn = this._menuBtn;
+
+      menu.add({
+        label: "つぶあにから実況を取得",
+        click() {
+          modal.emptyContent();
+          modal.appendContent(tsubuaniElement);
+          modal.relative = true;
+          modal.top = modal.left = modal.right = modal.bottom = 50;
+          modal.show();
+        }
+      });
+
+      menuBtn.addEventListener("click", () => {
+        var rect = menuBtn.getBoundingClientRect();
+        menu.show(rect.right, rect.top);
+      });
 
       this.shortcutkeys = [
         { key: "ctrl+o", macKey: "command+o", label: "コメントファイルを開く", press: open },
@@ -176,10 +210,30 @@
           r = e.shadowRoot,
           t = p.file;
 
+      var tpath = r.querySelector("#file-tsubuani-path");
+      var filename = r.querySelector("#file-tsubuani-filename");
+      var file = r.querySelector("#file-file");
+
       r.querySelector("#file-heatmap").checked = t.heatmap;
       r.querySelector("#file-auto-coloring").checked = t.autoColoring;
       r.querySelector("#file-comment-big-size").value = t.bigSize;
       r.querySelector("#file-comment-small-size").value = t.smallSize;
+      tpath.value = t.tsubuaniPath;
+      filename.value = t.tsubuaniFilename;
+
+      file.addEventListener("change", () => {
+        if (!this.value) return;
+        tpath.value = this.value;
+      });
+
+      r.querySelector("#file-tsubuani-refer").addEventListener("click", () => {
+        file.setAttribute("nwworkingdir", tpath.value);
+        file.click();
+      });
+
+      filename.addEventListener("blur", () => {
+        filename.value = filenameSanitizer(filename.value);
+      });
     }
 
     savePreferenceView(e) {
@@ -193,6 +247,8 @@
       t.autoColoring = r.querySelector("#file-auto-coloring").checked;
       t.bigSize = r.querySelector("#file-comment-big-size").value;
       t.smallSize = r.querySelector("#file-comment-small-size").value;
+      t.tsubuaniPath = r.querySelector("#file-tsubuani-path").value;
+      t.tsubuaniFilename = r.querySelector("#file-tsubuani-filename").value;
     }
 
     initPreference() {
@@ -200,7 +256,9 @@
         heatmap: true,
         autoColoring: false,
         bigSize: "150%",
-        smallSize: "50%"
+        smallSize: "50%",
+        tsubuaniPath: process.env[process.platform === "win32" ? "USERPROFILE" : "HOME"],
+        tsubuaniFilename: "{title} 第{episode2}話「{subtitle}」.xml"
       };
     }
 
@@ -208,17 +266,20 @@
       this._open(file);
     }
 
-    _open(path) {
+    _open(cpath) {
+      if (this._adapter.playing) {
+        this._playBtn.classList.remove("controller-btn-pause");
+        this._adapter.stop();
+      }
       var nico = new NicoComment();
       nico.options.autoColoring = this.preference.file.autoColoring;
       nico.options.size.big = this.preference.file.bigSize;
       nico.options.size.small = this.preference.file.smallSize;
-      nico.readFromFile(path).then((result => {
+      nico.readFromFile(cpath).then((result => {
         this._isOpen = true;
         this._adapter.clearComment();
         this._adapter.addComment(result);
         this._adapter.render();
-        this._drawSeekbarBackground();
         this._range.removeAttribute("disabled");
         this._playBtn.classList.remove("disabled");
         this._drawSeekbarBackground();
@@ -300,6 +361,118 @@
       }, this);
 
       ctx.putImageData(img, 0, 0);
+    }
+
+    _initTsubuaniDialog(root, modal) {
+      var tmodal = root.getElementById("tsubuani-modal"),
+          title = root.getElementById("tsubuani-title"),
+          episode = root.getElementById("tsubuani-episode"),
+          list = root.getElementById("tsubuani-list"),
+          save = root.getElementById("tsubuani-save"),
+          search = root.getElementById("tsubuani-search"),
+          quick = root.getElementById("tsubuani-quick"),
+          full = root.getElementById("tsubuani-full"),
+          selectedAnime = null,
+          that = this;
+
+      function fetch(fn) {
+        if (!selectedAnime) return;
+        if (save.checked && !that.preference.file.tsubuaniPath) {
+          tmodal.use("alert", "つぶあに保存先ディレクトリが設定されていません。");
+          tmodal.show();
+          return;
+        }
+        if (save.checked && !that.preference.file.tsubuaniFilename) {
+          tmodal.use("alert", "つぶあにファイル名が設定されていません。");
+          tmodal.show();
+          return;
+        }
+
+        tmodal.use("loading");
+        tmodal.show();
+
+        fn(selectedAnime.id, episode.value).then(result => {
+          if (save.checked) {
+            fs.writeFileSync(path.join(
+              that.preference.file.tsubuaniPath,
+              tsubuani.getFilename(
+                that.preference.file.tsubuaniFilename,
+                selectedAnime.title,
+                episode.value,
+                result.subtitle
+              )
+            ), tsubuani.toXml(result.comment), "utf8");
+          }
+
+          console.log(result);
+          tmodal.hide();
+          modal.hide();
+        }).catch(e => {
+          if (e === "episode_not_found")
+            tmodal.use("alert", "存在しないエピソードです。話数が正しいかどうか確認して下さい。");
+          else if (e === "not_broadcasted")
+            tmodal.use("alert", "このエピソードはまだ放送されていないようです。");
+          else if (e === "not_available")
+            tmodal.use("alert", "放送が終わったばかりで、まだつぶあに側でツイートの集計処理が終わっていないようです。しばらく待ってから再度試してみてください。");
+          else {
+            console.log("tsubuani fetch comment error");
+            console.log(e.stack || e);
+            tmodal.use("alert", "取得中にエラーが発生しました。");
+          }
+        });
+      }
+
+      root.getElementById("ok").addEventListener("click", () => modal.hide());
+
+      search.addEventListener("click", () => {
+        tmodal.use("loading");
+        tmodal.show();
+        tsubuani.search(title.value).then(data => {
+          if (data.length === 0) {
+            tmodal.use("alert", "アニメが見つかりませんでした。検索ワードを変更して再度お試し下さい。");
+            return;
+          }
+          list.innerHTML = "";
+          data.forEach(anime => {
+            var option = document.createElement("option");
+            option.textContent = anime.name;
+            option.value = anime.id;
+            list.appendChild(option);
+          });
+          tmodal.hide();
+        }).catch(e => {
+          console.log("tsubuani search error");
+          console.log(e.stack || e);
+          tmodal.use("alert", "つぶあにに接続できませんでした。");
+        });
+      });
+
+      quick.addEventListener("click", () => {
+        fetch(tsubuani.fetchComment);
+      });
+
+      full.addEventListener("click", () => {
+      });
+
+      Kefir.fromEvents(title, "keyup")
+        .map(e => ({
+          ok: title.value.length > 0,
+          enterKey: e.keyCode === 13
+        }))
+        .onValue(e => {
+          search.disabled = !e.ok;
+          if (e.enterKey) search.click();
+        });
+
+      Kefir.fromEvents(list, "change")
+        .map(e => list.selectedIndex >= 0 ? list.options[list.selectedIndex] : null)
+        .map(e => e ? { title: e.textContent, id: e.value } : null)
+        .onValue(e => {
+          quick.disabled = !e;
+          full.disabled = !e;
+          selectedAnime = e;
+        });
+
     }
 
   }

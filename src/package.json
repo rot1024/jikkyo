@@ -29,6 +29,7 @@
     "min_height": 100
   },
   "dependencies": {
+    "cheerio-httpcli": "^0.3.3",
     "kefir": "^2.6.0",
     "mousetrap": "^1.5.2",
     "oauth": "^0.9.12",
