@@ -134,14 +134,19 @@
   <hr>
 
   <div class="form-group">
-    <label for="file-tsubuani-path" class="form-label">つぶあに 保存先</label>
+    <label for="file-tsubuani-path" class="form-label">つぶあに保存先</label>
     <input type="text" id="file-tsubuani-path" class="form-control">
     <button id="file-tsubuani-refer" class="btn">参照</button>
   </div>
 
   <div class="form-group">
-    <label for="file-tsubuani-filename" class="form-label">つぶあに ファイル名</label>
+    <label for="file-tsubuani-filename" class="form-label">つぶあにファイル名<span class="form-desc">クイック取得時</span></label>
     <input type="text" id="file-tsubuani-filename" class="form-control">
+  </div>
+
+  <div class="form-group">
+    <label for="file-tsubuani-filename-full" class="form-label">つぶあにファイル名<span class="form-desc">フル取得時</span></label>
+    <input type="text" id="file-tsubuani-filename-full" class="form-control">
   </div>
 
   <p class="form-desc">${title}：タイトル ${episode}：話数 ${episode2}:2桁の話数 ${subtitle}:サブタイトル</p>
@@ -164,7 +169,7 @@
   </style>
 
   <div class="modal-content">
-    <p class="form-desc">つぶあにから過去のTwitterアニメ実況を取得します。<br>フル取得は、クイック取得よりも時間がかかりますが、全ての実況コメントを取得することができます。</p>
+    <p class="form-desc">つぶあにから過去のTwitterアニメ実況を取得します。<br>フル取得は、クイック取得よりも時間がかかりますが、全ての実況コメントを取得することができます。<br>既に同名のファイルが既に存在していた場合、上書きされますのでご注意下さい。</p>
 
     <div class="form-group">
       <input type="text" id="tsubuani-title" class="form-control" placeholder="アニメタイトル">

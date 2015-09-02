@@ -2,7 +2,12 @@
 
 const root = "http://www.tsubuani.com";
 
-var cheerio = require("cheerio-httpcli");
+var co = require("co"),
+    cheerio = require("cheerio-httpcli");
+
+// fetchFullComment
+var fetching = false,
+    canceled = false;
 
 function decode(str) {
   str = str.replace(/%(?:25)+([0-9A-F][0-9A-F])/g, (w, m) => "%" + m);
@@ -61,6 +66,46 @@ function getEpisodeInfo(id, episode) {
   });
 }
 
+function getTweets(pid, minute, size) {
+  var url = `${root}/tvs/get_by_minute/${pid}/${minute}/${size}`;
+  return cheerio.fetch(url).then(result => {
+    if (result.error)
+      throw result.error;
+    else if (result.response.statusCode !== 200)
+      throw "status_code_wrong";
+    var $ = result.$;
+    var sn = $(this).find("p.twi_icon > a").attr("title");
+    return $("li").map(() => ({
+      text: $(this).find(".twi_comment").text()
+        .replace(/http:\/\/.+?(\s|$)|#.+?(\s|$)|\n/ig, "").trim(),
+      date: parseDate($(this).find(".post").text()),
+      screenname: sn,
+      image: $(this).find("p.twi_icon > a > img").attr("src"),
+      class: $(this).attr("class"),
+      user_id: sn
+    })).toArray();
+  });
+}
+
+function getMinuteTweets(pid, minute, callback) {
+  const minute_tweet_count = 30;
+
+  var isFn = typeof callback === "function";
+  var comment = [];
+  var size = 0;
+
+  return co(function *() {
+    do {
+      if (canceled) throw "canceled";
+      var tweets = yield getTweets(pid, minute, size);
+      comment = comment.concat(tweets);
+      size += tweets.length;
+      if (isFn) callback(minute, size);
+    } while(tweets.length >= minute_tweet_count);
+    return comment;
+  });
+}
+
 module.exports = {
 
   search(title) {
@@ -76,7 +121,7 @@ module.exports = {
     });
   },
 
-  fetchComment(id, episode, callback) {
+  fetchComment(id, episode) {
     var url = `${root}/rec_datas/comments?tvId=${id}&count=${episode}&idx=`;
     return getEpisodeInfo(id, episode).then(info => Promise.all([
       info,
@@ -128,6 +173,50 @@ module.exports = {
   },
 
   fetchFullComment(id, episode, callback) {
+    if (fetching)
+      return Promise.reject("it has already started fetching");
+
+    if (typeof callback !== "function")
+      callback = null;
+
+    var comment = [],
+        firstTime = 0,
+        current = 0,
+        beforeCount = 0,
+        beforeMinute = 0;
+
+    fetching = true;
+    canceled = false;
+
+    return getEpisodeInfo(id, episode).then(info => co(function *() {
+      var length = info.chart.length;
+      var sum = info.chart.reduce((a, b) => a + b, 0);
+      var cb = (minute, count) => {
+        if (!callback) return;
+        if (beforeMinute !== minute)
+          beforeCount = 0;
+        current += count - beforeCount;
+        beforeMinute = minute;
+        beforeCount = count;
+        callback(current, sum);
+      };
+      for (let m = 0; m < length; ++m) {
+        comment = comment.concat(yield getMinuteTweets(info.pid, m, cb));
+        if (m === 0) firstTime = comment[0].date.getTime();
+      }
+      fetching = false;
+      return {
+        subtitle: info.subtitle,
+        comment: comment.map((c, i, a) => {
+          c.vpos = Math.round((c.date.getTime() - firstTime) / 10);
+          return c;
+        })
+      };
+    }));
+  },
+
+  cancelFetchFullComment() {
+    if (fetching) canceled = true;
   },
 
   toXml(comment) {
