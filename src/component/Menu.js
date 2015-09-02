@@ -121,16 +121,20 @@
     }
 
     show(x, y) {
-      var left = x, top = y;
       document.body.appendChild(this);
-      const rect = this._menu.getBoundingClientRect();
+
+      var left = x, top = y;
+      var rect = this._menu.getBoundingClientRect();
+
       if (window.innerWidth < x + rect.width)
         left -= rect.width;
-      if (window.innerHeight < y + rect.height)
-        top -= rect.height;
+      top -= rect.height;
+
       this.style.left = left + "px";
       this.style.top = top + "px";
+
       this._menu.classList.remove("hidden");
+
       window.addEventListener("click", this._menuCb, true);
       window.addEventListener("mousemove", this._stopPropagationCb, true);
       window.addEventListener("mouseout", this._stopPropagationCb, true);
