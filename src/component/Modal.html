@@ -56,6 +56,14 @@
       pointer-events: none;
     }
 
+    .space {
+      margin-bottom: 20px;
+    }
+
+    .modal-list-select {
+      width: 100%;
+    }
+
     #modal /deep/ .modal-footer {
       position: absolute;
       left: 0;
@@ -211,6 +219,17 @@
   <div class="modal-footer">
     <div id="modal-btn-no" class="btn">いいえ</div>
     <div id="modal-btn-yes" class="btn btn-primary">はい</div>
+  </div>
+</template>
+
+<template id="list" data-width="500" data-height="370">
+  <div class="modal-content">
+    <div id="modal-content" class="space"></div>
+    <select id="modal-select" class="modal-list-select" size="10"></select>
+  </div>
+  <div class="modal-footer">
+    <div id="modal-btn-cancel" class="btn">キャンセル</div>
+    <div id="modal-btn-ok" class="btn btn-primary form-control-right">OK</div>
   </div>
 </template>
 

@@ -83,7 +83,7 @@
       this.content.innerHTML = "";
     }
 
-    use(name, content, listener1, listener2) {
+    use(name, content, listener1, listener2, listener3) {
       var cb = null;
 
       if (name === "main" || name === this._template)
@@ -97,7 +97,11 @@
       this.width = parseInt(template.dataset.width);
       this.height = parseInt(template.dataset.height);
 
-      if (name !== "loading" && name !== "progress-cancelable")
+      if (
+        name !== "loading" &&
+        name !== "progress-cancelable" &&
+        name !== "list"
+      )
         root.querySelector(".modal-content").innerHTML = content;
       if (name === "yesno") {
         root.querySelector("#modal-btn-no").addEventListener(
@@ -119,6 +123,21 @@
           if (typeof content === "string")
             progressContent.innerHTML = pcontent;
         };
+      } else if (name === "list") {
+        root.querySelector("#modal-content").innerHTML = content;
+        let list = root.querySelector("#modal-select");
+        list.innerHTML = "";
+        listener1.forEach(l => {
+          var option = document.createElement("option");
+          option.textContent = l;
+          list.appendChild(option);
+        });
+        list.selectedIndex = 0;
+        root.querySelector("#modal-btn-ok").addEventListener("click", listener2 ? () => {
+          listener2(list.selectedIndex);
+        } : (() => this.hide()).bind(this));
+        root.querySelector("#modal-btn-cancel").addEventListener(
+          "click", listener3 || (() => this.hide()).bind(this));
       }
 
       this.emptyStyle();
