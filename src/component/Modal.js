@@ -2,6 +2,7 @@
   "use strict";
 
   var doc = document.currentScript.ownerDocument;
+  var stopCb = e => e.stopPropagation();
 
   class Modal extends HTMLElement {
 
@@ -22,8 +23,7 @@
       this.attributeChangedCallback("height", null, this.getAttribute("height"));
       this.attributeChangedCallback("visible", null, this.getAttribute("visible"));
 
-      this._stopCb = e => e.stopPropagation();
-
+      this._template = null;
       this._width = 400;
       this._height = 300;
       this._relative = false;
@@ -39,10 +39,10 @@
       if (attrName === "visible") {
         if (newVal !== null) {
           this._modalBg.classList.remove("hidden");
-          this.addEventListener("mousemove", this._stopCb, true);
+          this.addEventListener("mousemove", stopCb, true);
         } else {
           this._modalBg.classList.add("hidden");
-          this.removeEventListener("mousemove", this._stopCb, true);
+          this.removeEventListener("mousemove", stopCb, true);
         }
       }
     }
@@ -65,13 +65,18 @@
         this.shadowRoot.removeChild(s);
       }, this);
       this._styles = [];
+      this._template = null;
     }
 
-    appendContent(content) {
+    appendContent(content, name) {
       if (typeof content === "string")
         this.content.innerHTML += content;
       else
         this.content.appendChild(content);
+      if (typeof name === "string")
+        this._template = name;
+      else
+        this._template = null;
     }
 
     emptyContent() {
@@ -79,16 +84,20 @@
     }
 
     use(name, content, listener1, listener2) {
-      if (name === "main") return;
+      var cb = null;
+
+      if (name === "main" || name === this._template)
+        return void 0;
+
       var template = doc.querySelector("template#" + name);
-      if (!template) return;
+      if (!template) return void 0;
       var root = document.importNode(template.content, true);
 
       this.relative = false;
       this.width = parseInt(template.dataset.width);
       this.height = parseInt(template.dataset.height);
 
-      if (name !== "loading")
+      if (name !== "loading" && name !== "progress-cancelable")
         root.querySelector(".modal-content").innerHTML = content;
       if (name === "yesno") {
         root.querySelector("#modal-btn-no").addEventListener(
@@ -98,12 +107,26 @@
       } else if (name === "alert") {
         root.querySelector("#modal-btn-ok").addEventListener(
           "click", listener1 || (() => this.hide()).bind(this));
+      } else if (name === "progress-cancelable") {
+        let progressbar = root.querySelector("#modal-progressbar");
+        let progressContent = root.querySelector("#modal-progress-content");
+        progressContent.innerHTML = content;
+        root.querySelector("#modal-btn-cancel").addEventListener(
+          "click", listener1 || (() => this.hide()).bind(this));
+        progressbar.style.width = "0%";
+        cb = (progress, pcontent) => {
+          progressbar.style.width = progress + "%";
+          if (typeof content === "string")
+            progressContent.innerHTML = pcontent;
+        };
       }
 
       this.emptyStyle();
       this.emptyContent();
-      this.appendContent(root);
+      this.appendContent(root, name);
       this.refreshSize();
+
+      return cb;
     }
 
     show() {
