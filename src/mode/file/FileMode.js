@@ -4,7 +4,7 @@
 
   var fs = require("fs"),
       path = require("path"),
-      tsubuani = require("./mode/file/tsubuani"),
+      tsubuani = require("./util/tsubuani"),
       filenameSanitizer = require("./util/FilenameSanitizer"),
       nicoComment = require("./mode/file/NicoComment"),
       Time = require("./util/Time");

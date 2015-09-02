@@ -241,6 +241,21 @@ module.exports = {
       .replace(/\$\{episode2\}/g,
         episode.toString().length > 2 ? episode : ("0" + episode).slice(-2))
       .replace(/\$\{subtitle\}/g, subtitle);
+  },
+
+  fetchHashtags() {
+    return cheerio.fetch(root + "/anime").then(result => {
+      if (result.error) throw result.error;
+      if (result.response.statusCode !== 200)
+        throw "status_code_wrong";
+
+      var $ = result.$;
+
+      return $("#now_animes > .section > table tr").map(() => ({
+        title: $(this).find("a").text().trim(),
+        hashtag: $(this).find(".hasttag_cell").text().trim().split(" ")
+      })).toArray().filter(e => e.title && e.hashtag);
+    });
   }
 
 };
