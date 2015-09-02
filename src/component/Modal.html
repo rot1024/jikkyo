@@ -47,12 +47,16 @@
       transition: opacity .2s ease-in-out;
     }
 
+    .hidden {
+      visibility: hidden;
+    }
+
     .hidden #modal {
       opacity: 0;
       pointer-events: none;
     }
 
-    .modal-footer {
+    #modal /deep/ .modal-footer {
       position: absolute;
       left: 0;
       right: 0;
@@ -64,20 +68,7 @@
       line-height: 50px;
     }
 
-    .modal-form {
-      display: block;
-      padding: 20px;
-    }
-
-    .modal-control {
-      width: 100%;
-    }
-
-    .modal-form .modal-control {
-      width: calc(100% - 20px);
-    }
-
-    .modal-content {
+    #modal /deep/ .modal-content {
       position: absolute;
       left: 0;
       top: 0;
@@ -85,10 +76,24 @@
       bottom: 50px;
       display: block;
       padding: 20px;
+      overflow-x: hidden;
       overflow-y: auto;
     }
 
-    .modal-loading {
+    #modal /deep/ .modal-form {
+      display: block;
+      padding: 20px;
+    }
+
+    #modal /deep/ .modal-control {
+      width: 100%;
+    }
+
+    #modal /deep/ .modal-form .modal-control {
+      width: calc(100% - 20px);
+    }
+
+    #modal /deep/ .modal-loading {
       position: absolute;
       display: block;
       left: 50%;
@@ -100,10 +105,72 @@
       background-size: contain;
     }
 
-    .hidden {
-      visibility: hidden;
+    #modal /deep/ hr {
+      margin-bottom: 20px;
+      border-width: 1px;
+      border-color: rgba(255, 255, 255, .2);
     }
 
+    #modal /deep/ .form-group + hr {
+      margin-top: 20px;
+    }
+
+    #modal /deep/ .form {
+      margin-bottom: 10px;
+    }
+
+    #modal /deep/ .form-group {
+      display: flex;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+
+    #modal /deep/ .form-label {
+      width: 180px;
+      padding: 5px 20px 0 0;
+    }
+
+    #modal /deep/ .form-control {
+      flex: auto;
+    }
+
+    #modal /deep/ .form-control-right {
+      margin-left: 10px;
+    }
+
+    #modal /deep/ .form-right {
+      padding-left: 10px;
+    }
+
+    #modal /deep/ .form-start {
+      margin-top: 10px;
+    }
+
+    #modal /deep/ .form-end {
+      margin-bottom: 20px;
+    }
+
+    #modal /deep/ .form-hidden {
+      display: none;
+    }
+
+    #modal /deep/ .form-desc {
+      display: block;
+      margin: 5px 0 10px 0;
+      color: #777;
+      font-size: 85%;
+    }
+
+    #modal /deep/ .form-desc-check {
+      display: block;
+      margin: -5px 0 15px 24px;
+      color: #777;
+      font-size: 85%;
+    }
+
+    #modal /deep/ .form-textarea-mono {
+      font-family: monospace;
+    }
   </style>
 
   <div id="modal-bg" class="hidden">

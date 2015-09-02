@@ -50,69 +50,6 @@
       display: block;
     }
 
-    .container /deep/ hr {
-      margin-bottom: 20px;
-      border-width: 1px;
-      border-color: rgba(255, 255, 255, .2);
-    }
-
-    .container /deep/ .form-group + hr {
-      margin-top: 20px;
-    }
-
-    .container /deep/ .form {
-      margin-bottom: 10px;
-    }
-
-    .container /deep/ .form-group {
-      display: flex;
-      margin-bottom: 10px;
-      align-items: center;
-    }
-
-    .container /deep/ .form-label {
-      width: 180px;
-      padding: 5px 20px 0 0;
-    }
-
-    .container /deep/ .form-control {
-      flex: auto;
-    }
-
-    .container /deep/ .form-control-right {
-      padding-left: 10px;
-    }
-
-    .container /deep/ .form-start {
-      margin-top: 10px;
-    }
-
-    .container /deep/ .form-end {
-      margin-bottom: 20px;
-    }
-
-    .container /deep/ .form-hidden {
-      display: none;
-    }
-
-    .container /deep/ .form-desc {
-      display: block;
-      margin: 5px 0 10px 0;
-      color: #777;
-      font-size: 85%;
-    }
-
-    .container /deep/ .form-desc-check {
-      display: block;
-      margin: -5px 0 15px 24px;
-      color: #777;
-      font-size: 85%;
-    }
-
-    .form-textarea-mono {
-      font-family: monospace;
-    }
-
     .about {
       display: flex;
       align-items: center;
@@ -162,7 +99,7 @@
         <div class="form-group">
           <label for="comment-font-family" class="form-label">フォントファミリー</label>
           <input type="text" id="comment-font-family" class="form-control">
-          <div class="form-control-right">
+          <div class="form-right">
             <input type="checkbox" id="comment-font-weight"><label for="comment-font-weight">太字</label>
           </div>
         </div>
@@ -223,7 +160,7 @@
         <div class="form-group">
           <label for="comment-window-bgcolor" class="form-label">背景色</label>
           <input type="text" id="comment-window-bgcolor" class="form-control">
-          <div class="form-control-right">
+          <div class="form-right">
             <input type="checkbox" id="comment-window-bgcolor-transparent"><label for="comment-window-bgcolor-transparent">透明</label>
           </div>
         </div>
@@ -256,7 +193,7 @@
           </div>
         </div>
 
-        <div id="about-check" class="btn">更新をチェックする</div>
+        <div id="about-check" class="btn" tabindex="0">更新をチェックする</div>
 
         <p><input type="checkbox" id="about-check-auto"><label for="about-check-auto">起動時に更新チェック</label></p>
 
@@ -266,7 +203,7 @@
     </div>
   </div>
   <div class="modal-footer">
-    <div id="ok" class="btn">閉じる</div>
+    <div id="ok" class="btn" tabindex="0">閉じる</div>
   </div>
 
 </template>
