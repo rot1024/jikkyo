@@ -59,6 +59,32 @@
       margin: 0 10px;
     }
 
+    #container /deep/ .item-menu {
+      margin: 0 0 0 -10px;
+      padding: 0 2px;
+      height: 30px;
+      transition: background-color .2s ease-in-out;
+    }
+
+    #container /deep/ .item-menu:hover {
+      cursor: pointer;
+      background-color: rgba(255,255,255,.1);
+      border-radius: 3px;
+    }
+
+    #container /deep/ .item-menu:after {
+      content: "";
+    	position: relative;
+      top: calc(-50% + 6px);
+    	border: 6px solid transparent;
+    	border-bottom: 6px solid rgba(170, 170, 170, .5);
+      transition: border-color .2s ease-in-out;
+    }
+
+    #container /deep/ .item-menu:hover:after {
+    	border-bottom-color: #aaa;
+    }
+
     #container /deep/ .item-grow {
       flex: auto;
     }
