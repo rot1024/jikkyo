@@ -74,16 +74,18 @@ function getTweets(pid, minute, size) {
     else if (result.response.statusCode !== 200)
       throw "status_code_wrong";
     var $ = result.$;
-    var sn = $(this).find("p.twi_icon > a").attr("title");
-    return $("li").map(() => ({
-      text: $(this).find(".twi_comment").text()
-        .replace(/http:\/\/.+?(\s|$)|#.+?(\s|$)|\n/ig, "").trim(),
-      date: parseDate($(this).find(".post").text()),
-      screenname: sn,
-      image: $(this).find("p.twi_icon > a > img").attr("src"),
-      class: $(this).attr("class"),
-      user_id: sn
-    })).toArray();
+    return $("li").map(() => {
+      var sn = $(this).find("p.twi_icon > a").attr("title");
+      return {
+        text: $(this).find(".twi_comment").text()
+          .replace(/http:\/\/.+?(\s|$)|#.+?(\s|$)|\n/ig, "").trim(),
+        date: parseDate($(this).find(".post").text()),
+        screenname: sn,
+        image: $(this).find("p.twi_icon > a > img").attr("src"),
+        class: $(this).attr("class"),
+        user_id: sn
+      };
+    }).toArray();
   });
 }
 
