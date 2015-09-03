@@ -147,8 +147,9 @@
         click: (() => {
           modal.emptyContent();
           modal.appendContent(tsubuaniElement);
-          modal.relative = true;
-          modal.top = modal.left = modal.right = modal.bottom = 50;
+          modal.relative = false;
+          modal.width = 500;
+          modal.height = 400;
           this._tsubuaniDialogSaveChecked(this.preference.file.tsubuaniSave);
           modal.show();
         }).bind(this)
