@@ -31,10 +31,10 @@
   "dependencies": {
     "cheerio-httpcli": "^0.3.3",
     "co": "^4.6.0",
-    "kefir": "^2.6.0",
-    "mousetrap": "^1.5.2",
-    "oauth": "^0.9.12",
-    "twit": "^1.1.20",
-    "xml2js": "^0.4.8"
+    "kefir": "^2.8.1",
+    "mousetrap": "^1.5.3",
+    "oauth": "^0.9.13",
+    "twit": "^2.1.0",
+    "xml2js": "^0.4.12"
   }
 }

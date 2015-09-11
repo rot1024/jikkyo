@@ -20,10 +20,10 @@
   },
   "homepage": "https://rot1024.github.io/jikkyo",
   "devDependencies": {
-    "archiver": "^0.14.4",
-    "del": "^1.1.1",
-    "gulp": "^3.8.11",
-    "gulp-util": "^3.0.4",
+    "archiver": "^0.15.1",
+    "del": "^2.0.2",
+    "gulp": "^3.9.0",
+    "gulp-util": "^3.0.6",
     "nw-builder": "git://github.com/rot1024/nw-builder.git"
   },
   "dependencies": {
