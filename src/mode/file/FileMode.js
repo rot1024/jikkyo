@@ -259,8 +259,8 @@
       t.bigSize = r.querySelector("#file-comment-big-size").value;
       t.smallSize = r.querySelector("#file-comment-small-size").value;
       t.tsubuaniPath = r.querySelector("#file-tsubuani-path").value;
-      t.tsubuaniFilename = r.querySelector("#file-tsubuani-filename").value;
-      t.tsubuaniFilenameFull = r.querySelector("#file-tsubuani-filename-full").value;
+      t.tsubuaniFilename = filenameSanitizer(r.querySelector("#file-tsubuani-filename").value);
+      t.tsubuaniFilenameFull = filenameSanitizer(r.querySelector("#file-tsubuani-filename-full").value);
     }
 
     initPreference() {
@@ -480,13 +480,13 @@
         if (save.checked) {
           fs.writeFileSync(path.join(
             that.preference.file.tsubuaniPath,
-            tsubuani.getFilename(
+            filenameSanitizer(tsubuani.getFilename(
               afull ? that.preference.file.tsubuaniFilenameFull : that.preference.file.tsubuaniFilename,
               atitle,
               aepisode,
               asubtitle
             )
-          ), tsubuani.toXml(comment), "utf8");
+          )), tsubuani.toXml(comment), "utf8");
         }
 
         that._open(comment/*, 100*/);
