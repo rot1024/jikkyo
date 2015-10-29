@@ -205,6 +205,30 @@
       var root = element.createShadowRoot();
       var template = doc.getElementById("preference");
       root.appendChild(document.importNode(template.content, true));
+
+      var tpath = root.querySelector("#file-tsubuani-path");
+      var filename = root.querySelector("#file-tsubuani-filename");
+      var filenameFull = root.querySelector("#file-tsubuani-filename-full");
+      var file = root.querySelector("#file-file");
+
+      file.addEventListener("change", () => {
+        if (!this.value) return;
+        tpath.value = this.value;
+      });
+
+      root.querySelector("#file-tsubuani-refer").addEventListener("click", () => {
+        file.setAttribute("nwworkingdir", tpath.value);
+        file.click();
+      });
+
+      filename.addEventListener("blur", () => {
+        filename.value = filenameSanitizer(filename.value);
+      });
+
+      filenameFull.addEventListener("blur", () => {
+        filenameFull.value = filenameSanitizer(filenameFull.value);
+      });
+
       return element;
     }
 
@@ -227,24 +251,6 @@
       tpath.value = t.tsubuaniPath;
       filename.value = t.tsubuaniFilename;
       filenameFull.value = t.tsubuaniFilenameFull;
-
-      file.addEventListener("change", () => {
-        if (!this.value) return;
-        tpath.value = this.value;
-      });
-
-      r.querySelector("#file-tsubuani-refer").addEventListener("click", () => {
-        file.setAttribute("nwworkingdir", tpath.value);
-        file.click();
-      });
-
-      filename.addEventListener("blur", () => {
-        filename.value = filenameSanitizer(filename.value);
-      });
-
-      filenameFull.addEventListener("blur", () => {
-        filenameFull.value = filenameSanitizer(filenameFull.value);
-      });
     }
 
     savePreferenceView(e) {
