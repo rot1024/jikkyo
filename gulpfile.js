@@ -1,38 +1,118 @@
 "use strict";
 
-var fs = require("fs");
-var path = require("path");
-var gulp = require("gulp");
-var gutil = require("gulp-util");
-var del = require("del");
-var NwBuilder = require("nw-builder");
-var archiver = require("archiver");
-var runSequence = require("run-sequence");
+const fs = require("fs");
+const gulp = require("gulp");
+const gutil = require("gulp-util");
+const del = require("del");
+const NwBuilder = require("nw-builder");
+const archiver = require("archiver");
+const runSequence = require("run-sequence");
 
-gulp.task("sync", function() {
-  var json = JSON.parse(fs.readFileSync("package.json", "utf8"));
-  var srcPackage = JSON.parse(fs.readFileSync("src/package.json", "utf8"));
-  srcPackage.name = json.name;
-  srcPackage.version = json.version;
-  srcPackage.description = json.description;
-  srcPackage.repository = json.repository;
-  srcPackage.homepage = json.homepage;
-  try {
-    fs.writeFileSync("src/package.json", JSON.stringify(srcPackage, null, "  ") + "\n", "utf8");
-  } catch(e) {
-    console.error("Failed to sync package.json");
+const platforms = {
+  win: ["win32", "win64"],
+  osx: ["osx32", "osx64"],
+  linux: ["linux32", "linux64"]
+};
+
+const platformsArray = (() => {
+  return Object.keys(platforms).reduce((prev, current) => {
+    return prev.concat(current);
+  }, []);
+})();
+
+var currentTarget;
+
+switch (process.platform) {
+  case "win32":
+    currentTarget = "win";
+    break;
+
+  case "darwin":
+    currentTarget = "osx";
+    break;
+
+  case "linux":
+    currentTarget = "linux";
+    break;
+
+  default:
+    currentTarget = "";
+    break;
+}
+
+if (currentTarget) {
+  switch (process.arch) {
+    case "x64":
+      currentTarget += "64";
+      break;
+
+    case "ia32":
+      currentTarget += "32";
+      break;
+
+    default:
+      currentTarget = "";
+      break;
   }
-});
+}
 
-gulp.task("clean", function(cb) {
-  del(["build"], cb);
-});
+function readFile(file, encoding) {
+  return new Promise((resolve, reject) => {
+    encoding = encoding || "utf8";
 
-var nw = function(cb, platforms) {
+    fs.readFile(file, encoding, (err, data) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+
+      resolve(data);
+    });
+  });
+}
+
+function writeFile(file, data, encoding) {
+  return new Promise((resolve, reject) => {
+    encoding = encoding || "utf8";
+
+    fs.writeFile(file, data, encoding, err => {
+      if (err) {
+        reject(err);
+        return;
+      }
+
+      resolve();
+    });
+  });
+}
+
+function readJSON(file, encoding) {
+  return readFile(file, encoding).then(data => JSON.parse(data));
+}
+
+function writeJSON(file, data, encoding) {
+  return writeFile(file, JSON.stringify(data, null, "  ") + "\n", encoding);
+}
+
+function cleanList(target) {
+  var list = [];
+  var parent = "build/jikkyo";
+
+  if (target === "all") {
+    list.push(parent);
+  } else {
+    list.push(`${parent}/${target}`);
+    list.push(`${parent}/*-${target}.zip`);
+  }
+
+  return list;
+}
+
+function nw(targets) {
   var nwb = new NwBuilder({
     files: "src/**",
     version: "0.12.3",
-    platforms: platforms,
+    platforms: targets,
     build: "build",
     cacheDir: "cache",
     macCredits: "Credits.html",
@@ -41,211 +121,112 @@ var nw = function(cb, platforms) {
     winIco: "src/images/jikkyo.ico",
     winZip: false
   });
-  nwb.on("log", function(msg) {
-    gutil.log("nw-builder", msg);
+
+  nwb.on("log", msg => {
+    if (!/^Zipping/.test(msg))
+      gutil.log("nw-builder", msg);
   });
-  nwb.build().then(function() {
-    platforms.forEach(function(platform) {
-      var jikkyoCt,
-          targets =
-          platform === "win" ? ["win32", "win64"] :
-          platform === "osx" ? ["osx32", "osx64"] :
-          platform === "linux" ? ["linux32", "linux64"] : [platform];
 
-      if (platform.indexOf("win") !== -1) {
-        jikkyoCt = fs.readFileSync(path.join(__dirname, "attachment", "jikkyo_ct.cmd"));
-        targets.forEach(function(target) {
-          fs.writeFileSync(path.join(__dirname, "build", "jikkyo", target, "jikkyo_ct.cmd"), jikkyoCt);
-        });
-      }
+  return nwb.build();
+}
 
-      if (platform.indexOf("osx") !== -1) {
-        jikkyoCt = fs.readFileSync(path.join(__dirname, "attachment", "jikkyo_ct.command"));
-        targets.forEach(function(target) {
-          fs.writeFileSync(path.join(__dirname, "build", "jikkyo", target, "jikkyo_ct.command"), jikkyoCt);
-        });
-      }
+function copyList(target) {
+  var files = ["README.md", "LICENSE"];
 
-      var readme = fs.readFileSync(path.join(__dirname, "README.md"));
-      targets.forEach(function(target) {
-        fs.writeFileSync(path.join(__dirname, "build", "jikkyo", target, "README.md"), readme);
-      });
-    });
-
-    cb();
-  });
-};
-
-gulp.task("nw:all", function(cb) {
-  nw(cb, ["win", "osx", "linux"]);
-});
-
-gulp.task("nw", function(cb) {
-  var platform = "", arch = "";
-
-  if (process.platform === "win32") platform = "win";
-  else if (process.platform === "darwin") platform = "osx";
-  else if (process.platform !== "linux") {
-    console.error("Cannot build for " + process.platform);
-    return;
+  if (target.includes("win")) {
+    files.push("attachment/jikkyo_ct.cmd");
+  } else if (target.includes("osx")) {
+    files.push("attachment/jikkyo_ct.command");
   }
 
-  if (process.arch === "x64") arch = "64";
-  else if (process.arch === "ia32") arch = "32";
-  else {
-    console.error("Cannot build for " + process.arch);
-    return;
-  }
+  return files;
+}
 
-  nw(cb, [platform + arch]);
-});
+function pack(targets) {
+  return readJSON("package.json").then(json => {
+    var version = json.version;
 
-gulp.task("nw:win", function(cb) {
-  nw(cb, ["win"]);
-});
+    return Promise.all(targets.map(target => {
+      return new Promise((resolve, reject) => {
+        var dir = `build/jikkyo/${target}`;
+        var name = `jikkyo-v${version}-${target}`;
+        var out = `build/jikkyo/${name}.zip`;
 
-gulp.task("nw:win32", function(cb) {
-  nw(cb, ["win32"]);
-});
+        var archive = archiver("zip");
+        var output = fs.createWriteStream(out);
 
-gulp.task("nw:win64", function(cb) {
-  nw(cb, ["win64"]);
-});
+        output.on("close", resolve);
+        archive.on("error", reject);
 
-gulp.task("nw:osx", function(cb) {
-  nw(cb, ["osx"]);
-});
+        archive.pipe(output);
 
-gulp.task("nw:osx32", function(cb) {
-  nw(cb, ["osx32"]);
-});
-
-gulp.task("nw:osx64", function(cb) {
-  nw(cb, ["osx64"]);
-});
-
-gulp.task("nw:linux", function(cb) {
-  nw(cb, ["linux"]);
-});
-
-gulp.task("nw:linux32", function(cb) {
-  nw(cb, ["linux32"]);
-});
-
-gulp.task("nw:linux64", function(cb) {
-  nw(cb, ["linux64"]);
-});
-
-var zip = function(platform, version, cb) {
-  var archive = archiver("zip");
-  var dir = path.join("build", "jikkyo", platform);
-  var name = "jikkyo-v" + version + "-" + platform;
-  var out = path.join("build", "jikkyo", name + ".zip");
-
-  var output = fs.createWriteStream(out);
-
-  output.on("close", cb);
-  archive.on("error", cb);
-
-  archive.pipe(output);
-  archive.directory(dir, name).finalize();
-};
-
-gulp.task("copy", ["copy:win", "copy:osx", "copy:linux"]);
-
-gulp.task("copy:win", ["copy:win32", "copy:win64"]);
-
-gulp.task("copy:win32", function() {
-  return gulp.src([
-    "README.md",
-    "LICENSE",
-    "attachment/jikkyo_ct.cmd"
-  ]).pipe(gulp.dest("build/jikkyo/win32"));
-});
-
-gulp.task("copy:win64", function() {
-  return gulp.src([
-    "README.md",
-    "LICENSE",
-    "attachment/jikkyo_ct.cmd"
-  ]).pipe(gulp.dest("build/jikkyo/win64"));
-});
-
-gulp.task("copy:osx", ["copy:osx32", "copy:osx64"]);
-
-gulp.task("copy:osx32", function() {
-  return gulp.src([
-    "README.md",
-    "LICENSE",
-    "attachment/jikkyo_ct.command"
-  ]).pipe(gulp.dest("build/jikkyo/osx32"));
-});
-
-gulp.task("copy:osx64", function() {
-  return gulp.src([
-    "README.md",
-    "LICENSE",
-    "attachment/jikkyo_ct.command"
-  ]).pipe(gulp.dest("build/jikkyo/osx64"));
-});
-
-gulp.task("copy:linux", ["copy:linux32", "copy:linux64"]);
-
-gulp.task("copy:linux32", function() {
-  return gulp.src([
-    "README.md",
-    "LICENSE"
-  ]).pipe(gulp.dest("build/jikkyo/linux32"));
-});
-
-gulp.task("copy:linux64", function() {
-  return gulp.src([
-    "README.md",
-    "LICENSE"
-  ]).pipe(gulp.dest("build/jikkyo/linux64"));
-});
-
-gulp.task("package", function(cb) {
-  var version = JSON.parse(fs.readFileSync("package.json", "utf8")).version;
-
-  var dirs = fs.readdirSync("build/jikkyo").filter(function(file) {
-    return fs.statSync("build/jikkyo/" + file).isDirectory();
-  }).map(function(dir) {
-    return new Promise(function(resolve, reject) {
-      console.log("Zipping v" + version + "-" + dir + "...");
-      zip(dir, version, function(err) {
-        if (err) return reject(err);
-        console.log("Complete zipping v" + version + "-" + dir + "!");
-        resolve();
+        archive.directory(dir, name)
+               .finalize();
       });
+    }));
+  });
+}
+
+function release(target) {
+  return new Promise((resolve, reject) => {
+    runSequence(`clean:${target}`, `nw:${target}`, `copy:${target}`, `package:${target}`, err => {
+      if (err) {
+        reject(err);
+        return;
+      }
+
+      resolve();
     });
   });
+}
 
-  /*
-  .reduce(function(promise, dir) {
-    return promise.then(function() {
-      return new Promise(function(resolve, reject) {
-        console.log("Zipping v" + version + "-" + dir + "...");
-        zip(dir, version, function(err) {
-          if (err) return reject(err);
-          console.log("Complete zipping v" + version + "-" + dir + "!");
-          resolve();
-        });
-      });
-    });
-  }, Promise.resolve()).then(function() {
-  */
+gulp.task("sync", () => {
+  return Promise.all([
+    readJSON("package.json"),
+    readJSON("src/package.json")
+  ]).then(jsons => {
+    var pkg = jsons[0];
+    var srcPkg = jsons[1];
 
-  Promise.all(dirs).then(function() {
-    cb();
-  }).catch(function(err) {
-    console.error(err);
-    cb();
+    srcPkg.name = pkg.name;
+    srcPkg.version = pkg.version;
+    srcPkg.description = pkg.description;
+    srcPkg.repository = pkg.repository;
+    srcPkg.homepage = pkg.homepage;
+
+    return writeJSON("src/package.json", srcPkg);
   });
 });
 
-gulp.task("release", function(cb) {
-  runSequence("clean", "nw:all", "copy", "package", cb);
+gulp.task("clean:all", () => del(cleanList("all")));
+gulp.task("nw:all", () => nw(platformsArray));
+gulp.task("copy:all", Object.keys(platforms).map(platform => `copy:${platform}`));
+gulp.task("package:all", Object.keys(platforms).map(platform => `package:${platform}`));
+gulp.task("release:all", () => release("all"));
+
+Object.keys(platforms).forEach(platform => {
+  gulp.task(`clean:${platform}`, platforms[platform].map(target => `clean:${target}`));
+  gulp.task(`nw:${platform}`, () => nw(platforms[platform]));
+  gulp.task(`copy:${platform}`, platforms[platform].map(target => `copy:${target}`));
+  gulp.task(`package:${platform}`, platforms[platform].map(target => `package:${target}`));
+  gulp.task(`release:${platform}`, () => release(platform));
+
+  platforms[platform].forEach(target => {
+    gulp.task(`clean:${target}`, () => del(cleanList(target)));
+    gulp.task(`nw:${target}`, () => nw([target]));
+    gulp.task(`copy:${target}`, () => gulp.src(copyList(target)).pipe(gulp.dest(`build/jikkyo/${target}`)));
+    gulp.task(`package:${target}`, () => pack([target]));
+    gulp.task(`release:${target}`, () => release(target));
+  });
 });
+
+gulp.task("clean", ["clean:all"]);
+
+if (currentTarget) {
+  gulp.task("nw", [`nw:${currentTarget}`]);
+  gulp.task("copy", [`copy:${currentTarget}`]);
+  gulp.task("package", [`package:${currentTarget}`]);
+  gulp.task("release", [`release:${currentTarget}`]);
+}
 
 gulp.task("default", ["nw"]);

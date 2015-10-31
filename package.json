@@ -8,7 +8,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "ct": "nw src --disable-gpu --force-cpu-draw",
     "nw": "gulp nw",
-    "release": "gulp release"
+    "clean": "gulp clean",
+    "release": "gulp release:all"
   },
   "repository": {
     "type": "git",
@@ -25,7 +26,8 @@
     "del": "^2.0.2",
     "gulp": "^3.9.0",
     "gulp-util": "^3.0.6",
-    "nw-builder": "git://github.com/rot1024/nw-builder.git"
+    "nw-builder": "git://github.com/rot1024/nw-builder.git",
+    "run-sequence": "^1.1.4"
   },
   "dependencies": {
     "nw": "^0.12.3"
