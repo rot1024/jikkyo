@@ -1,29 +1,13 @@
 (() => {
   "use strict";
 
-  var gui = require("nw.gui"),
-      UpdateChecker = require("./util/UpdateChecker");
+  const gui = require("nw.gui");
+  const UpdateChecker = require("./util/UpdateChecker");
 
   var win = gui.Window.get();
 
   var pref = new window.jikkyo.Preference();
   pref.load();
-
-  if (pref.general && pref.general.checkNewVersionAuto) {
-    UpdateChecker.getLatestVersion().then(v => {
-      if (v === UpdateChecker.currentVersion) return;
-      var modal = document.querySelector("jikkyo-modal");
-      modal.use(
-        "yesno", `新バージョン ${v} が公開されています。公式サイトを開きますか？`,
-        null,
-        () => {
-          gui.Shell.openExternal(UpdateChecker.homepageURL);
-          modal.hide();
-        }
-      );
-      modal.show();
-    });
-  }
 
   if (window.WindowWrapper.clickthrough) {
     win.x = 0;
@@ -33,14 +17,6 @@
   }
 
   win.on("loaded", () => {
-
-    window.ondragover = e => { e.preventDefault(); return false; };
-    window.ondrop = e => { e.preventDefault(); return false; };
-
-    window.addEventListener("keydown", e => {
-      if (e.keyCode === 123) win.showDevTools();
-    });
-
     var container = document.getElementById("window"),
         titlebar = document.querySelector("jikkyo-titlebar"),
         controller = document.querySelector("jikkyo-controller"),
@@ -49,6 +25,38 @@
         modal = document.querySelector("jikkyo-modal"),
         holder = document.querySelector("jikkyo-drop-holder"),
         manager = new window.jikkyo.ModeManager();
+
+    if (pref.hasOwnProperty("general") && pref.general.checkNewVersionAuto) {
+      let checker = new UpdateChecker({
+        user: "rot1024",
+        repos: "jikkyo"
+      });
+
+      checker.check().then(data => {
+        if (data === null) return;
+
+        modal.use(
+          "yesno",
+          `新バージョン ${data.latest.version} が公開されています。リリースページを開きますか？`,
+          null,
+          () => {
+            gui.Shell.openExternal(data.latest.url);
+            modal.hide();
+          }
+        );
+
+        modal.show();
+      }).catch(err => {
+        console.error(err);
+      });
+    }
+
+    window.ondragover = e => { e.preventDefault(); return false; };
+    window.ondrop = e => { e.preventDefault(); return false; };
+
+    window.addEventListener("keydown", e => {
+      if (e.keyCode === 123) win.showDevTools();
+    });
 
     if (window.WindowWrapper.clickthrough) {
       window.document.body.classList.add("clickthrough");

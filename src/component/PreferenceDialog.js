@@ -1,9 +1,10 @@
 (() => {
   "use strict";
 
-  var gui = require("nw.gui"),
-      EventEmitter = require("events").EventEmitter,
-      UpdateChecker = require("./util/UpdateChecker");
+  const gui = require("nw.gui");
+  const EventEmitter = require("events").EventEmitter;
+  const package_json = require("./package.json");
+  const UpdateChecker = require("./util/UpdateChecker");
 
   var doc = document.currentScript.ownerDocument;
 
@@ -38,33 +39,42 @@
 
       var modal = this.shadowRoot.querySelector("#about-modal");
 
-      this.shadowRoot.querySelector("#about-version").textContent = UpdateChecker.currentVersion;
-      this.shadowRoot.querySelector("#about-homepage").addEventListener(
-          "click", () => gui.Shell.openExternal(UpdateChecker.homepageURL));
-      this.shadowRoot.querySelector("#about-repository").addEventListener(
-        "click", () => gui.Shell.openExternal(UpdateChecker.repositoryURL));
+      this.shadowRoot.querySelector("#about-version").textContent = package_json.version;
+      this.shadowRoot.querySelector("#about-homepage").addEventListener("click", () => {
+        gui.Shell.openExternal(package_json.homepage);
+      });
+      this.shadowRoot.querySelector("#about-repository").addEventListener("click", () => {
+        gui.Shell.openExternal(package_json.repository.url);
+      });
+      this.shadowRoot.querySelector("#about-check").addEventListener("click", () => {
+        modal.use("loading");
+        modal.show();
 
-      this.shadowRoot.querySelector("#about-check").addEventListener(
-        "click", () => {
-          modal.use("loading");
-          modal.show();
-          UpdateChecker.getLatestVersion().then(v => {
-            if (v !== UpdateChecker.currentVersion) {
-              modal.use(
-                "yesno", `新バージョン ${v} が公開されています。公式サイトを開きますか？`,
-                null, () => {
-                  gui.Shell.openExternal(UpdateChecker.homepageURL);
-                  modal.hide();
-                });
-            } else {
-              modal.use("alert", "最新バージョンをお使いです。");
-            }
-          }).catch(e => {
-            console.error(e);
-            modal.use("alert", "データの取得に失敗しました。");
-          });
+        let checker = new UpdateChecker({
+          user: "rot1024",
+          repos: "jikkyo"
         });
 
+        checker.check().then(data => {
+          if (data === null) {
+            modal.use("alert", "最新バージョンをお使いです。");
+            return;
+          }
+
+          modal.use(
+            "yesno",
+            `新バージョン ${data.latest.version} が公開されています。リリースページを開きますか？`,
+            null,
+            () => {
+              gui.Shell.openExternal(data.latest.url);
+              modal.hide();
+            }
+          );
+        }).catch(err => {
+          console.error(err);
+          modal.use("alert", "データの取得に失敗しました。");
+        });
+      });
     }
 
     get preference() {
