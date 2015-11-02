@@ -10,7 +10,7 @@
   pref.load();
 
   win.on("loaded", () => {
-    var container = document.getElementById("window"),
+    var container = document.getElementById("windowContainer"),
         titlebar = document.querySelector("jikkyo-titlebar"),
         controller = document.querySelector("jikkyo-controller"),
         viewer = document.querySelector("jikkyo-viewer"),

@@ -4,7 +4,7 @@
   const gui = require("nw.gui");
 
   const win = gui.Window.get();
-  const winContainer = document.getElementById("windowContainer");
+  const winParent = document.getElementById("windowParent");
 
   class WindowWrapper {
     constructor() {
@@ -13,7 +13,7 @@
         if (gui.App.argv.indexOf("--force-cpu-draw") === -1) return false;
 
         return true;
-      });
+      })();
 
       this.maximized = false;
 
@@ -66,7 +66,7 @@
 
     get x() {
       if (this.clickthrough) {
-        return parseInt(winContainer.style.left, 10);
+        return parseInt(winParent.style.left, 10);
       } else {
         return win.x;
       }
@@ -74,7 +74,7 @@
 
     get y() {
       if (this.clickthrough) {
-        return parseInt(winContainer.style.top, 10);
+        return parseInt(winParent.style.top, 10);
       } else {
         return win.y;
       }
@@ -82,7 +82,7 @@
 
     get width() {
       if (this.clickthrough) {
-        return parseInt(winContainer.style.width, 10);
+        return parseInt(winParent.style.width, 10);
       } else {
         return win.width;
       }
@@ -90,7 +90,7 @@
 
     get height() {
       if (this.clickthrough) {
-        return parseInt(winContainer.style.height, 10);
+        return parseInt(winParent.style.height, 10);
       } else {
         return win.height;
       }
@@ -98,7 +98,7 @@
 
     set x(x) {
       if (this.clickthrough) {
-        winContainer.style.left = `${x}px`;
+        winParent.style.left = `${x}px`;
       } else {
         win.x = x;
       }
@@ -106,7 +106,7 @@
 
     set y(y) {
       if (this.clickthrough) {
-        winContainer.style.top = `${y}px`;
+        winParent.style.top = `${y}px`;
       } else {
         win.y = y;
       }
@@ -114,7 +114,7 @@
 
     set width(width) {
       if (this.clickthrough) {
-        winContainer.style.width = `${Math.max(this.minSize.width, width)}px`;
+        winParent.style.width = `${Math.max(this.minSize.width, width)}px`;
       } else {
         win.width = width;
       }
@@ -122,7 +122,7 @@
 
     set height(height) {
       if (this.clickthrough) {
-        winContainer.style.height = `${Math.max(this.minSize.height, height)}px`;
+        winParent.style.height = `${Math.max(this.minSize.height, height)}px`;
       } else {
         win.height = height;
       }
