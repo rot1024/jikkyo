@@ -9,15 +9,8 @@
   var pref = new window.jikkyo.Preference();
   pref.load();
 
-  if (window.windowWrapper.clickthrough) {
-    win.x = 0;
-    win.y = 0;
-    win.width = window.screen.availWidth;
-    win.height = window.screen.availHeight;
-  }
-
   win.on("loaded", () => {
-    var container = document.getElementById("window"),
+    var container = document.getElementById("windowContainer"),
         titlebar = document.querySelector("jikkyo-titlebar"),
         controller = document.querySelector("jikkyo-controller"),
         viewer = document.querySelector("jikkyo-viewer"),
