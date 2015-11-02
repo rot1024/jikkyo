@@ -137,6 +137,8 @@ function copyList(target) {
     files.push("attachment/jikkyo_ct.cmd");
   } else if (target.includes("osx")) {
     files.push("attachment/jikkyo_ct.command");
+  } else if (target.includes("linux")) {
+    files.push("attachment/jikkyo_ct.sh");
   }
 
   return files;
