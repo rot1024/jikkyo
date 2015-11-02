@@ -1,10 +1,14 @@
 # jikkyo
 
+![repo](https://david-dm.org/rot1024/jikkyo.svg)
+
 ![jikkyo](http://rot1024.com/jikkyo/images/kinmoza_min.jpg)
 
 ニコニコ動画から取得したコメントファイルやTwitterのタイムラインを、透明なウィンドウの上にニコニコ動画コメント風に流せる実況閲覧アプリです。
 
 [jikkyo Webページ](https://rot1024.github.io/jikkyo/)
+
+[jikkyo ダウンロード](https://github.com/rot1024/jikkyo/releases/latest)
 
 ## 特徴
 
@@ -19,6 +23,7 @@
 * ニコニコ動画のコメントファイル（XML）が読み込めます。
 * コメントの盛り上がりをシークバーの色で可視化します。
 * ドラッグ・アンド・ドロップでコメントファイルを読み込めます。
+* つぶあにから過去のアニメ実況を取得して楽しむことができます。
 
 ### Twitterモード
 
@@ -26,7 +31,7 @@
 * UserStream と FilterStream に対応。
 * TLを録画してファイルに保存できます。
 * テキスト・ユーザー名・クライアント名による（正規表現も利用可能な）ミュート機能。
-* **イベントなどでスクリーンに映すと盛り上がります！**
+* イベントなどでスクリーンに映すと盛り上がります
 
 ## 注意点
 
@@ -41,13 +46,14 @@
 
 このアプリケーションはオープンソースで、 [MIT License](LICENSE) の下 [GitHub](https://github.com/rot1024/jikkyo) にてソースコードを公開しています。
 
-バグや要望等がありましたら、作者の Twitter [@aayh](http://twitter.com/aayh) にお知らせいただくか、 GitHub の issues に投げてください。
+バグや要望等がありましたら、作者の Twitter [@aayh](http://twitter.com/aayh) にお知らせいただくか、 GitHub の issues に投げてください。プルリクエスト歓迎。
 
 ## 今後の予定
 
-* つぶあにで過去のアニメ実況を楽しめる機能
+* Electronへの移行
+* 動画再生機能
 * ニコニコ実況対応
-* ニコニコ動画コメント取得機能
+* 2ch実況スレ対応
 
 ...etc
 
