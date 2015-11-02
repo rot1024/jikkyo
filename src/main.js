@@ -9,7 +9,7 @@
   var pref = new window.jikkyo.Preference();
   pref.load();
 
-  if (window.WindowWrapper.clickthrough) {
+  if (window.windowWrapper.clickthrough) {
     win.x = 0;
     win.y = 0;
     win.width = window.screen.availWidth;
@@ -58,7 +58,7 @@
       if (e.keyCode === 123) win.showDevTools();
     });
 
-    if (window.WindowWrapper.clickthrough) {
+    if (window.windowWrapper.clickthrough) {
       window.document.body.classList.add("clickthrough");
       titlebar.setAttribute("clickthrough", "");
     }
@@ -70,7 +70,7 @@
     win.on("unmaximize", () => container.classList.remove("maximized"));
 
     win.on("focus", () => {
-      if (window.WindowWrapper.clickthrough) {
+      if (window.windowWrapper.clickthrough) {
         titlebar.show();
         controller.show();
       }
@@ -88,17 +88,17 @@
     win.on("close", () => {
       manager.currentMode.hide();
       win.hide();
-      window.WindowWrapper.save(pref);
+      window.windowWrapper.save(pref);
       win.close(true);
     });
 
     container.addEventListener("mouseover", () => {
-      if (window.WindowWrapper.clickthrough) return;
+      if (window.windowWrapper.clickthrough) return;
       container.classList.add("hover");
     });
 
     container.addEventListener("mouseout", () => {
-      if (window.WindowWrapper.clickthrough) return;
+      if (window.windowWrapper.clickthrough) return;
       titlebar.hide();
       if (!controller.isFixed) {
         controller.hide();
@@ -107,7 +107,7 @@
     });
 
     container.addEventListener("mousemove", e => {
-      if (window.WindowWrapper.clickthrough) return;
+      if (window.windowWrapper.clickthrough) return;
       if (e.clientY < 70) titlebar.show();
       else titlebar.hide();
       if (win.height - 150 < e.clientY)
@@ -138,7 +138,7 @@
     preferenceDialog.on("hide", applyPreference);
 
     win.show();
-    window.WindowWrapper.init(pref);
+    window.windowWrapper.init(pref);
 
     setTimeout(() => {
       container.classList.remove("attention");

@@ -199,7 +199,7 @@
       }).bind(this));
 
       var resetWindow = () => {
-        window.WindowWrapper.reset();
+        window.windowWrapper.reset();
       };
 
       this.shortcutkeys = [

@@ -17,7 +17,7 @@ body /deep/ textarea {
   font-family: "メイリオ", sans-serif;
 }
 
-#windowp {
+#windowContainer {
   position: absolute;
   left: 0;
   top: 0;

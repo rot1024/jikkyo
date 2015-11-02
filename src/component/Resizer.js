@@ -76,20 +76,20 @@
             return;
           }
 
-          var winw = window.WindowWrapper,
+          var winw = window.windowWrapper,
               x = 0, y = 0, w = 0, h = 0;
 
           if (hor === 0) {
             x = v.x - winw.x;
             w = -x;
-            if (winw.width + w < winw.minWidth)
+            if (winw.width + w < winw.minSize.width)
               x = w = 0;
           }
 
           if (ver === 0) {
             y = v.y - winw.y;
             h = -y;
-            if (winw.height + h < winw.minHeight)
+            if (winw.height + h < winw.minSize.height)
               y = h = 0;
           }
 

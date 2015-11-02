@@ -36,7 +36,7 @@
 
       root.getElementById("minimize").addEventListener("click", e => {
         if (process.platform === "darwin")
-          window.WindowWrapper.toggleMaximized();
+          window.windowWrapper.toggleMaximized();
         else
           win.minimize();
         e.stopPropagation();
@@ -44,7 +44,7 @@
 
       root.getElementById("maximize").addEventListener("click", e => {
         if (process.platform === "darwin") win.minimize();
-        else window.WindowWrapper.toggleMaximized();
+        else window.windowWrapper.toggleMaximized();
         e.stopPropagation();
       });
 
@@ -62,22 +62,22 @@
           window.removeEventListener("mouseup", mu, true);
 
           if (e.screenY < 10) {
-            window.WindowWrapper.maximize();
+            window.windowWrapper.maximize();
           }
         };
 
         mm = e => {
           if (!dragging) mu();
 
-          if (window.WindowWrapper.maximized) {
-            window.WindowWrapper.unmaximize();
-            window.WindowWrapper.moveTo(
-              e.screenX - window.WindowWrapper.width / 2,
+          if (window.windowWrapper.maximized) {
+            window.windowWrapper.unmaximize();
+            window.windowWrapper.moveTo(
+              e.screenX - window.windowWrapper.width / 2,
               e.screenY - 10);
           } else {
             let diffX = e.screenX - x,
                 diffY = e.screenY - y;
-            window.WindowWrapper.moveBy(diffX, diffY);
+            window.windowWrapper.moveBy(diffX, diffY);
           }
 
           x = e.screenX;
@@ -85,7 +85,7 @@
         };
 
         root.addEventListener("mousedown", e => {
-          if (!window.WindowWrapper.clickthrough) return;
+          if (!window.windowWrapper.clickthrough) return;
           x = e.screenX;
           y = e.screenY;
           dragging = true;
@@ -94,7 +94,7 @@
         });
 
         root.addEventListener("dblclick", e => {
-          window.WindowWrapper.toggleMaximized();
+          window.windowWrapper.toggleMaximized();
         }, true);
 
       }
