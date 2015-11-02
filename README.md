@@ -1,6 +1,6 @@
 # jikkyo
 
-![repo](https://david-dm.org/rot1024/jikkyo.svg)
+[![repo](https://david-dm.org/rot1024/jikkyo.svg)](https://david-dm.org/rot1024/jikkyo)
 
 ![jikkyo](http://rot1024.com/jikkyo/images/kinmoza_min.jpg)
 
