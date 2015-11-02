@@ -43,6 +43,13 @@
         height: -1
       };
 
+      if (this.clickthrough) {
+        win.x = this.maxSize.x;
+        win.y = this.maxSize.y;
+        win.width = this.maxSize.width;
+        win.height = this.maxSize.height;
+      }
+
       win.on("maximize", (() => {
         this.maximized = true;
       }).bind(this));
