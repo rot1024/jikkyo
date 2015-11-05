@@ -29,12 +29,7 @@
         height: 100
       };
 
-      this.maxSize = {
-        x: 0,
-        y: 0,
-        width: window.screen.availWidth,
-        height: window.screen.availHeight
-      };
+      this.refreshMaxSize();
 
       this.origSize = {
         x: -1,
@@ -163,6 +158,15 @@
       win.emit("resize", this.width, this.height);
     }
 
+    refreshMaxSize() {
+      this.maxSize = {
+        x: 0,
+        y: process.platform === "darwin" ? window.screen.height - window.screen.availHeight : 0,
+        width: window.screen.availWidth,
+        height: window.screen.availHeight
+      };
+    }
+
     reset() {
       this.unmaximize();
 
@@ -234,14 +238,23 @@
       this.origSize.height = this.height;
 
       if (this.clickthrough) {
+        this.refreshMaxSize();
         this.resize(
           this.maxSize.x,
           this.maxSize.y,
           this.maxSize.width,
           this.maxSize.height
         );
-
-        win.emit("maximize");
+        if (process.platform !== "darwin")
+          win.emit("maximize");
+      } else if (process.platform === "darwin") {
+        this.refreshMaxSize();
+        this.resize(
+          this.maxSize.x,
+          this.maxSize.y,
+          this.maxSize.width,
+          this.maxSize.height
+        );
       } else {
         win.maximize();
       }
