@@ -31,12 +31,7 @@
 * UserStream と FilterStream に対応。
 * TLを録画してファイルに保存できます。
 * テキスト・ユーザー名・クライアント名による（正規表現も利用可能な）ミュート機能。
-* イベントなどでスクリーンに映すと盛り上がります
-
-## 注意点
-
-* Macではウィンドウの最大化機能に問題があり、現在無効にしています。
-* Linuxでの動作はまだ未検証です。
+* イベントなどでスクリーンに映すと盛り上がります。
 
 ## 更新履歴
 
@@ -62,8 +57,6 @@
 ```sh
 git clone https://github.com/rot1024/jikkyo.git
 cd jikkyo
-npm i
-cd src
 npm i
 npm start
 
