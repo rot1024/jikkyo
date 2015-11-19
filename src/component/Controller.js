@@ -207,7 +207,7 @@
         { key: "ctrl+f", macKey: "command+f", label: "コントロールバーを固定", press: fix },
         { key: "ctrl+n", macKey: "command+n", label: "次のモード", press: modeNext },
         { key: "ctrl+p", macKey: "command+p", label: "前のモード", press: modePrev },
-        { key: "ctrl+r", macKey: "command+r", label: "ウィンドウの位置・サイズをを初期状態に戻す", press: resetWindow }
+        { key: "ctrl+i", macKey: "command+i", label: "ウィンドウの位置・サイズをを初期状態に戻す", press: resetWindow }
       ];
 
       const mac = process.platform === "darwin";

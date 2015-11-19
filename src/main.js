@@ -47,9 +47,9 @@
     window.ondragover = e => { e.preventDefault(); return false; };
     window.ondrop = e => { e.preventDefault(); return false; };
 
-    window.addEventListener("keydown", e => {
-      if (e.keyCode === 123) win.showDevTools();
-    });
+    Mousetrap.bind(
+      [process.platform === "darwin" ? "command+option+i" : "ctrl+shift+i", "f12"],
+      () => win.showDevTools());
 
     if (window.windowWrapper.clickthrough) {
       window.document.body.classList.add("clickthrough");
