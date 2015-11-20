@@ -2,7 +2,7 @@
 
 [![repo](https://david-dm.org/rot1024/jikkyo.svg)](https://david-dm.org/rot1024/jikkyo)
 
-![jikkyo](http://rot1024.com/jikkyo/images/kinmoza_min.jpg)
+![jikkyo](http://rot1024.github.io/jikkyo/images/kinmoza_min.jpg)
 
 ニコニコ動画から取得したコメントファイルやTwitterのタイムラインを、透明なウィンドウの上にニコニコ動画コメント風に流せる実況閲覧アプリです。
 
