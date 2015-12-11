@@ -20,7 +20,7 @@ const platformsArray = (() => {
   }, []);
 })();
 
-var currentTarget;
+let currentTarget;
 
 switch (process.platform) {
   case "win32":
@@ -95,8 +95,8 @@ function writeJSON(file, data, encoding) {
 }
 
 function cleanList(target) {
-  var list = [];
-  var parent = "build/jikkyo";
+  const list = [];
+  const parent = "build/jikkyo";
 
   if (target === "all") {
     list.push(parent);
@@ -109,8 +109,8 @@ function cleanList(target) {
 }
 
 function nw(targets) {
-  var nwb = new NwBuilder({
-    files: "src/**",
+  const nwb = new NwBuilder({
+    files: "src/**/*",
     version: "0.12.3",
     platforms: targets,
     build: "build",
@@ -131,7 +131,7 @@ function nw(targets) {
 }
 
 function copyList(target) {
-  var files = ["README.md", "LICENSE"];
+  const files = ["README.md", "LICENSE"];
 
   if (target.includes("win")) {
     files.push("attachment/jikkyo_ct.cmd");
@@ -146,16 +146,16 @@ function copyList(target) {
 
 function pack(targets) {
   return readJSON("package.json").then(json => {
-    var version = json.version;
+    const version = json.version;
 
     return Promise.all(targets.map(target => {
       return new Promise((resolve, reject) => {
-        var dir = `build/jikkyo/${target}`;
-        var name = `jikkyo-v${version}-${target}`;
-        var out = `build/jikkyo/${name}.zip`;
+        const dir = `build/jikkyo/${target}`;
+        const name = `jikkyo-v${version}-${target}`;
+        const out = `build/jikkyo/${name}.zip`;
 
-        var archive = archiver("zip");
-        var output = fs.createWriteStream(out);
+        const archive = archiver("zip");
+        const output = fs.createWriteStream(out);
 
         output.on("close", resolve);
         archive.on("error", reject);
@@ -187,8 +187,8 @@ gulp.task("sync", () => {
     readJSON("package.json"),
     readJSON("src/package.json")
   ]).then(jsons => {
-    var pkg = jsons[0];
-    var srcPkg = jsons[1];
+    const pkg = jsons[0];
+    const srcPkg = jsons[1];
 
     srcPkg.name = pkg.name;
     srcPkg.version = pkg.version;
