@@ -215,14 +215,14 @@ Object.keys(platforms).forEach(platform => {
 
   platforms[platform].forEach(target => {
     if (platform === "win") {
-      gulp.task("workaround", () => {
+      gulp.task(`workaround:${target}`, () => {
         return gulp.src("src/package.json")
           .pipe(gulp.dest(`build/jikkyo/${target}/src`));
       });
     }
     gulp.task(`clean:${target}`, () => del(cleanList(target)));
     gulp.task(`nw:${target}`, () => nw([target]));
-    gulp.task(`copy:${target}`, platform === "win" ? ["workaround"] : [], () => {
+    gulp.task(`copy:${target}`, platform === "win" ? [`workaround:${target}`] : [], () => {
       return gulp.src(copyList(target)).pipe(gulp.dest(`build/jikkyo/${target}`));
     });
     gulp.task(`package:${target}`, () => pack([target]));
