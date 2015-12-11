@@ -214,9 +214,17 @@ Object.keys(platforms).forEach(platform => {
   gulp.task(`release:${platform}`, () => release(platform));
 
   platforms[platform].forEach(target => {
+    if (platform === "win") {
+      gulp.task("workaround", () => {
+        return gulp.src("src/package.json")
+          .pipe(gulp.dest(`build/jikkyo/${target}/src`));
+      });
+    }
     gulp.task(`clean:${target}`, () => del(cleanList(target)));
     gulp.task(`nw:${target}`, () => nw([target]));
-    gulp.task(`copy:${target}`, () => gulp.src(copyList(target)).pipe(gulp.dest(`build/jikkyo/${target}`)));
+    gulp.task(`copy:${target}`, platform === "win" ? ["workaround"] : [], () => {
+      return gulp.src(copyList(target)).pipe(gulp.dest(`build/jikkyo/${target}`));
+    });
     gulp.task(`package:${target}`, () => pack([target]));
     gulp.task(`release:${target}`, () => release(target));
   });
