@@ -1,6 +1,6 @@
 {
   "name": "jikkyo",
-  "version": "1.2.2",
+  "version": "1.2.1",
   "description": "Jikkyo App",
   "scripts": {
     "start": "cd .. && npm start",
