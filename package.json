@@ -22,7 +22,7 @@
   },
   "homepage": "https://rot1024.github.io/jikkyo",
   "devDependencies": {
-    "archiver": "^0.16.0",
+    "archiver": "^0.20.0",
     "del": "^2.1.0",
     "gulp": "^3.9.0",
     "gulp-util": "^3.0.7",

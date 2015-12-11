@@ -31,7 +31,7 @@
   "dependencies": {
     "cheerio-httpcli": "^0.3.3",
     "co": "^4.6.0",
-    "kefir": "^2.8.1",
+    "kefir": "^3.1.0",
     "mousetrap": "^1.5.3",
     "oauth": "^0.9.13",
     "twit": "^2.1.0",
