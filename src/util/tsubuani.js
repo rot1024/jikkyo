@@ -158,10 +158,10 @@ module.exports = {
           return {
             text: text,
             date: date,
-            user_id: e.id,
-            screenname: e.s,
-            user_name: decode(e.n),
-            image: e.i.replace(/\\\//g, "/"),
+            user_id: e.id === null ? "" : e.id,
+            screenname: e.s === null ? "" : e.s,
+            user_name: e.n === null ? "" : decode(e.n),
+            image: e.i === null ? "" : e.i.replace(/\\\//g, "/"),
             ci: e.ci,
             vpos: Math.round((date.getTime() - firstTime) / 10)
           };
