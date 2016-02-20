@@ -113,13 +113,12 @@ function nw(targets) {
     files: "src/**/*",
     version: "0.12.3",
     platforms: targets,
-    build: "build",
+    buildDir: "build",
     cacheDir: "cache",
     macCredits: "Credits.html",
     macIcns: "src/images/jikkyo.icns",
-    macZip: false,
     winIco: "src/images/jikkyo.ico",
-    winZip: false
+    zip: false
   });
 
   nwb.on("log", msg => {
@@ -214,15 +213,9 @@ Object.keys(platforms).forEach(platform => {
   gulp.task(`release:${platform}`, () => release(platform));
 
   platforms[platform].forEach(target => {
-    if (platform === "win") {
-      gulp.task(`workaround:${target}`, () => {
-        return gulp.src("src/package.json")
-          .pipe(gulp.dest(`build/jikkyo/${target}/src`));
-      });
-    }
     gulp.task(`clean:${target}`, () => del(cleanList(target)));
     gulp.task(`nw:${target}`, () => nw([target]));
-    gulp.task(`copy:${target}`, platform === "win" ? [`workaround:${target}`] : [], () => {
+    gulp.task(`copy:${target}`, () => {
       return gulp.src(copyList(target)).pipe(gulp.dest(`build/jikkyo/${target}`));
     });
     gulp.task(`package:${target}`, () => pack([target]));
