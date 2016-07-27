@@ -18,8 +18,8 @@
       this.maximized = false;
 
       this.defaultSize = {
-        x: (window.screen.availWidth - 800) / 2,
-        y: (window.screen.availHeight - 520) / 2,
+        x: ~~Math.max(0, (window.screen.availWidth - 800) / 2),
+        y: ~~Math.max(0, (window.screen.availHeight - 520) / 2),
         width: 800,
         height: 520
       };
@@ -180,19 +180,19 @@
 
     moveTo(x, y) {
       if (this.clickthrough) {
-        this.x = x;
-        this.y = y;
+        this.x = ~~x;
+        this.y = ~~y;
       } else {
-        win.moveTo(x, y);
+        win.moveTo(~~x, ~~y);
       }
     }
 
     moveBy(x, y) {
       if (this.clickthrough) {
-        this.x += x;
-        this.y += y;
+        this.x += ~~x;
+        this.y += ~~y;
       } else {
-        win.moveBy(x, y);
+        win.moveBy(~~x, ~~y);
       }
     }
 
