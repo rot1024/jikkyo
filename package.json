@@ -22,12 +22,12 @@
   },
   "homepage": "https://rot1024.github.io/jikkyo",
   "devDependencies": {
-    "archiver": "^0.20.0",
-    "del": "^2.1.0",
-    "gulp": "^3.9.0",
+    "archiver": "^1.0.0",
+    "del": "^2.2.1",
+    "gulp": "^3.9.1",
     "gulp-util": "^3.0.7",
-    "nw-builder": "^2.2.0",
-    "run-sequence": "^1.1.5"
+    "nw-builder": "^2.2.5",
+    "run-sequence": "^1.2.2"
   },
   "dependencies": {
     "nw": "^0.12.3"
