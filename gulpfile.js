@@ -1,5 +1,6 @@
 "use strict";
 
+/* eslint-disable node/no-unpublished-require */
 const fs = require("fs");
 const gulp = require("gulp");
 const gutil = require("gulp-util");
@@ -7,6 +8,7 @@ const del = require("del");
 const NwBuilder = require("nw-builder");
 const archiver = require("archiver");
 const runSequence = require("run-sequence");
+/* eslint-enable node/no-unpublished-require */
 
 const platforms = {
   win: ["win32", "win64"],

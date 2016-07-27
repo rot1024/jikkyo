@@ -4,23 +4,23 @@
   const gui = require("nw.gui");
   const UpdateChecker = require("./util/UpdateChecker");
 
-  var win = gui.Window.get();
+  const win = gui.Window.get();
 
-  var pref = new window.jikkyo.Preference();
+  const pref = new window.jikkyo.Preference();
   pref.load();
 
   win.on("loaded", () => {
-    var container = document.getElementById("windowContainer"),
-        titlebar = document.querySelector("jikkyo-titlebar"),
-        controller = document.querySelector("jikkyo-controller"),
-        viewer = document.querySelector("jikkyo-viewer"),
-        preferenceDialog = document.querySelector("jikkyo-preference-dialog"),
-        modal = document.querySelector("jikkyo-modal"),
-        holder = document.querySelector("jikkyo-drop-holder"),
-        manager = new window.jikkyo.ModeManager();
+    const container = document.getElementById("windowContainer"),
+          titlebar = document.querySelector("jikkyo-titlebar"),
+          controller = document.querySelector("jikkyo-controller"),
+          viewer = document.querySelector("jikkyo-viewer"),
+          preferenceDialog = document.querySelector("jikkyo-preference-dialog"),
+          modal = document.querySelector("jikkyo-modal"),
+          holder = document.querySelector("jikkyo-drop-holder"),
+          manager = new window.jikkyo.ModeManager();
 
     if (pref.hasOwnProperty("general") && pref.general.checkNewVersionAuto) {
-      let checker = new UpdateChecker({
+      const checker = new UpdateChecker({
         user: "rot1024",
         repos: "jikkyo"
       });
@@ -119,14 +119,15 @@
     manager.addMode(new window.jikkyo.TwitterMode());
     manager.setModeFromPref();
 
-    var applyPreference = () => {
+    function applyPreference() {
       if (pref.general.windowBgColorTransparent) {
         container.style.backgroundColor = null;
       } else {
         container.style.backgroundColor = pref.general.windowBgColor;
       }
       manager.applyPreference();
-    };
+    }
+
     applyPreference();
     preferenceDialog.on("hide", applyPreference);
 

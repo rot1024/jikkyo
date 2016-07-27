@@ -2,12 +2,12 @@
 (() => {
   "use strict";
 
-  var win = require("nw.gui").Window.get();
-  var doc = document.currentScript.ownerDocument;
+  const win = require("nw.gui").Window.get();
+  const doc = document.currentScript.ownerDocument;
 
-  var EventEmitter = require("events").EventEmitter;
+  const EventEmitter = require("events").EventEmitter;
 
-  var Controller = class extends HTMLElement {
+  const Controller = class extends HTMLElement {
 
     hide() {
       if (this._isFixed) return;
@@ -33,7 +33,7 @@
 
     set isAlwaysOnTop(v) {
       this._alwaysOnTop = v;
-      var btn = this.shadowRoot.getElementById("btn-alwaysontop");
+      const btn = this.shadowRoot.getElementById("btn-alwaysontop");
       if (v) btn.classList.add("on");
       else btn.classList.remove("on");
       win.setAlwaysOnTop(v);
@@ -45,7 +45,7 @@
 
     set isFixed(v) {
       this._isFixed = !!v;
-      var btn = this.shadowRoot.getElementById("btn-fix");
+      const btn = this.shadowRoot.getElementById("btn-fix");
       if (v) {
         this.show();
         btn.classList.add("on");
@@ -84,7 +84,7 @@
     }
 
     loadPref() {
-      var p = this._pref;
+      const p = this._pref;
       if (!p || !p.controller) return;
 
       this.isAlwaysOnTop = p.controller.alwaysOnTop || false;
@@ -92,7 +92,7 @@
     }
 
     savePref() {
-      var p = this._pref;
+      const p = this._pref;
       if (!p) return;
 
       if (!p.controller) p.controller = {};
@@ -103,8 +103,8 @@
     }
 
     addMode(mode) {
-      var i = this._modes.length;
-      var item = new window.jikkyo.MenuItem({
+      const i = this._modes.length;
+      const item = new window.jikkyo.MenuItem({
         label: mode.label,
         checked: i === this._mode,
         click: (() => {
@@ -130,9 +130,9 @@
     }
 
     createdCallback() {
-      var that = this;
-      var root = this.createShadowRoot();
-      var template = doc.getElementById("main");
+      const that = this;
+      const root = this.createShadowRoot();
+      const template = doc.getElementById("main");
       root.appendChild(document.importNode(template.content, true));
       root.addEventListener("click", e => e.stopPropagation());
 
@@ -146,25 +146,25 @@
       this._modeMenuItems = [];
       this._modeContainer = root.getElementById("container-mode");
 
-      var alwaysontopBtn = root.getElementById("btn-alwaysontop"),
-          fixBtn = root.getElementById("btn-fix"),
-          menuBtn = root.getElementById("btn-menu");
+      const alwaysontopBtn = root.getElementById("btn-alwaysontop"),
+            fixBtn = root.getElementById("btn-fix"),
+            menuBtn = root.getElementById("btn-menu");
 
-      var fix = (() => {
+      const fix = (() => {
         this.isFixed = !this.isFixed;
         this.savePref();
       }).bind(this);
 
-      var alwaysontop = (() => {
+      const alwaysontop = (() => {
         this.isAlwaysOnTop = !this.isAlwaysOnTop;
         this.savePref();
       }).bind(this);
 
-      var modeNext = (() => {
+      const modeNext = (() => {
         this._event.emit("observe", "modeNext");
       }).bind(this);
 
-      var modePrev = (() => {
+      const modePrev = (() => {
         this._event.emit("observe", "modePrev");
       }).bind(this);
 
@@ -194,13 +194,13 @@
       });
 
       menuBtn.addEventListener("click", (() => {
-        var rect = menuBtn.getBoundingClientRect();
+        const rect = menuBtn.getBoundingClientRect();
         this._menu.show(rect.right, rect.top);
       }).bind(this));
 
-      var resetWindow = () => {
+      function resetWindow() {
         window.windowWrapper.reset();
-      };
+      }
 
       this.shortcutkeys = [
         { key: "ctrl+t", macKey: "command+t", label: "常に最前面表示", press: alwaysontop },

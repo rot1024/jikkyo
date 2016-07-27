@@ -1,20 +1,22 @@
 (() => {
   "use strict";
 
-  var doc = document.currentScript.ownerDocument;
-  var stopCb = e => e.stopPropagation();
+  const doc = document.currentScript.ownerDocument;
+  function stopCb(e) {
+    e.stopPropagation();
+  }
 
   class Modal extends HTMLElement {
 
     createdCallback() {
-      var template = document.importNode(doc.getElementById("main").content, true);
+      const template = document.importNode(doc.getElementById("main").content, true);
 
       this._styles = [];
 
       this._modalBg = template.querySelector("#modal-bg");
       this.content = template.querySelector("#modal");
 
-      var innerHTML = this.innerHTML;
+      const innerHTML = this.innerHTML;
       this.innerHTML = "";
       template.innerHTML = innerHTML;
       this.createShadowRoot().appendChild(template);
@@ -48,7 +50,7 @@
     }
 
     appendStyle(style) {
-      var s;
+      let s;
       if (typeof style === "string") {
         s = document.createElement("style");
         s.textContent = style;
@@ -84,18 +86,18 @@
     }
 
     use(name, content, listener1, listener2, listener3) {
-      var cb = null;
+      let cb = null;
 
       if (name === "main" || name === this._template)
         return void 0;
 
-      var template = doc.querySelector("template#" + name);
+      const template = doc.querySelector("template#" + name);
       if (!template) return void 0;
-      var root = document.importNode(template.content, true);
+      const root = document.importNode(template.content, true);
 
       this.relative = false;
-      this.width = parseInt(template.dataset.width);
-      this.height = parseInt(template.dataset.height);
+      this.width = parseInt(template.dataset.width, 10);
+      this.height = parseInt(template.dataset.height, 10);
 
       if (
         name !== "loading" &&
@@ -112,8 +114,8 @@
         root.querySelector("#modal-btn-ok").addEventListener(
           "click", listener1 || (() => this.hide()).bind(this));
       } else if (name === "progress-cancelable") {
-        let progressbar = root.querySelector("#modal-progressbar");
-        let progressContent = root.querySelector("#modal-progress-content");
+        const progressbar = root.querySelector("#modal-progressbar");
+        const progressContent = root.querySelector("#modal-progress-content");
         progressContent.innerHTML = content;
         root.querySelector("#modal-btn-cancel").addEventListener(
           "click", listener1 || (() => this.hide()).bind(this));
@@ -125,10 +127,10 @@
         };
       } else if (name === "list") {
         root.querySelector("#modal-content").innerHTML = content;
-        let list = root.querySelector("#modal-select");
+        const list = root.querySelector("#modal-select");
         list.innerHTML = "";
         listener1.forEach(l => {
-          var option = document.createElement("option");
+          const option = document.createElement("option");
           option.textContent = l;
           list.appendChild(option);
         });

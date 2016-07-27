@@ -1,15 +1,15 @@
 (() => {
   "use strict";
 
-  var gui = require('nw.gui'),
-      filenameSanitizer = require("./util/FilenameSanitizer"),
-      tsubuani = require("./util/tsubuani"),
-      TwitterComment = require("./mode/twitter/TwitterComment"),
-      TwitterAuth = require("./mode/twitter/TwitterAuth"),
-      TwitterRecorder = require("./mode/twitter/TwitterRecorder"),
-      constants = require("./constants");
+  const gui = require("nw.gui");
+  const filenameSanitizer = require("./util/FilenameSanitizer"),
+        tsubuani = require("./util/tsubuani"),
+        TwitterComment = require("./mode/twitter/TwitterComment"),
+        TwitterAuth = require("./mode/twitter/TwitterAuth"),
+        TwitterRecorder = require("./mode/twitter/TwitterRecorder"),
+        constants = require("./constants");
 
-  var doc = document.currentScript.ownerDocument;
+  const doc = document.currentScript.ownerDocument;
 
   class TwitterMode extends window.jikkyo.Mode {
 
@@ -24,16 +24,16 @@
       this._recorder = new TwitterRecorder();
       this._recording = false;
 
-      var root = this.createShadowRoot();
-      var template = doc.getElementById("main");
+      const root = this.createShadowRoot();
+      const template = doc.getElementById("main");
       root.appendChild(document.importNode(template.content, true));
 
-      var modal = document.querySelector("jikkyo-modal"),
-          twitter = new TwitterComment(),
-          twitterRec = root.getElementById("twitter-rec"),
-          twitterTrack = root.getElementById("twitter-track"),
-          twitterConnect = root.getElementById("twitter-connect"),
-          twitterTextMenu = root.getElementById("twitter-text-menu");
+      const modal = document.querySelector("jikkyo-modal"),
+            twitter = new TwitterComment(),
+            twitterRec = root.getElementById("twitter-rec"),
+            twitterTrack = root.getElementById("twitter-track"),
+            twitterConnect = root.getElementById("twitter-connect"),
+            twitterTextMenu = root.getElementById("twitter-text-menu");
 
       this._twitter = twitter;
       this._twitterRec = twitterRec;
@@ -54,7 +54,7 @@
         if (this._recording) {
           this._recorder.directory = this.preference.twitter.recordingDirecotry;
           this._recorder.filename = this.preference.twitter.recordingFilename;
-          let ok = this._recorder.start();
+          const ok = this._recorder.start();
           if (!ok) {
             this._recording = false;
             twitterRec.classList.remove("on");
@@ -87,11 +87,11 @@
         }
       }).bind(this));
 
-      var record = (() => {
+      const record = (() => {
         if (twitterRec.classList.contains("diasbled")) return;
 
         if (!this._recording && !this.preference.twitter.recordingDirecotry) {
-          window.alert("設定画面で録画保存先ディレクトリを設定してください。");
+          window.alert("設定画面で録画保存先ディレクトリを設定してください。"); // eslint-disable-line no-alert
           return;
         }
 
@@ -103,7 +103,7 @@
           if (this._recording) {
             this._recorder.directory = this.preference.twitter.recordingDirecotry;
             this._recorder.filename = this.preference.twitter.recordingFilename;
-            let ok = this._recorder.start();
+            const ok = this._recorder.start();
             if (!ok) {
               this._recording = false;
               twitterRec.classList.remove("on");
@@ -115,7 +115,7 @@
 
       twitterRec.addEventListener("click", record);
 
-      var twitterTrackChanged = (() => {
+      const twitterTrackChanged = (() => {
         if (!this.preference) return;
         this.preference.twitter.track = twitterTrack.value;
         this.preference.save();
@@ -123,7 +123,7 @@
 
       twitterTrack.addEventListener("blur", twitterTrackChanged);
 
-      var connect = (() => {
+      const connect = (() => {
         if (twitterConnect.classList.contains("diasbled")) return;
 
         if (twitterConnect.classList.contains("on")) {
@@ -138,14 +138,14 @@
           return;
         }
 
-        var opts = {};
+        const opts = {};
 
         if (this.preference.twitter.advanced) {
           if (!this.preference.twitter.consumerKey ||
              !this.preference.twitter.consumerSecret ||
              !this.preference.twitter.accessToken ||
              !this.preference.twitter.accessSecret) {
-            window.alert("上級者向けモードに必要な情報が入力されていません。");
+            window.alert("上級者向けモードに必要な情報が入力されていません。"); // eslint-disable-line no-alert
             return;
           }
           opts.consumer_key = this.preference.twitter.consumerKey;
@@ -160,7 +160,7 @@
           opts.access_token_secret = this.preference.twitter._accessSecret;
         }
         else {
-          window.alert("Twitterアカウントが認証されていません。先に設定画面で認証してください。");
+          window.alert("Twitterアカウントが認証されていません。先に設定画面で認証してください。"); // eslint-disable-line no-alert
           return;
         }
 
@@ -193,13 +193,13 @@
 
       twitterConnect.addEventListener("click", connect);
 
-      var focusTrack = () => {
+      function focusTrack() {
         twitterTrack.focus();
-      };
+      }
 
       // menu
-      var menu = document.createElement("jikkyo-menu");
-      var hashtags = null;
+      const menu = document.createElement("jikkyo-menu");
+      let hashtags = null;
       menu.add({
         label: "アニメハッシュタグ一覧",
         click() {
@@ -226,7 +226,7 @@
       });
 
       twitterTextMenu.addEventListener("click", () => {
-        var rect = twitterTextMenu.getBoundingClientRect();
+        const rect = twitterTextMenu.getBoundingClientRect();
         menu.show(rect.right, rect.top);
       });
 
@@ -266,29 +266,29 @@
     }
 
     getPreferenceView() {
-      var p = this.preference;
-      var element = document.createElement("div");
-      var root = element.createShadowRoot();
+      const p = this.preference;
+      const element = document.createElement("div");
+      const root = element.createShadowRoot();
       root.appendChild(document.importNode(
         doc.getElementById("preference").content, true));
 
-      var unauthed = root.querySelector("#twitter-unauthed"),
-          authed = root.querySelector("#twitter-authed"),
-          modal = document.createElement("jikkyo-modal"),
-          resetModal;
+      const unauthed = root.querySelector("#twitter-unauthed"),
+            authed = root.querySelector("#twitter-authed"),
+            modal = document.createElement("jikkyo-modal");
+      let resetModal;
 
       {
         modal.width = 300;
         modal.height = 120;
 
-        let content = document.importNode(doc.getElementById("modal-auth").content, true),
-            pin = content.querySelector("#twitter-auth-pin"),
-            cancel = content.querySelector("#twitter-auth-cancel"),
-            ok = content.querySelector("#twitter-auth-ok"),
-            loading = content.querySelector("#twitter-auth-loading"),
-            authContent = content.querySelector("#twitter-auth-content");
+        const content = document.importNode(doc.getElementById("modal-auth").content, true),
+              pin = content.querySelector("#twitter-auth-pin"),
+              cancel = content.querySelector("#twitter-auth-cancel"),
+              ok = content.querySelector("#twitter-auth-ok"),
+              loading = content.querySelector("#twitter-auth-loading"),
+              authContent = content.querySelector("#twitter-auth-content");
 
-        var auth;
+        let auth;
 
         resetModal = () => {
           pin.value = "";
@@ -308,7 +308,7 @@
             console.error("TwitterAuth#getAuthorizeURL failed", err);
             modal.hide();
             auth = null;
-            window.alert("認証に失敗しました。ネットワーク接続を確認の上、再度試してみてください。");
+            window.alert("認証に失敗しました。ネットワーク接続を確認の上、再度試してみてください。"); // eslint-disable-line no-alert
           });
         };
 
@@ -336,7 +336,7 @@
             console.error("TwitterAuth#getAccessToken failed", err);
             loading.classList.add("hidden");
             authContent.classList.remove("hidden");
-            window.alert("認証に失敗しました。PINコードが正しくないようです。");
+            window.alert("認証に失敗しました。PINコードが正しくないようです。"); // eslint-disable-line no-alert
           }).catch(err => {
             console.error("TwitterAuth#getAccessToken failed", err);
             loading.classList.add("hidden");
@@ -349,7 +349,7 @@
       }
 
       {
-        let authBtn = root.querySelector("#twitter-auth");
+        const authBtn = root.querySelector("#twitter-auth");
         authBtn.addEventListener("click", () => {
           resetModal();
           modal.show();
@@ -357,7 +357,7 @@
       }
 
       {
-        let unauthBtn = root.querySelector("#twitter-unauth");
+        const unauthBtn = root.querySelector("#twitter-unauth");
         unauthBtn.addEventListener("click", () => {
           unauthed.classList.remove("form-hidden");
           authed.classList.add("form-hidden");
@@ -368,9 +368,9 @@
       }
 
       {
-        let refBtn = root.querySelector("#twitter-recording-direcotry-ref"),
-            direcotry = root.querySelector("#twitter-recording-direcotry"),
-            file = root.querySelector("#twitter-recording-file");
+        const refBtn = root.querySelector("#twitter-recording-direcotry-ref"),
+              direcotry = root.querySelector("#twitter-recording-direcotry"),
+              file = root.querySelector("#twitter-recording-file");
         file.addEventListener("change", () => {
           if (!this || !this.value) return;
           direcotry.value = this.value;
@@ -388,9 +388,9 @@
     initPreferenceView(e) {
       super.initPreferenceView();
 
-      var p = this.preference,
-          r = e.shadowRoot,
-          t = p.twitter;
+      const p = this.preference,
+            r = e.shadowRoot,
+            t = p.twitter;
 
       if (t._accessToken) {
         r.querySelector("#twitter-unauthed").classList.add("form-hidden");
@@ -409,7 +409,7 @@
       r.querySelector("#twitter-recording-direcotry").value = t.recordingDirecotry;
       r.querySelector("#twitter-recording-file").nwworkingdir = t.recordingDirecotry;
 
-      var fn = r.querySelector("#twitter-recording-filename");
+      const fn = r.querySelector("#twitter-recording-filename");
       fn.value = t.recordingFilename;
       fn.addEventListener("blur", () => {
         fn.value = filenameSanitizer(fn.value);
@@ -431,8 +431,8 @@
     savePreferenceView(e) {
       super.savePreferenceView();
 
-      var p = this.preference.twitter,
-          r = e.shadowRoot;
+      const p = this.preference.twitter,
+            r = e.shadowRoot;
 
       p.excludeMention = r.querySelector("#twitter-exclude-mention").checked;
       p.excludeRetweet = r.querySelector("#twitter-exclude-retweet").checked;
@@ -480,12 +480,12 @@
     menu(e) {
       super.menu();
 
-      var chat = e.relatedTarget.chat;
+      const chat = e.relatedTarget.chat;
 
-      var ngCb = ((value, name) => {
+      const ngCb = ((value, name) => {
         return (() => {
-          var pref = this.preference;
-          var ng = pref.twitter[name].split("\n").filter(val => val !== "");
+          const pref = this.preference;
+          const ng = pref.twitter[name].split("\n").filter(val => val !== "");
           ng.push(value);
           pref.twitter[name] = ng.join("\n");
           pref.save();
@@ -494,7 +494,7 @@
 
       this._customMenu.clear();
       this._customMenu.add({ label: chat.text.length > 25 ? chat.text.slice(0, 25) + "...　" : chat.text });
-      this._customMenu.add({ type: "separator"});
+      this._customMenu.add({ type: "separator" });
       this._customMenu.add({
         label: `この内容を含むツイートをNG登録する`,
         click: ngCb(chat.text.split("\n")[0], "textNg")
@@ -513,13 +513,13 @@
     _getNgList(ng) {
       if (ng === "") return [];
       return ng.split("\n").map(n => {
-        var m = n.match(/\/(.+)\/([igmy]*)/);
+        const m = n.match(/\/(.+)\/([igmy]*)/);
         if (!m) return n;
 
-        var result;
+        let result;
         try {
           result = new RegExp(m[1], m[2]);
-        } catch(e) {
+        } catch (e) {
           result = n;
         }
         return result;

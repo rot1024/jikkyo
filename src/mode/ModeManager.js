@@ -27,7 +27,7 @@
       if (typeof v !== "number")
         throw new TypeError("mode must be number: " + typeof v);
       if (v < 0) v = 0;
-      if(v >= this._modeList.length) v = this._modeList.length - 1;
+      if (v >= this._modeList.length) v = this._modeList.length - 1;
       this._setMode(v);
 
       if (this._pref && v !== this._pref.mode) {
@@ -78,7 +78,7 @@
       this._preferenceDialogView = v;
       if (v) {
         this._modeList.forEach(mode => {
-          var view = mode.getPreferenceView();
+          const view = mode.getPreferenceView();
           if (view) this._preferenceDialogView.addModePreference(
             view, mode.preferenceLabel || mode.label,
             mode.initPreferenceView.bind(mode), mode.savePreferenceView.bind(mode));
@@ -131,7 +131,7 @@
       if (this._controllerView)
         this._controllerView.addMode(mode);
       if (this._preferenceDialogView) {
-        let view = mode.getPreferenceView();
+        const view = mode.getPreferenceView();
         if (view) this._preferenceDialogView.addModePreference(
           view, mode.preferenceLabel || mode.label,
           mode.initPreferenceView.bind(mode), mode.savePreferenceView.bind(mode));
@@ -153,26 +153,32 @@
     }
 
     setDuration(duration) {
+      // eslint-disable-next-line no-return-assign
       this._modeList.forEach(m => m.adapter.duration = duration);
     }
 
     setDurationAlt(duration) {
+      // eslint-disable-next-line no-return-assign
       this._modeList.forEach(m => m.adapter.durationAlt = duration);
     }
 
     setLimit(limit) {
+      // eslint-disable-next-line no-return-assign
       this._modeList.forEach(m => m.adapter.limit = limit);
     }
 
     setSizingMode(sizingMode) {
+      // eslint-disable-next-line no-return-assign
       this._modeList.forEach(m => m.adapter.sizingMode = sizingMode);
     }
 
     setBaseFontSize(fontSize) {
+      // eslint-disable-next-line no-return-assign
       this._modeList.forEach(m => m.adapter.baseFontSize = fontSize);
     }
 
     setRows(rows) {
+      // eslint-disable-next-line no-return-assign
       this._modeList.forEach(m => m.adapter.rows = rows);
     }
 
@@ -181,7 +187,7 @@
     }
 
     applyPreference() {
-      var p = this._pref;
+      const p = this._pref;
       if (!p) return;
       this._modeList.forEach(m => {
         m.applyPreference(p);
@@ -196,16 +202,18 @@
       if (!this.modal) return;
 
       const mac = process.platform === "darwin";
-      var str = "", keys = [];
+      let str = "";
+      let keys = [];
 
       if (this._controllerView && Array.isArray(this._controllerView.shortcutkeys))
         keys.push({ keys: this._controllerView.shortcutkeys });
+      // eslint-disable-next-line no-return-assign
       keys = keys.concat(this._modeList.map(m => ({ label: m.label, keys: m.shortcutkeys })));
 
       keys.forEach(m => {
         if (m.label) str += `<h1>${m.label}</h1>`;
         m.keys.forEach(k => {
-          var key = (mac && k.macKey ? k.macKey : k.key).split("+");
+          let key = (mac && k.macKey ? k.macKey : k.key).split("+");
           key = key.map(s => {
             if (s === "left") return "←";
             if (s === "right") return "→";

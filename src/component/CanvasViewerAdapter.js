@@ -1,8 +1,7 @@
-/* global createjs */
 (() => {
   "use strict";
 
-  var Adapter = class {
+  class Adapter {
 
     get view() {
       return this._el;
@@ -13,9 +12,8 @@
       if (v) this.stop();
       this._el = v;
       if (v) {
-        //this._stage = new createjs.Stage(v.canvas);
         this._hcanvas = v.hiddenCanvas;
-        var ctx = this._hctx = v.hiddenCanvas.getContext("2d");
+        this._hctx = v.hiddenCanvas.getContext("2d");
       } else {
         this._stage = null;
         this._ctx = null;
@@ -71,7 +69,7 @@
       this._oldDate = 0;
       this._drawCb = (() => {
         if (!this._playing) return;
-        var now = Date.now();
+        const now = Date.now();
         this._pos += now - this._oldDate;
         this.draw();
         this._oldDate = now;
@@ -111,7 +109,7 @@
 
     }
 
-  };
+  }
 
   Adapter.mode = {
     PRECOMPUTATION: 0,

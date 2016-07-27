@@ -1,8 +1,8 @@
 (() => {
   "use strict";
 
-  var EventEmitter = require("events").EventEmitter;
-  var win = require("nw.gui").Window.get();
+  const EventEmitter = require("events").EventEmitter;
+  const win = require("nw.gui").Window.get();
 
   class Adapter {
 
@@ -196,10 +196,10 @@
       if (!Array.isArray(comment))
         throw new TypeError("comment must be array: " + typeof comment);
 
-      var index = this._comment.length;
+      let index = this._comment.length;
 
       comment.forEach(obj => {
-        var chat = {
+        const chat = {
           text: obj.text || "",
           color: obj.color,
           size: obj.size,
@@ -215,14 +215,14 @@
           data: obj.data || {}
         };
 
-        var search = this._binarySearch(chat, this._comment);
+        const search = this._binarySearch(chat, this._comment);
         index = Math.min(index, search);
 
         this._comment.splice(search, 0, chat);
       }, this);
 
       if (!this._realtime) {
-        let lastComment = this._comment[this._comment.length - 1];
+        const lastComment = this._comment[this._comment.length - 1];
         this.length =
           lastComment.vpos +
           (lastComment.position === "ue" || lastComment.position === "shita" ?
@@ -321,13 +321,13 @@
     }
 
     refresh(index) {
-      var start = index || 0, end = this._comment.length;
+      let start = index || 0, end = this._comment.length;
 
       this._calcBaseFontSize();
 
-      var refresh = ((start2, end2) => {
+      const refresh = ((start2, end2) => {
         this._comment.slice(start2, end2).forEach(chat => {
-          var size = this._calcSize(chat);
+          const size = this._calcSize(chat);
           chat.width = size.width;
           chat.height = size.height;
           if ("size" in size) chat.size = size.size;
@@ -337,17 +337,17 @@
       }).bind(this);
 
       if (this.isSimpleMode) {
-        let getLastIndex = ((position, last) => {
+        const getLastIndex = ((position, last) => {
           return this._comment.slice(last).reduce((prev, chat, index2) => {
             if (chat.vpos > position) return prev;
             return index2 + last + 1;
           }, last);
         }).bind(this);
 
-        let refreshCb = this._refreshCb = ((start2, array) => {
+        const refreshCb = this._refreshCb = ((start2, array) => {
           if (refreshCb !== this._refreshCb) return;
 
-          var end2 = getLastIndex(this._position + 500, start2);
+          const end2 = getLastIndex(this._position + 500, start2);
           refresh(start2, end2);
 
           if (end2 === array.length) {
@@ -397,16 +397,16 @@
     }
 
     getInfluence(division) {
-      var influence = new Array(division).fill(0);
-      var length = this._length;
+      const influence = new Array(division).fill(0);
+      const length = this._length;
 
       this._comment.forEach(c => {
-        var start = c.vpos;
-        var end = c.vpos +
+        const start = c.vpos;
+        const end = c.vpos +
             (c.position === "ue" || c.position === "shita" ?
              this.durationAlt : this.duration);
-        var s = parseInt(Math.min(1, start / length) * division);
-        var e = parseInt(Math.min(1, end / length) * division);
+        const s = parseInt(Math.min(1, start / length) * division, 10);
+        const e = parseInt(Math.min(1, end / length) * division, 10);
 
         for (let i = 0; i <= e - s; i++)
           influence[s + i]++;
@@ -420,8 +420,8 @@
       if (this._viewer === null) return;
       if (!this._playing) return;
 
-      var prev = this._renderDate;
-      var current = this._renderDate = Date.now();
+      const prev = this._renderDate;
+      const current = this._renderDate = Date.now();
 
       if (this._realtime)
         this._length = this._position = this._position + current - prev;
@@ -446,23 +446,23 @@
     }
 
     _calcSize(chat) {
-      var dummy = this._viewer.getDummyChat(chat);
+      const dummy = this._viewer.getDummyChat(chat);
 
       dummy.chat = {
-        text:       chat.text,
-        color:      chat.color,
-        size:       chat.rawSize,
+        text: chat.text,
+        color: chat.color,
+        size: chat.rawSize,
         visibility: false
       };
 
-      var size = {
+      const size = {
         width: dummy.width,
         height: dummy.height,
         size: chat.rawSize
       };
 
       if (chat.position === "ue" || chat.position === "shita") {
-        let r = this._viewer.width / size.width;
+        const r = this._viewer.width / size.width;
         if (r < 1) {
           size.size = dummy.size = (dummy.computedFontSize * r) + "px";
           size.width = dummy.width;
@@ -480,11 +480,10 @@
         position = this._position;
 
       if (chat.position === "ue" || chat.position === "shita") {
-        return parseInt((this._viewer.width - chat.width) / 2);
-      } else {
-        let rate = (position - chat.vpos) / this._duration;
-        return parseInt(this._viewer.width - rate * (this._viewer.width + chat.width));
+        return parseInt((this._viewer.width - chat.width) / 2, 10);
       }
+      const rate = (position - chat.vpos) / this._duration;
+      return parseInt(this._viewer.width - rate * (this._viewer.width + chat.width), 10);
     }
 
     _calcY(chat) {
@@ -494,14 +493,14 @@
             height = this._viewer.height,
             base = this.isSimpleMode ? Math.max(this._comment.indexOf(chat) - this._limit, 0) : 0;
 
-      var y = 0,
+      let y = 0,
           bullet = false;
 
-      var loop = (() => {
-        var flag = false;
+      const loop = (() => {
+        let flag = false;
 
         this._comment.slice(base).some(current => {
-          const currentY = (isShita ? height - current.y - current.height  : current.y);
+          const currentY = (isShita ? height - current.y - current.height : current.y);
 
           if (current === chat) return true;
           if (current.position !== chat.position) return false;
@@ -521,30 +520,31 @@
 
             flag = true;
             return true;
-          } else {
-            const vstart = Math.max(chat.vpos, current.vpos),
-                  vend = Math.min(chat.vpos + duration, current.vpos + duration),
-                  chatStartX = this._calcX(chat, vstart),
-                  chatEndX = this._calcX(chat, vend),
-                  currentStartX = this._calcX(current, vstart),
-                  currentEndX = this._calcX(current, vend);
+          }
 
-            if ((chatStartX >= currentStartX + current.width || currentStartX >= chatStartX + chat.width) &&
-                (chatEndX >= currentEndX + current.width || currentEndX >= chatEndX + chat.width))
-                return false;
+          const vstart = Math.max(chat.vpos, current.vpos),
+                vend = Math.min(chat.vpos + duration, current.vpos + duration),
+                chatStartX = this._calcX(chat, vstart),
+                chatEndX = this._calcX(chat, vend),
+                currentStartX = this._calcX(current, vstart),
+                currentEndX = this._calcX(current, vend);
 
-            y += current.height;
+          if ((chatStartX >= currentStartX + current.width || currentStartX >= chatStartX + chat.width) &&
+              (chatEndX >= currentEndX + current.width || currentEndX >= chatEndX + chat.width))
+            return false;
 
-            if (y > height - chat.height) {
-              y = Math.floor(Math.random() * (height - chat.height));
-              bullet = true;
+          y += current.height;
 
-              return true;
-            }
+          if (y > height - chat.height) {
+            y = Math.floor(Math.random() * (height - chat.height));
+            bullet = true;
 
-            flag = true;
             return true;
           }
+
+          flag = true;
+          return true;
+
         }, this);
 
         if (flag) loop();
@@ -568,7 +568,7 @@
     _calcBaseFontSize() {
       if (!this._viewer) return;
 
-      var fontSize = "";
+      let fontSize = "";
       if (this._sizingMode === 1 && this._rows > 0) {
         fontSize = this._viewer.calcChatFontSizeFromHeight(
           this._viewer.height / this._rows) + "px";
@@ -583,9 +583,9 @@
       if (array.length === 0) return 0;
       if (array[array.length - 1].vpos <= chat.vpos) return array.length;
 
-      var search = (start, end) => {
-        var current = Math.floor((start + end) / 2);
-        var currentChat = array[current];
+      function search(start, end) {
+        let current = Math.floor((start + end) / 2);
+        const currentChat = array[current];
 
         if (currentChat.vpos < chat.vpos) {
           start = current + 1;
@@ -596,7 +596,7 @@
         }
 
         return start > end ? start : search(start, end);
-      };
+      }
 
       return search(0, array.length - 1);
     }

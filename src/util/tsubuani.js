@@ -1,17 +1,18 @@
+/* eslint { strict: [2, "global"] } */
 "use strict";
 
 const root = "http://www.tsubuani.com";
 
-var co = require("co"),
-    cheerio = require("cheerio-httpcli");
+const co = require("co"),
+      cheerio = require("cheerio-httpcli");
 
 // fetchFullComment
-var fetching = false,
+let fetching = false,
     canceled = false;
 
 function decode(str) {
   str = str.replace(/%(?:25)+([0-9A-F][0-9A-F])/g, (w, m) => "%" + m);
-  var utf8uri = new RegExp(
+  const utf8uri = new RegExp(
      "%[0-7][0-9A-F]|" +
      "%C[2-9A-F]%[89AB][0-9A-F]|%D[0-9A-F]%[89AB][0-9A-F]|" +
      "%E[0-F](?:%[89AB][0-9A-F]){2}|" +
@@ -22,11 +23,11 @@ function decode(str) {
 }
 
 function parseDate(d) {
-  var date = null;
-  var m = d.match(/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/);
+  let date = null;
+  const m = d.match(/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/);
   if (m) {
-    date = new Date(m[1], parseInt(m[2]) - 1, m[3], 0, m[5], m[6]);
-    date.setHours(parseInt(m[4]));
+    date = new Date(m[1], parseInt(m[2], 10) - 1, m[3], 0, m[5], m[6]);
+    date.setHours(parseInt(m[4], 10));
   }
   return date;
 }
@@ -34,48 +35,50 @@ function parseDate(d) {
 function getEpisodeInfo(id, episode) {
   return cheerio.fetch(`${root}/anime/${id}/${episode}`).then(result => {
     if (result.error) throw result.error;
+
     if (result.response.statusCode !== 200)
-      throw "status_code_wrong";
+      throw "status_code_wrong"; // eslint-disable-line no-throw-literal
 
-    var $ = result.$;
+    const $ = result.$;
 
-    var subtitle = $("#main > div.anime_info_area.box > h1 > span")
+    const subtitle = $("#main > div.anime_info_area.box > h1 > span")
       .text().replace(/[0-9]+話/, "").trim();
     if (!subtitle)
-      throw "episode_not_found";
+      throw "episode_not_found"; // eslint-disable-line no-throw-literal
 
-    var chart;
+    let chart;
     try {
       chart = JSON.parse(result.body.match(/var CHART_VAL=(.*?);/)[1]);
-    } catch(e) {
-      throw "not_broadcasted";
+    } catch (e) {
+      throw "not_broadcasted"; // eslint-disable-line no-throw-literal
     }
 
     if (chart.some(c => c === 0))
-      throw "not_available";
+      throw "not_available"; // eslint-disable-line no-throw-literal
 
-    var pid = $("#pid").val();
+    const pid = $("#pid").val();
     if (!pid)
-      throw "pid_not_found";
+      throw "pid_not_found"; // eslint-disable-line no-throw-literal
 
     return {
-      subtitle: subtitle,
-      pid: pid,
-      chart: chart
+      subtitle,
+      pid,
+      chart
     };
   });
 }
 
 function getTweets(pid, minute, size) {
-  var url = `${root}/tvs/get_by_minute/${pid}/${minute}/${size}`;
+  const url = `${root}/tvs/get_by_minute/${pid}/${minute}/${size}`;
   return cheerio.fetch(url).then(result => {
     if (result.error)
       throw result.error;
     else if (result.response.statusCode !== 200)
-      throw "status_code_wrong";
-    var $ = result.$;
-    return $("li").map(() => {
-      var sn = $(this).find("p.twi_icon > a").attr("title");
+      throw "status_code_wrong"; // eslint-disable-line no-throw-literal
+    const $ = result.$;
+    return $("li").map(function() {
+      /* eslint-disable no-invalid-this */
+      const sn = $(this).find("p.twi_icon > a").attr("title");
       return {
         text: $(this).find(".twi_comment").text()
           .replace(/http:\/\/.+?(\s|$)|#.+?(\s|$)|\n/ig, "").trim(),
@@ -85,25 +88,27 @@ function getTweets(pid, minute, size) {
         class: $(this).attr("class"),
         user_id: sn
       };
+      /* eslint-enable no-invalid-this */
     }).toArray();
   });
 }
 
 function getMinuteTweets(pid, minute, callback) {
-  const minute_tweet_count = 30;
+  const minuteTweetCount = 30;
 
-  var isFn = typeof callback === "function";
-  var comment = [];
-  var size = 0;
+  const isFn = typeof callback === "function";
+  let comment = [];
+  let size = 0;
 
   return co(function *() {
+    let tweets;
     do {
-      if (canceled) throw "canceled";
-      var tweets = yield getTweets(pid, minute, size);
+      if (canceled) throw "canceled"; // eslint-disable-line no-throw-literal
+      tweets = yield getTweets(pid, minute, size);
       comment = comment.concat(tweets);
       size += tweets.length;
-      if (isFn) callback(minute, size);
-    } while(tweets.length >= minute_tweet_count);
+      if (isFn) callback(minute, size); // eslint-disable-line callback-return
+    } while (tweets.length >= minuteTweetCount);
     return comment;
   });
 }
@@ -114,8 +119,10 @@ module.exports = {
     return cheerio.fetch(
       `${root}/anime/all?keyword=${encodeURIComponent(title)}`
     ).then(result => {
-      if (result.error) throw result.error;
-      var $ = result.$;
+      if (result.error) {
+        throw result.error;
+      }
+      const $ = result.$;
       return $(".anime-box").map(() => ({
         id: $(this).data("id"),
         name: $(this).find("span.title").text()
@@ -124,17 +131,17 @@ module.exports = {
   },
 
   fetchComment(id, episode) {
-    var url = `${root}/rec_datas/comments?tvId=${id}&count=${episode}&idx=`;
+    const url = `${root}/rec_datas/comments?tvId=${id}&count=${episode}&idx=`;
     return getEpisodeInfo(id, episode).then(info => Promise.all([
       info,
       cheerio.fetch(url + "1"),
       cheerio.fetch(url + "2"),
       cheerio.fetch(url + "3")
     ])).then(results => {
-      var info = results[0];
+      const info = results[0];
       delete results[0];
 
-      var error;
+      let error;
       if (results.some(r => {
         if (r.error) {
           error = r.error;
@@ -143,21 +150,22 @@ module.exports = {
         return false;
       }))
         throw error;
-      if (results.some(r => r.response.statusCode !== 200))
-        throw "status_code_wrong";
 
-      var firstTime = 0;
-      var comment = results.map(r => JSON.parse(r.body))
+      if (results.some(r => r.response.statusCode !== 200))
+        throw "status_code_wrong"; // eslint-disable-line no-throw-literal
+
+      let firstTime = 0;
+      const comment = results.map(r => JSON.parse(r.body))
         .reduce((a, b) => a.concat(b), [])
         .map(e => e.l)
         .reduce((a, b) => a.concat(b), [])
         .map((e, i) => {
-          var text = decode(e.t).replace(/http:\/\/.+?(\s|$)|#.+?(\s|$)|\n/ig, "").trim();
-          var date = parseDate(e.d);
+          const text = decode(e.t).replace(/http:\/\/.+?(\s|$)|#.+?(\s|$)|\n/ig, "").trim();
+          const date = parseDate(e.d);
           if (i === 0) firstTime = date.getTime();
           return {
-            text: text,
-            date: date,
+            text,
+            date,
             user_id: e.id === null ? "" : e.id,
             screenname: e.s === null ? "" : e.s,
             user_name: e.n === null ? "" : decode(e.n),
@@ -169,7 +177,7 @@ module.exports = {
         .filter(e => e.text.length > 0);
       return {
         subtitle: info.subtitle,
-        comment: comment
+        comment
       };
     });
   },
@@ -181,7 +189,7 @@ module.exports = {
     if (typeof callback !== "function")
       callback = null;
 
-    var comment = [],
+    let comment = [],
         firstTime = 0,
         current = 0,
         beforeCount = 0,
@@ -191,9 +199,9 @@ module.exports = {
     canceled = false;
 
     return getEpisodeInfo(id, episode).then(info => co(function *() {
-      var length = info.chart.length;
-      var sum = info.chart.reduce((a, b) => a + b, 0);
-      var cb = (minute, count) => {
+      const length = info.chart.length;
+      const sum = info.chart.reduce((a, b) => a + b, 0);
+      const cb = (minute, count) => { // eslint-disable-line func-style
         if (!callback) return;
         if (beforeMinute !== minute)
           beforeCount = 0;
@@ -209,12 +217,15 @@ module.exports = {
       fetching = false;
       return {
         subtitle: info.subtitle,
-        comment: comment.map((c, i, a) => {
+        comment: comment.map(c => {
           c.vpos = Math.round((c.date.getTime() - firstTime) / 10);
           return c;
         })
       };
-    }));
+    })).catch(err => {
+      fetching = false;
+      throw err;
+    });
   },
 
   cancelFetchFullComment() {
@@ -222,13 +233,13 @@ module.exports = {
   },
 
   toXml(comment) {
-    var firstTime = new Date(comment[0].date).getTime();
+    const firstTime = new Date(comment[0].date).getTime();
     // new Date(tweets.map(e => e.date).sort((a, b) => a - b)[0])
-    var output = "";
+    let output = "";
     comment.forEach((c, i) => {
-      var vpos = c.vpos || Math.round((c.date.getTime() - firstTime) / 10);
-      var date = Math.round(c.date.getTime() / 1000);
-      var text = c.text
+      const vpos = c.vpos || Math.round((c.date.getTime() - firstTime) / 10);
+      const date = Math.round(c.date.getTime() / 1000);
+      const text = c.text
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;");
@@ -249,9 +260,9 @@ module.exports = {
     return cheerio.fetch(root + "/anime").then(result => {
       if (result.error) throw result.error;
       if (result.response.statusCode !== 200)
-        throw "status_code_wrong";
+        throw "status_code_wrong"; // eslint-disable-line no-throw-literal
 
-      var $ = result.$;
+      const $ = result.$;
 
       return $("#now_animes > .section > table tr").map(() => ({
         title: $(this).find("a").text().trim(),

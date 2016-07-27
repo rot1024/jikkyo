@@ -1,9 +1,9 @@
 module.exports = (() => {
   "use strict";
 
-  var EventEmitter = require("events").EventEmitter,
-      util = require("util"),
-      Twit = require("twit");
+  const EventEmitter = require("events").EventEmitter;
+  const util = require("util");
+  const Twit = require("twit");
 
   class TwitterComment {
 
@@ -76,21 +76,21 @@ module.exports = (() => {
 
     _registerStreamCallback(stream) {
       const table = {
-        '&amp;': '&',
-        '&lt;': '<',
-        '&gt;': '>'
+        "&amp;": "&",
+        "&lt;": "<",
+        "&gt;": ">"
       };
 
-      var streamStartAt, streaming = false;
+      let streamStartAt, streaming = false;
 
-      var setup = (() => {
+      const setup = (() => {
         if (streaming) return;
         streaming = true;
         streamStartAt = Date.now();
         this._event.emit("stream");
       }).bind(this);
 
-      var destroy = (err => {
+      const destroy = (err => {
         this.destroyStream();
         streaming = false;
         this._event.emit("error", err);
@@ -113,12 +113,12 @@ module.exports = (() => {
       });
 
       stream.on("tweet", (tweet => {
-        var getKey = (obj, args) => {
+        function getKey(obj, args) {
           return args.reduce((obj2, current) => {
-            if (obj2 === void 0) return;
+            if (obj2 === void 0) return void 0;
             return obj2[current];
           }, obj);
-        };
+        }
 
         if (!tweet || !tweet.text || this.options.excludeRetweet && tweet.retweeted) return;
 
@@ -126,62 +126,59 @@ module.exports = (() => {
           if (ng === null) return false;
           if (util.isRegExp(ng))
             return ng.test(tweet.user.screen_name);
-          else
-            return tweet.user.screen_name === ng;
+          return tweet.user.screen_name === ng;
         })) return;
 
         if (this.textNg.some(ng => {
           if (ng === null) return false;
           if (util.isRegExp(ng))
             return ng.test(tweet.text);
-          else
-            return tweet.text.indexOf(ng) >= 0;
+          return tweet.text.indexOf(ng) >= 0;
         })) return;
 
-        var sourceMatch = tweet.source.match(/<a.*?>(.*?)<\/a>/);
-        var source = sourceMatch && sourceMatch[1] ? sourceMatch[1] : tweet.source;
+        const sourceMatch = tweet.source.match(/<a.*?>(.*?)<\/a>/);
+        const source = sourceMatch && sourceMatch[1] ? sourceMatch[1] : tweet.source;
         if (this.sourceNg.some(ng => {
           if (ng === null) return false;
           if (util.isRegExp(ng))
             return ng.test(source);
-          else
-            return source.indexOf(ng) >= 0;
+          return source.indexOf(ng) >= 0;
         })) return;
 
-        var mentions_length = getKey(tweet, ["entities", "user_mentions", "length"]) || 0;
-        if (this.options.excludeMention && mentions_length > 0) return;
+        const mentionsLength = getKey(tweet, ["entities", "user_mentions", "length"]) || 0;
+        if (this.options.excludeMention && mentionsLength > 0) return;
 
-        var text = tweet.text;
+        let text = tweet.text;
 
-        var hashtags_length = getKey(tweet, ["entities", "hashtags", "length"]) || 0;
-        if (this.options.excludeHashtag && hashtags_length > 0) {
+        const hashtagsLength = getKey(tweet, ["entities", "hashtags", "length"]) || 0;
+        if (this.options.excludeHashtag && hashtagsLength > 0) {
           tweet.entities.hashtags.forEach(hashtag => {
             text = text.replace("#" + hashtag.text, "");
           });
         }
 
-        var media_length = getKey(tweet, ["entities", "media", "length"]) || 0;
-        if (this.options.excludeUrl && media_length > 0) {
+        const mediaLength = getKey(tweet, ["entities", "media", "length"]) || 0;
+        if (this.options.excludeUrl && mediaLength > 0) {
           tweet.entities.media.forEach(url => {
             text = text.replace(url.url, "");
           });
         }
 
-        var urls_length = getKey(tweet, ["entities", "urls", "length"]) || 0;
-        if (this.options.excludeUrl && urls_length > 0) {
+        const urlsLength = getKey(tweet, ["entities", "urls", "length"]) || 0;
+        if (this.options.excludeUrl && urlsLength > 0) {
           tweet.entities.urls.forEach(url => {
             text = text.replace(url.url, "");
           });
         }
 
-        text = text.replace(/\&(amp|lt|gt);/g, m => table[m]);
+        text = text.replace(/&(amp|lt|gt);/g, m => table[m]);
 
         text = text.trim();
 
-        var color = "";
+        let color = "";
 
-        var link_color = getKey(tweet, ["user", "profile_link_color"]);
-        if (this.options.applyThemeColor && link_color !== void 0 && link_color !== "0084B4") {
+        const linkColor = getKey(tweet, ["user", "profile_link_color"]);
+        if (this.options.applyThemeColor && linkColor !== void 0 && linkColor !== "0084B4") {
           color = "#" + tweet.user.profile_link_color;
         }
 

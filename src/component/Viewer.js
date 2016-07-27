@@ -1,22 +1,22 @@
 (() => {
   "use strict";
 
-  var doc = document.currentScript.ownerDocument;
+  const doc = document.currentScript.ownerDocument;
 
-  var defaults = {
+  const defaults = {
     color: "",
     size: "100%"
   };
 
   function escapeHTML(content) {
     const table = {
-      '&': '&amp;',
-      '"': '&quot;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '\n': '<br />',
-      ' ': '&#xA0;',
-      '　': '&#x3000;'
+      "&": "&amp;",
+      '"': "&quot;",
+      "<": "&lt;",
+      ">": "&gt;",
+      "\n": "<br />",
+      " ": "&#xA0;",
+      "　": "&#x3000;"
     };
     return content.replace(/[&"<>\n]/g, m => table[m]);
   }
@@ -27,13 +27,13 @@
       this._observer = this._observer.bind(this);
 
       this.chat = {
-        text:       "",
-        color:      defaults.color,
-        size:       defaults.size,
-        x:          0,
-        y:          0,
+        text: "",
+        color: defaults.color,
+        size: defaults.size,
+        x: 0,
+        y: 0,
         visibility: false,
-        bullet:     false
+        bullet: false
       };
 
       this.addEventListener("contextmenu", this._menuCb.bind(this));
@@ -194,7 +194,7 @@
 
     _observer(changes) {
       changes.forEach(change => {
-        switch(change.name) {
+        switch (change.name) {
           case "text":
             this.text = this._chat.text;
             break;
@@ -216,20 +216,21 @@
           case "bullet":
             this.bullet = this._chat.bullet;
             break;
+          // no default
         }
       }, this);
     }
 
     _update(name, value) {
-      var chat = this._chat;
-      var notifier = Object.getNotifier(chat);
+      const chat = this._chat;
+      const notifier = Object.getNotifier(chat);
       notifier.performChange(name in chat ? "update" : "add", () => {
         chat[name] = value;
       });
     }
 
     _menuCb(e) {
-      var event = new MouseEvent("custom_menu", {
+      const event = new MouseEvent("custom_menu", {
         screenX: e.screenX,
         screenY: e.screenY,
         clientX: e.clientX,
@@ -247,19 +248,19 @@
       this._comment = new Map();
 
       // Shadow DOMのRoot
-      var root = this.createShadowRoot();
+      const root = this.createShadowRoot();
 
       // インポート
-      var template = doc.getElementById("viewer");
-      var node = document.importNode(template.content, true);
+      const template = doc.getElementById("viewer");
+      const node = document.importNode(template.content, true);
       root.appendChild(node);
 
       // コンテナ
-      var container = root.querySelector(".container");
+      const container = root.querySelector(".container");
       this._container = container;
 
       // ダミーコメント(サイズ取得等)
-      var dummy = document.createElement("jikkyo-chat");
+      const dummy = document.createElement("jikkyo-chat");
       dummy.visibility = false;
       container.appendChild(dummy);
       this._dummy = dummy;
@@ -274,12 +275,12 @@
     }
 
     applyPreference(pref) {
-      var css = `font-family: ${pref.general.fontFamily}; `;
+      let css = `font-family: ${pref.general.fontFamily}; `;
       if (pref.general.fontWeight) css += `font-weight: bold; `;
       css += `opacity: ${pref.general.opacity}; `;
       css += pref.general.style;
 
-      var bulletCss = `opacity: ${pref.general.bulletOpacity}; `;
+      let bulletCss = `opacity: ${pref.general.bulletOpacity}; `;
       bulletCss += pref.general.bulletStyle;
 
       this.setChatStyle(css);
@@ -293,7 +294,7 @@
       if (this._comment.has(chat))
         return this._comment.get(chat);
 
-      var elem = document.createElement("jikkyo-chat");
+      const elem = document.createElement("jikkyo-chat");
       elem.chat = chat;
       this._container.appendChild(elem);
       this._comment.set(chat, elem);
@@ -310,7 +311,7 @@
     removeChat(chat) {
       if (!this._comment.has(chat)) return false;
 
-      var elem = this._comment.get(chat);
+      const elem = this._comment.get(chat);
       this._comment.delete(chat);
       this._container.removeChild(elem);
 
@@ -322,41 +323,41 @@
     }
 
     setBaseFontSize(fontSize) {
-      var style = this.shadowRoot.querySelector("style#base");
+      const style = this.shadowRoot.querySelector("style#base");
       style.sheet.cssRules[0].style.fontSize = fontSize;
     }
 
     setChatStyle(css) {
-      var style = this.shadowRoot.querySelector("style#chat");
+      const style = this.shadowRoot.querySelector("style#chat");
       style.sheet.cssRules[0].style.cssText = css;
     }
 
     setBulletChatStyle(css) {
-      var style = this.shadowRoot.querySelector("style#chat-bullet");
+      const style = this.shadowRoot.querySelector("style#chat-bullet");
       style.sheet.cssRules[0].style.cssText = css;
     }
 
     calcChatFontSizeFromHeight(height) {
-      var baseStyle = this.shadowRoot.querySelector("style#base").sheet.cssRules[1].style;
-      var chatStyle = this.shadowRoot.querySelector("style#chat").sheet.cssRules[0].style;
+      const baseStyle = this.shadowRoot.querySelector("style#base").sheet.cssRules[1].style;
+      const chatStyle = this.shadowRoot.querySelector("style#chat").sheet.cssRules[0].style;
 
-      var lineHeight = chatStyle.lineHeight || baseStyle.lineHeight;
+      const lineHeight = chatStyle.lineHeight || baseStyle.lineHeight;
 
-      var dummyStyle = window.getComputedStyle(this.getDummyChat()),
-          paddingTop = parseFloat(dummyStyle.paddingTop),
-          paddingBottom = parseFloat(dummyStyle.paddingBottom);
+      const dummyStyle = window.getComputedStyle(this.getDummyChat()),
+            paddingTop = parseFloat(dummyStyle.paddingTop),
+            paddingBottom = parseFloat(dummyStyle.paddingBottom);
 
-      var h = height - paddingTop - paddingBottom;
+      let h = height - paddingTop - paddingBottom;
 
       if (/[A-Za-z]+$/.test(lineHeight)) {
-        let lh = parseFloat(dummyStyle.lineHeight);
+        const lh = parseFloat(dummyStyle.lineHeight);
         if (h > lh) h = lh;
       } else {
-        let lh = parseFloat(lineHeight);
+        const lh = parseFloat(lineHeight);
         if (lineHeight.slice(-1) === "%") {
           h /= lh / 100;
-        } else {
-          if (lh !== 0) h /= lh;
+        } else if (lh !== 0) {
+          h /= lh;
         }
       }
 

@@ -1,3 +1,4 @@
+/* eslint { strict: [2, "global"] } */
 "use strict";
 
 const fs = require("fs");
@@ -28,7 +29,7 @@ class UpdateChecker {
           return;
         }
 
-        var json;
+        let json;
         try {
           json = JSON.parse(data);
         } catch (e) {
@@ -46,7 +47,7 @@ class UpdateChecker {
     if (this.latest !== null) return Promise.resolve(this.latest);
 
     return new Promise(((resolve, reject) => {
-      var options = {
+      const options = {
         hostname: this.options.api,
         path: `/repos/${this.options.user}/${this.options.repos}/releases/latest`,
         headers: { "user-agent": "UpdateChecker" }
@@ -58,7 +59,7 @@ class UpdateChecker {
           return;
         }
 
-        var data = "";
+        let data = "";
 
         res.setEncoding("utf8");
 
@@ -67,8 +68,9 @@ class UpdateChecker {
         });
 
         res.on("end", (() => {
+          let json;
           try {
-            var json = JSON.parse(data);
+            json = JSON.parse(data);
           } catch (e) {
             reject(e);
           }
@@ -96,7 +98,7 @@ class UpdateChecker {
     return this.getLatest().then(latest => {
       if (!latest.hasOwnProperty("tag_name")) return "";
 
-      var version = latest.tag_name;
+      let version = latest.tag_name;
 
       if (version[0] === "v") {
         version = version.slice(1);
@@ -128,8 +130,8 @@ class UpdateChecker {
       this.getCurrentVersion(),
       this.getLatestVersion()
     ]).then((versions => {
-      var current = versions[0];
-      var latest = versions[1];
+      const current = versions[0];
+      const latest = versions[1];
 
       if (current === latest) return null;
 

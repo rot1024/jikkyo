@@ -1,23 +1,24 @@
 module.exports = (() => {
   "use strict";
 
-  var fs = require("fs"),
-      path = require("path"),
-      EventEmitter = require("events").EventEmitter;
+  const fs = require("fs"),
+        path = require("path"),
+        EventEmitter = require("events").EventEmitter;
 
-  var escapeHTML = (content) => {
+  function escapeHTML(content) {
     const table = {
-      '&': '&amp;',
-      '"': '&quot;',
-      '<': '&lt;',
-      '>': '&gt;'
+      "&": "&amp;",
+      '"': "&quot;",
+      "<": "&lt;",
+      ">": "&gt;"
     };
     return content.replace(/[&"<>]/g, m => table[m]);
-  };
+  }
 
   class TwitterRecorder extends EventEmitter {
 
     constructor() {
+      super();
       this._stream = null;
       this._directory = "";
       this._filename = "YYYY-MM-DD_hh-mm-ss.xml";
@@ -50,8 +51,8 @@ module.exports = (() => {
       if (!this._directory || !this._filename)
         return false;
       this._startAt = new Date(Math.floor(Date.now() / 1000) * 1000);
-      var filename = this._formatDate(this._startAt, this._filename);
-      var stream = this._stream = fs.createWriteStream(path.join(this._directory, filename));
+      const filename = this._formatDate(this._startAt, this._filename);
+      const stream = this._stream = fs.createWriteStream(path.join(this._directory, filename));
       stream.on("error", (err => {
         console.error(err);
         stream.end();
@@ -61,7 +62,7 @@ module.exports = (() => {
       }).bind(this));
       this._open = true;
       this._counter = 0;
-      this._stream.write('<?xml version="1.0" encoding="UTF-8"?>\n<packet>\n');
+      this._stream.write('<?xml version=U1.0" encoding="UTF-8"?>\n<packet>\n');
       return true;
     }
 
@@ -94,13 +95,13 @@ module.exports = (() => {
     }
 
     _mkdirp(dirPath, mode, callback) {
-      var mkdirp = this._mkdirp;
-      fs.mkdir(dirPath, mode, function(error) {
+      const mkdirp = this._mkdirp;
+      fs.mkdir(dirPath, mode, error => {
         if (error && error.errno === 34) {
           mkdirp(path.dirname(dirPath), mode, callback);
           mkdirp(dirPath, mode, callback);
         }
-        if (callback) callback();
+        if (callback) callback(); // eslint-disable-line callback-return
       });
     }
 

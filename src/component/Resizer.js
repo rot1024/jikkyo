@@ -2,37 +2,38 @@
 (() => {
   "use strict";
 
-  var win = require("nw.gui").Window.get();
-  var doc = document.currentScript.ownerDocument;
+  const win = require("nw.gui").Window.get();
+  const doc = document.currentScript.ownerDocument;
 
-  var cursors = [
+  const cursors = [
     ["ew-resize", ["w", "e"]],
     ["ns-resize", ["n", "s"]],
     ["nwse-resize", ["nw", "se"]],
     ["nesw-resize", ["ne", "sw"]]
   ];
 
-  var getCursorName = function(id) {
-    var name = null;
+  function getCursorName(id) {
+    let name = null;
     cursors.some(c => {
       if (c[1].indexOf(id) >= 0) {
         name = c[0];
         return true;
       }
+      return false;
     });
     return name;
-  };
+  }
 
-  var resizer = class extends HTMLElement {
+  const resizer = class extends HTMLElement {
 
     createdCallback() {
-      var root = this.createShadowRoot();
-      var template = doc.querySelector("template");
+      const root = this.createShadowRoot();
+      const template = doc.querySelector("template");
       root.appendChild(document.importNode(template.content, true));
 
-      var indicator = root.getElementById("indicator");
+      const indicator = root.getElementById("indicator");
 
-      var maximized = false;
+      let maximized = false;
       win.on("maximize", (() => {
         this.classList.add("maximized");
         maximized = true;
@@ -76,8 +77,11 @@
             return;
           }
 
-          var winw = window.windowWrapper,
-              x = 0, y = 0, w = 0, h = 0;
+          const winw = window.windowWrapper;
+          let x = 0,
+              y = 0,
+              w = 0,
+              h = 0;
 
           if (hor === 0) {
             x = v.x - winw.x;

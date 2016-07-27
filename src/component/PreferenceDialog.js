@@ -3,10 +3,10 @@
 
   const gui = require("nw.gui");
   const EventEmitter = require("events").EventEmitter;
-  const package_json = require("./package.json");
+  const packageJson = require("./package.json");
   const UpdateChecker = require("./util/UpdateChecker");
 
-  var doc = document.currentScript.ownerDocument;
+  const doc = document.currentScript.ownerDocument;
 
   class PreferenceDialog extends window.jikkyo.Modal {
 
@@ -28,7 +28,7 @@
       this._prefs = this.content.querySelector("#prefs");
       this._event = new EventEmitter();
 
-      var prefc = this.content.querySelectorAll(".pref");
+      const prefc = this.content.querySelectorAll(".pref");
       Array.from(prefc).forEach(c => {
         this.addModePreference(c, c.dataset.title, null, null, true, c.hasAttribute("data-last"));
       }, this);
@@ -37,20 +37,20 @@
         this.hide();
       }).bind(this));
 
-      var modal = this.shadowRoot.querySelector("#about-modal");
+      const modal = this.shadowRoot.querySelector("#about-modal");
 
-      this.shadowRoot.querySelector("#about-version").textContent = package_json.version;
+      this.shadowRoot.querySelector("#about-version").textContent = packageJson.version;
       this.shadowRoot.querySelector("#about-homepage").addEventListener("click", () => {
-        gui.Shell.openExternal(package_json.homepage);
+        gui.Shell.openExternal(packageJson.homepage);
       });
       this.shadowRoot.querySelector("#about-repository").addEventListener("click", () => {
-        gui.Shell.openExternal(package_json.repository.url);
+        gui.Shell.openExternal(packageJson.repository.url);
       });
       this.shadowRoot.querySelector("#about-check").addEventListener("click", () => {
         modal.use("loading");
         modal.show();
 
-        let checker = new UpdateChecker({
+        const checker = new UpdateChecker({
           user: "rot1024",
           repos: "jikkyo"
         });
@@ -83,7 +83,7 @@
 
     set preference(v) {
       this._preference = v;
-      var init = this._initGeneralPreference();
+      const init = this._initGeneralPreference();
       if (!v.general) {
         v.general = init;
         v.save();
@@ -108,7 +108,7 @@
     }
 
     show() {
-      var at = this._tabs.querySelector(".active");
+      let at = this._tabs.querySelector(".active");
       if (at) at.classList.remove("active");
       at = this._prefs.querySelector(".pref.active");
       if (at) at.classList.remove("active");
@@ -129,7 +129,7 @@
     }
 
     hide() {
-      var pr = this.preference;
+      const pr = this.preference;
       if (pr) {
         this._modePrefs.forEach((p, i) => this._savePrefCb[i](p), this);
         this._saveGeneralPreference(this.content, this.preference.general);
@@ -142,11 +142,11 @@
 
     addModePreference(element, title, initCb, saveCb, builtin, last) {
       if (!element) return;
-      var tab = document.createElement("li");
+      const tab = document.createElement("li");
       if (last) tab.setAttribute("data-last", "");
       tab.textContent = title;
       tab.addEventListener("click", (() => {
-        var active = this._prefs.querySelector(".active");
+        const active = this._prefs.querySelector(".active");
         if (active) active.classList.remove("active");
         element.classList.add("active");
         this._tabs.querySelector(".active").classList.remove("active");
@@ -155,7 +155,7 @@
       element.classList.add("pref");
       this._prefs.appendChild(element);
 
-      var lastTab = this._tabs.querySelector("li[data-last]");
+      const lastTab = this._tabs.querySelector("li[data-last]");
       if (lastTab) this._tabs.insertBefore(tab, lastTab);
       else this._tabs.appendChild(tab);
 
@@ -168,7 +168,7 @@
 
     _initGeneralPreference() {
       return {
-        fontFamily: process.platform === "darwin" ? "sans-serif" : 'Meiryo, Segoe UI Symbol, sans-serif',
+        fontFamily: process.platform === "darwin" ? "sans-serif" : "Meiryo, Segoe UI Symbol, sans-serif",
         fontWeight: true,
         duration: 4000,
         usDuration: 3000,
@@ -205,17 +205,17 @@
     }
 
     _saveGeneralPreference(r, p) {
-      var tmp;
+      let tmp;
       p.fontFamily = r.querySelector("#comment-font-family").value;
       p.fontWeight = r.querySelector("#comment-font-weight").checked;
 
-      tmp = parseInt(r.querySelector("#comment-duration").value);
+      tmp = parseInt(r.querySelector("#comment-duration").value, 10);
       if (tmp >= 100 && tmp <= 10000) p.duration = tmp;
 
-      tmp = parseInt(r.querySelector("#comment-us-duration").value);
+      tmp = parseInt(r.querySelector("#comment-us-duration").value, 10);
       if (tmp >= 100 && tmp <= 10000) p.usDuration = tmp;
 
-      tmp = parseInt(r.querySelector("#comment-limit").value);
+      tmp = parseInt(r.querySelector("#comment-limit").value, 10);
       if (tmp >= 1) p.limit = tmp;
 
       tmp = parseFloat(r.querySelector("#comment-opacity").value);
@@ -224,10 +224,10 @@
       tmp = parseFloat(r.querySelector("#comment-bullet-opacity").value);
       if (tmp >= 0 && tmp <= 1) p.bulletOpacity = tmp;
 
-      p.sizing = parseInt(r.querySelector("#comment-sizing").value);
+      p.sizing = parseInt(r.querySelector("#comment-sizing").value, 10);
       p.fontSize = r.querySelector("#comment-font-size").value;
 
-      tmp = parseInt(r.querySelector("#comment-rows").value);
+      tmp = parseInt(r.querySelector("#comment-rows").value, 10);
       if (tmp > 0 && tmp < 40) p.rows = tmp;
 
       p.windowBgColor = r.querySelector("#comment-window-bgcolor").value;

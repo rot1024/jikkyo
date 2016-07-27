@@ -1,10 +1,10 @@
 (() => {
   "use strict";
 
-  var win = require("nw.gui").Window.get(),
-      doc = document.currentScript.ownerDocument;
+  const win = require("nw.gui").Window.get(),
+        doc = document.currentScript.ownerDocument;
 
-  var viewer = class extends HTMLElement {
+  const viewer = class extends HTMLElement {
 
     get width() {
       return this._canvas.getAttribute("width") || 0;
@@ -30,8 +30,8 @@
     createdCallback() {
       this._resizeCallback = this.resize.bind(this);
 
-      var root = this.createShadowRoot();
-      var template = doc.querySelector("template");
+      const root = this.createShadowRoot();
+      const template = doc.querySelector("template");
       root.appendChild(document.importNode(template.content, true));
 
       this.canvas = root.querySelector("canvas");

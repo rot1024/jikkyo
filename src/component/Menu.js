@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  var doc = document.currentScript.ownerDocument;
+  const doc = document.currentScript.ownerDocument;
 
   class MenuItem {
 
@@ -58,8 +58,8 @@
   class Menu extends HTMLElement {
 
     createdCallback() {
-      var root = this.createShadowRoot();
-      var template = doc.querySelector("template");
+      const root = this.createShadowRoot();
+      const template = doc.querySelector("template");
       root.appendChild(document.importNode(template.content, true));
 
       this._menu = root.querySelector("ul");
@@ -83,7 +83,7 @@
     }
 
     inside(x, y) {
-      var rect = this._menu.getBoundingClientRect();
+      const rect = this._menu.getBoundingClientRect();
       return rect.left <= x && x <= rect.right &&
         rect.top <= y && y <= rect.bottom;
     }
@@ -93,7 +93,7 @@
         index = this._items.indexOf(index);
       }
 
-      var menuItem = item instanceof MenuItem ? item : new MenuItem(item);
+      const menuItem = item instanceof MenuItem ? item : new MenuItem(item);
 
       menuItem.on("click", (e => {
         if (!menuItem.disabled) {
@@ -123,11 +123,13 @@
     show(x, y) {
       document.body.appendChild(this);
 
-      var left = x, top = y;
-      var rect = this._menu.getBoundingClientRect();
+      let left = x;
+      let top = y;
+      const rect = this._menu.getBoundingClientRect();
 
-      if (window.innerWidth < x + rect.width)
+      if (window.innerWidth < x + rect.width) {
         left -= rect.width;
+      }
       top -= rect.height;
 
       this.style.left = left + "px";

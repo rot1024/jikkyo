@@ -1,7 +1,8 @@
+/* eslint { strict: [2, "global"], "key-spacing": 0 } */
 "use strict";
 
-var fs = require("fs"),
-    xml = require("xml2js").parseString;
+const fs = require("fs");
+const xml = require("xml2js").parseString;
 
 const colorRegExp = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
 const size = ["big", "small"];
@@ -37,24 +38,28 @@ const color = {
 };
 
 function read(data) {
-  var deferred = Promise.defer();
+  const deferred = Promise.defer();
 
   xml(data, (err, result) => {
-    if (err) return deferred.reject(err);
+    if (err) {
+      deferred.reject(err);
+      return;
+    }
 
     if (result === null ||
         typeof result.packet !== "object" ||
         !("chat" in result.packet)) {
-      return deferred.reject(new Error("parse error"));
+      deferred.reject(new Error("parse error"));
+      return;
     }
 
-    var comment  = result.packet.chat
+    const comment = result.packet.chat
       .filter(chat => !!chat._)
       .map(chat => {
 
-        var newChat = {
+        const newChat = {
           text: chat._,
-          vpos: parseInt(chat.$.vpos)
+          vpos: parseInt(chat.$.vpos, 10)
         };
 
         if ("mail" in chat.$) {
@@ -72,7 +77,7 @@ function read(data) {
         }
 
         return newChat;
-    });
+      });
 
     deferred.resolve(comment);
   });
@@ -83,15 +88,18 @@ function read(data) {
 module.exports = {
 
   readFromFile(path) {
-    var deferred = Promise.defer();
+    const deferred = Promise.defer();
     fs.readFile(path, "utf8", (err, data) => {
-      if (err) return deferred.reject(err);
+      if (err) {
+        deferred.reject(err);
+        return;
+      }
       read(data).then(r => deferred.resolve(r))
         .catch(e => deferred.reject(e));
     });
     return deferred.promise;
   },
 
-  read: read
+  read
 
 };

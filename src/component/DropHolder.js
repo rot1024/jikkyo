@@ -1,16 +1,16 @@
 (() => {
   "use strict";
 
-  var EventEmitter = require("events").EventEmitter;
-  var doc = document.currentScript.ownerDocument;
+  const EventEmitter = require("events").EventEmitter;
+  const doc = document.currentScript.ownerDocument;
 
   class DropHolder extends HTMLElement {
 
     createdCallback() {
       this._enabled = false;
-      var event = this._event = new EventEmitter();
-      var template = document.importNode(doc.querySelector("template").content, true);
-      var container = template.querySelector("#container");
+      const event = this._event = new EventEmitter();
+      const template = document.importNode(doc.querySelector("template").content, true);
+      const container = template.querySelector("#container");
 
       window.addEventListener("dragover", (() => {
         if (this._enabled)
@@ -56,4 +56,4 @@
     prototype: DropHolder.prototype
   });
 
-  })();
+})();

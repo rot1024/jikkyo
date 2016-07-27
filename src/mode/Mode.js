@@ -104,7 +104,7 @@
     _initPref() {
       if (!this._pref || !this.preferenceName) return;
 
-      var init = this.initPreference();
+      const init = this.initPreference();
 
       if (!this._pref[this.preferenceName]) {
         this._pref[this.preferenceName] = init;

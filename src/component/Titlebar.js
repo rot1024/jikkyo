@@ -1,10 +1,10 @@
 (() => {
   "use strict";
 
-  var win = require("nw.gui").Window.get();
-  var doc = document.currentScript.ownerDocument;
+  const win = require("nw.gui").Window.get();
+  const doc = document.currentScript.ownerDocument;
 
-  var titlebar = class extends HTMLElement {
+  const titlebar = class extends HTMLElement {
 
     show() {
       this.shadowRoot.getElementById("container").classList.remove("hidden");
@@ -24,11 +24,11 @@
     }
 
     createdCallback() {
-      var root = this.createShadowRoot();
-      var template = doc.querySelector("template");
+      const root = this.createShadowRoot();
+      const template = doc.querySelector("template");
       root.appendChild(document.importNode(template.content, true));
 
-      var container = root.getElementById("container");
+      const container = root.getElementById("container");
       container.classList.add(process.platform);
 
       win.on("maximize", () => container.classList.add("maximized"));
@@ -54,9 +54,9 @@
       });
 
       {
-        let x = 0, y = 0, dragging = false, mm;
+        let x = 0, y = 0, dragging = false;
 
-        let mu = e => {
+        const mu = e => { // eslint-disable-line func-style
           dragging = false;
           window.removeEventListener("mousemove", mm, true);
           window.removeEventListener("mouseup", mu, true);
@@ -66,7 +66,7 @@
           }
         };
 
-        mm = e => {
+        const mm = e => { // eslint-disable-line func-style
           if (!dragging) mu();
 
           if (window.windowWrapper.maximized) {
@@ -75,8 +75,8 @@
               e.screenX - window.windowWrapper.width / 2,
               e.screenY - 10);
           } else {
-            let diffX = e.screenX - x,
-                diffY = e.screenY - y;
+            const diffX = e.screenX - x,
+                  diffY = e.screenY - y;
             window.windowWrapper.moveBy(diffX, diffY);
           }
 
@@ -93,7 +93,7 @@
           window.addEventListener("mouseup", mu, true);
         });
 
-        root.addEventListener("dblclick", e => {
+        root.addEventListener("dblclick", () => {
           window.windowWrapper.toggleMaximized();
         }, true);
 

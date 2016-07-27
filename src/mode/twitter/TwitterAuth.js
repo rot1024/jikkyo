@@ -1,6 +1,7 @@
+/* eslint { strict: [2, "global"], "key-spacing": 0 } */
 "use strict";
 
-var oauth = require("oauth");
+const oauth = require("oauth");
 
 class TwitterAuth {
   constructor(options) {
@@ -13,9 +14,9 @@ class TwitterAuth {
   }
 
   getAuthorizeURL() {
-    var deferred = Promise.defer();
+    const deferred = Promise.defer();
 
-    var client = new oauth.OAuth(
+    const client = new oauth.OAuth(
       this.requestURL,
       this.accessURL,
       this.consumerKey,
@@ -38,9 +39,9 @@ class TwitterAuth {
   }
 
   getAccessToken(oauthVerifier) {
-    var deferred = Promise.defer();
+    const deferred = Promise.defer();
 
-    var client = new oauth.OAuth(
+    const client = new oauth.OAuth(
       this.requestURL,
       this.accessURL,
       this.consumerKey,

@@ -20,11 +20,10 @@ module.exports = (() => {
     }
 
     set totalMillisecond(v) {
-      var ts, tm;
       this._total = v;
-      ts = Math.floor(this._total / 1000);
+      const ts = Math.floor(this._total / 1000);
       this._s = ts % 60;
-      tm = Math.floor(ts / 60);
+      const tm = Math.floor(ts / 60);
       this._m = tm % 60;
       this._h = Math.floor(tm / 60);
     }

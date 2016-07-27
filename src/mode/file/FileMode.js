@@ -2,14 +2,15 @@
 (() => {
   "use strict";
 
-  var fs = require("fs"),
-      path = require("path"),
-      tsubuani = require("./util/tsubuani"),
-      filenameSanitizer = require("./util/FilenameSanitizer"),
-      nicoComment = require("./mode/file/NicoComment"),
-      Time = require("./util/Time");
+  const fs = require("fs");
+  const path = require("path");
 
-  var doc = document.currentScript.ownerDocument;
+  const tsubuani = require("./util/tsubuani"),
+        filenameSanitizer = require("./util/FilenameSanitizer"),
+        nicoComment = require("./mode/file/NicoComment"),
+        Time = require("./util/Time");
+
+  const doc = document.currentScript.ownerDocument;
 
   class FileMode extends window.jikkyo.Mode {
 
@@ -21,20 +22,20 @@
       this.preferenceName = "file";
       this.droppable = true;
 
-      var root = this.createShadowRoot();
-      var template = doc.getElementById("main");
+      const root = this.createShadowRoot();
+      const template = doc.getElementById("main");
       root.appendChild(document.importNode(template.content, true));
 
       this._time = new Time();
       this._isOpen = false;
       this._HeatmapList = [
-        {color: [  0,   0,   0, 255], ratio: 0.00},
-        {color: [  0, 255,   0, 255], ratio: 0.50},
-        {color: [255,   0,   0, 255], ratio: 1.00}
+        { color: [0, 0, 0, 255], ratio: 0.00 },
+        { color: [0, 255, 0, 255], ratio: 0.50 },
+        { color: [255, 0, 0, 255], ratio: 1.00 }
       ];
 
-      var fileInput = root.getElementById("file"),
-          fileOpenBtn = root.getElementById("file-open");
+      const fileInput = root.getElementById("file"),
+            fileOpenBtn = root.getElementById("file-open");
 
       this._playBtn = root.getElementById("file-play");
       this._range = root.querySelector("input[type=range]");
@@ -56,7 +57,7 @@
         }
       }).bind(this));
 
-      var playingBuf = false;
+      let playingBuf = false;
 
       this._range.addEventListener("mousedown", (() => {
         if (this._adapter.playing) {
@@ -73,21 +74,21 @@
       }).bind(this));
 
       this._range.addEventListener("input", (() => {
-        this._adapter.position = parseInt(this._range.value);
+        this._adapter.position = parseInt(this._range.value, 10);
         if (!this._adapter.playing) this._adapter.render();
         this._time.totalMillisecond = this._range.value;
         this._pos.textContent = this._time.toString();
       }).bind(this));
 
       this._rangeBg.addEventListener("click", (e => {
-        var rect = this._rangeBg.getBoundingClientRect();
-        var pos = (e.clientX - rect.left) / rect.width;
-        this._adapter.position = parseInt(pos * this._adapter.length);
+        const rect = this._rangeBg.getBoundingClientRect();
+        const pos = (e.clientX - rect.left) / rect.width;
+        this._adapter.position = parseInt(pos * this._adapter.length, 10);
         this.refresh();
         if (!this._adapter.playing) this._adapter.render();
       }).bind(this));
 
-      var play = (() => {
+      const play = (() => {
         if (!this._adapter.playing) {
           if (this._adapter.length === 0) return;
           this._adapter.realtime = false;
@@ -106,7 +107,7 @@
       this._playBtn.addEventListener("click", play);
 
       {
-        let that = this;
+        const that = this;
         fileInput.addEventListener("change", () => {
           if (!this || !this.value) return;
           that._openFromFile(this.value);
@@ -114,7 +115,9 @@
         });
       }
 
-      var open = () => fileInput.click();
+      function open() {
+        return fileInput.click();
+      }
 
       this._seekForward = this._seekForward.bind(this);
       this._seekBackward = this._seekBackward.bind(this);
@@ -127,20 +130,21 @@
 
       // tsubuani
 
-      var modal = document.querySelector("jikkyo-modal");
-      var tsubuaniElement = document.createElement("div");
-      var tsubuaniRoot = tsubuaniElement.createShadowRoot();
+      const modal = document.querySelector("jikkyo-modal");
+      const tsubuaniElement = document.createElement("div");
+      const tsubuaniRoot = tsubuaniElement.createShadowRoot();
       tsubuaniRoot.appendChild(
         document.importNode(doc.getElementById("tsubuani").content, true));
 
+      // eslint-disable-next-line no-return-assign
       this._tsubuaniDialogSaveCheckedChanged = c => this.preference.file.tsubuaniSave = c;
 
       this._initTsubuaniDialog(tsubuaniRoot, modal);
 
       // Menu
 
-      var menu = document.createElement("jikkyo-menu");
-      var menuBtn = this._menuBtn;
+      const menu = document.createElement("jikkyo-menu");
+      const menuBtn = this._menuBtn;
 
       menu.add({
         label: "つぶあにから実況を取得",
@@ -156,7 +160,7 @@
       });
 
       menuBtn.addEventListener("click", () => {
-        var rect = menuBtn.getBoundingClientRect();
+        const rect = menuBtn.getBoundingClientRect();
         menu.show(rect.right, rect.top);
       });
 
@@ -201,15 +205,15 @@
     }
 
     getPreferenceView() {
-      var element = document.createElement("div");
-      var root = element.createShadowRoot();
-      var template = doc.getElementById("preference");
+      const element = document.createElement("div");
+      const root = element.createShadowRoot();
+      const template = doc.getElementById("preference");
       root.appendChild(document.importNode(template.content, true));
 
-      var tpath = root.querySelector("#file-tsubuani-path");
-      var filename = root.querySelector("#file-tsubuani-filename");
-      var filenameFull = root.querySelector("#file-tsubuani-filename-full");
-      var file = root.querySelector("#file-file");
+      const tpath = root.querySelector("#file-tsubuani-path");
+      const filename = root.querySelector("#file-tsubuani-filename");
+      const filenameFull = root.querySelector("#file-tsubuani-filename-full");
+      const file = root.querySelector("#file-file");
 
       file.addEventListener("change", () => {
         if (!this.value) return;
@@ -235,14 +239,13 @@
     initPreferenceView(e) {
       super.initPreferenceView();
 
-      var p = this.preference,
-          r = e.shadowRoot,
-          t = p.file;
+      const p = this.preference,
+            r = e.shadowRoot,
+            t = p.file;
 
-      var tpath = r.querySelector("#file-tsubuani-path");
-      var filename = r.querySelector("#file-tsubuani-filename");
-      var filenameFull = r.querySelector("#file-tsubuani-filename-full");
-      var file = r.querySelector("#file-file");
+      const tpath = r.querySelector("#file-tsubuani-path");
+      const filename = r.querySelector("#file-tsubuani-filename");
+      const filenameFull = r.querySelector("#file-tsubuani-filename-full");
 
       r.querySelector("#file-heatmap").checked = t.heatmap;
       r.querySelector("#file-auto-coloring").checked = t.autoColoring;
@@ -256,9 +259,9 @@
     savePreferenceView(e) {
       super.savePreferenceView();
 
-      var p = this.preference,
-          r = e.shadowRoot,
-          t = p.file;
+      const p = this.preference,
+            r = e.shadowRoot,
+            t = p.file;
 
       t.heatmap = r.querySelector("#file-heatmap").checked;
       t.autoColoring = r.querySelector("#file-auto-coloring").checked;
@@ -288,7 +291,7 @@
 
     _open(data, margin) {
       function hashCode(str) {
-        var hash = 0, i, len;
+        let hash = 0, i, len;
         if (str.length === 0) return hash;
         for (i = 0, len = str.length; i < len; i++) {
           hash = ((hash << 5) - hash) + str.charCodeAt(i);
@@ -306,21 +309,21 @@
         this._adapter.stop();
       }
 
-      var size = {
+      const size = {
         big: this.preference.file.bigSize,
         small: this.preference.file.smallSize
       };
-      var autoColoring = this.preference.file.autoColoring;
+      const autoColoring = this.preference.file.autoColoring;
 
-      margin = margin >= 0 ? margin : data.reduce((m, chat, i) => {
-        for (; chat.vpos % m !== 0; ) m /= 10;
+      margin = margin >= 0 ? margin : data.reduce((m, chat) => {
+        for (; chat.vpos % m !== 0;) m /= 10;
         return m;
       }, 100);
 
-      var ac = autoColoring && !data.some(c => c.color);
+      const ac = autoColoring && !data.some(c => c.color);
 
-      var comment = data.map(datum => {
-        var chat = {
+      const comment = data.map(datum => {
+        const chat = {
           text: datum.text,
           vpos: 10 * (datum.vpos +
             (margin === 0 ? 0 : Math.floor(Math.random() * margin)))
@@ -336,19 +339,19 @@
           chat.color = datum.color;
 
         if (ac && !chat.color) {
-          let id = datum.user_id;
+          const id = datum.user_id;
           let hash;
 
           if (!id)
             hash = Math.random() * 0xFFFFFF;
           else if (/^[0-9]+$/.test(id))
-            hash = parseInt(id);
+            hash = parseInt(id, 10);
           else
             hash = hashCode(id);
 
-          let r = (hash & 0xFF0000) >> 16;
-          let g = (hash & 0x00FF00) >> 8;
-          let b = hash & 0x0000FF;
+          const r = (hash & 0xFF0000) >> 16;
+          const g = (hash & 0x00FF00) >> 8;
+          const b = hash & 0x0000FF;
 
           chat.color = "#" + toHex(r) + toHex(g) + toHex(b);
         }
@@ -403,14 +406,14 @@
     }
 
     _getHeatmapColor(minimum, maximum, value) {
-      var ratio = Math.min((value - minimum) / (maximum - minimum), 1);
+      const ratio = Math.min((value - minimum) / (maximum - minimum), 1);
 
-      var color;
+      let color;
       this._HeatmapList.reduce((prev, item) => {
         if (prev === null) return null;
         if (ratio > item.ratio) return item;
 
-        var colorRatio = (ratio - prev.ratio) / (item.ratio - prev.ratio);
+        const colorRatio = (ratio - prev.ratio) / (item.ratio - prev.ratio);
 
         color = [
           Math.floor(item.color[0] * colorRatio + prev.color[0] * (1 - colorRatio)),
@@ -432,19 +435,19 @@
             ctx = r.getContext("2d"),
             range = 8;
 
-      var img = ctx.getImageData(0, 0, r.width, r.height);
-      var influence = this.adapter.getInfluence(r.width);
+      const img = ctx.getImageData(0, 0, r.width, r.height);
+      let influence = this.adapter.getInfluence(r.width);
 
       influence = influence.map((d, i) => {
-        var arr = influence.slice(Math.max(0, i - range), Math.min(influence.length, i + range + 1));
+        const arr = influence.slice(Math.max(0, i - range), Math.min(influence.length, i + range + 1));
         return arr.reduce((prev, current) => prev + current, 0) / arr.length;
       });
 
-      var max = influence.reduce((prev, current) => {
+      const max = influence.reduce((prev, current) => {
         return current > prev ? current : prev;
       }, 10);
 
-      influence.map((d, i) => {
+      influence.forEach((d, i) => {
         img.data.set(this._getHeatmapColor(0, max * 0.8, d), i * 4);
       }, this);
 
@@ -452,17 +455,18 @@
     }
 
     _initTsubuaniDialog(root, modal) {
-      var tmodal = root.getElementById("tsubuani-modal"),
-          title = root.getElementById("tsubuani-title"),
-          episode = root.getElementById("tsubuani-episode"),
-          list = root.getElementById("tsubuani-list"),
-          save = root.getElementById("tsubuani-save"),
-          search = root.getElementById("tsubuani-search"),
-          quick = root.getElementById("tsubuani-quick"),
-          full = root.getElementById("tsubuani-full"),
-          selectedAnime = null,
-          that = this;
+      const tmodal = root.getElementById("tsubuani-modal"),
+            title = root.getElementById("tsubuani-title"),
+            episode = root.getElementById("tsubuani-episode"),
+            list = root.getElementById("tsubuani-list"),
+            save = root.getElementById("tsubuani-save"),
+            search = root.getElementById("tsubuani-search"),
+            quick = root.getElementById("tsubuani-quick"),
+            full = root.getElementById("tsubuani-full"),
+            that = this;
+      let selectedAnime = null;
 
+      // eslint-disable-next-line no-return-assign
       this._tsubuaniDialogSaveChecked = c => save.checked = c;
 
       function beforeFetch() {
@@ -495,7 +499,7 @@
           )), tsubuani.toXml(comment), "utf8");
         }
 
-        that._open(comment/*, 100*/);
+        that._open(comment/* , 100 */);
         tmodal.hide();
         modal.hide();
       }
@@ -519,7 +523,7 @@
       }
 
       function selectAnime(index) {
-        var ok = index >= 0;
+        const ok = index >= 0;
         quick.disabled = full.disabled = !ok;
         selectedAnime = ok ? {
           title: list.options[index].textContent,
@@ -539,7 +543,7 @@
           }
           list.innerHTML = "";
           data.forEach(anime => {
-            var option = document.createElement("option");
+            const option = document.createElement("option");
             option.textContent = anime.name;
             option.value = anime.id;
             list.appendChild(option);
@@ -567,15 +571,15 @@
 
       full.addEventListener("click", () => {
         function toFixed(number, precision) {
-          var multiplier = Math.pow(10, precision);
+          const multiplier = Math.pow(10, precision);
           return Math.round(number * multiplier) / multiplier;
         }
 
         if (!beforeFetch()) return;
 
-        var msg = "取得中です。しばらくお待ち下さい...<br>";
+        const msg = "取得中です。しばらくお待ち下さい...<br>";
 
-        var cb = tmodal.use("progress-cancelable", msg + "　", () => {
+        const cb = tmodal.use("progress-cancelable", msg + "　", () => {
           tsubuani.cancelFetchFullComment();
         });
         tmodal.show();
