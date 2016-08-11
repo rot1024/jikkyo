@@ -9,6 +9,7 @@
   class WindowWrapper {
     constructor() {
       this.clickthrough = (() => {
+        if (gui.App.argv.indexOf("--enable-transparent-visuals") !== -1) return false; // For Linux
         if (gui.App.argv.indexOf("--disable-gpu") === -1) return false;
         if (gui.App.argv.indexOf("--force-cpu-draw") === -1) return false;
 
