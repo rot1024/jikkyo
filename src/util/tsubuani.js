@@ -1,7 +1,7 @@
 /* eslint { strict: [2, "global"] } */
 "use strict";
 
-const root = "http://www.tsubuani.com";
+const root = "https://www.tsubuani.com";
 
 const co = require("co"),
       cheerio = require("cheerio-httpcli");
