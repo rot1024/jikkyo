@@ -2,6 +2,7 @@
 (() => {
   "use strict";
 
+  const App = require("nw.gui").App;
   const win = require("nw.gui").Window.get();
   const doc = document.currentScript.ownerDocument;
 
@@ -202,12 +203,17 @@
         window.windowWrapper.reset();
       }
 
+      function quitApp() {
+        App.quit();
+      }
+
       this.shortcutkeys = [
         { key: "ctrl+t", macKey: "command+t", label: "常に最前面表示", press: alwaysontop },
         { key: "ctrl+f", macKey: "command+f", label: "コントロールバーを固定", press: fix },
         { key: "ctrl+n", macKey: "command+n", label: "次のモード", press: modeNext },
         { key: "ctrl+p", macKey: "command+p", label: "前のモード", press: modePrev },
-        { key: "ctrl+i", macKey: "command+i", label: "ウィンドウの位置・サイズをを初期状態に戻す", press: resetWindow }
+        { key: "ctrl+i", macKey: "command+i", label: "ウィンドウの位置・サイズをを初期状態に戻す", press: resetWindow },
+        { key: "alt+f4", macKey: "command+q", label: "終了", press: quitApp }
       ];
 
       const mac = process.platform === "darwin";
