@@ -5,8 +5,9 @@
   "scripts": {
     "install": "cd src && npm i",
     "start": "nw src",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npm run lint",
     "ct": "nw src --disable-gpu --force-cpu-draw",
+    "lint": "eslint .",
     "nw": "gulp nw",
     "clean": "gulp clean",
     "release": "gulp release:all"
@@ -24,6 +25,8 @@
   "devDependencies": {
     "archiver": "^1.0.0",
     "del": "^2.2.1",
+    "eslint": "^3.11.1",
+    "eslint-plugin-node": "^3.0.4",
     "gulp": "^3.9.1",
     "gulp-util": "^3.0.7",
     "nw-builder": "^3.1.2",
