@@ -63,7 +63,7 @@ module.exports = (() => {
       this._streamType = "filter";
       this._streaming = true;
       this._registerStreamCallback(
-        this.twitter.stream("statuses/filter", { track: track }));
+        this.twitter.stream("statuses/filter", { track }));
     }
 
     destroyStream() {
@@ -189,15 +189,15 @@ module.exports = (() => {
         // const date = (tweet.id >> 22) + 1288834974657;
 
         this._event.emit("chat", {
-          text: text,
-          color: color,
-          size: size,
-          position: position,
-          vpos: vpos,
+          text,
+          color,
+          size,
+          position,
+          vpos,
           data: {
             userId: tweet.user.id_str,
             screenName: tweet.user.screen_name,
-            source: source,
+            source,
             date: Math.round(date / 1000),
             datem: date
           }

@@ -63,33 +63,29 @@
     get x() {
       if (this.clickthrough) {
         return parseInt(winParent.style.left, 10);
-      } else {
-        return win.x;
       }
+      return win.x;
     }
 
     get y() {
       if (this.clickthrough) {
         return parseInt(winParent.style.top, 10);
-      } else {
-        return win.y;
       }
+      return win.y;
     }
 
     get width() {
       if (this.clickthrough) {
         return parseInt(winParent.style.width, 10);
-      } else {
-        return win.width;
       }
+      return win.width;
     }
 
     get height() {
       if (this.clickthrough) {
         return parseInt(winParent.style.height, 10);
-      } else {
-        return win.height;
       }
+      return win.height;
     }
 
     set x(x) {

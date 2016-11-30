@@ -1,7 +1,7 @@
 /* eslint { strict: [2, "global"] } */
 "use strict";
 
-const illegalRe = /[\/\?<>\\:\*\|":]/g;
+const illegalRe = /[/?<>\\:*|":]/g;
 const controlRe = /[\x00-\x1f\x80-\x9f]/g; // eslint-disable-line no-control-regex
 
 function sanitize(path) {
