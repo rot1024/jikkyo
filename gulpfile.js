@@ -120,7 +120,8 @@ function nw(targets) {
     macCredits: "Credits.html",
     macIcns: "src/images/jikkyo.icns",
     winIco: "src/images/jikkyo.ico",
-    zip: false
+    zip: false,
+    flavor: "normal"
   });
 
   nwb.on("log", msg => {
