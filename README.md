@@ -1,14 +1,12 @@
-# jikkyo
+<h1 align="center"><img src="https://rot1024.github.io/jikkyo/images/jikkyo-logo.svg" alt="jikkyo" /></h1>
 
-[![repo](https://david-dm.org/rot1024/jikkyo.svg)](https://david-dm.org/rot1024/jikkyo)
+ [![repo](https://david-dm.org/rot1024/jikkyo.svg)](https://david-dm.org/rot1024/jikkyo)
 
-![jikkyo](http://rot1024.github.io/jikkyo/images/kinmoza_min.jpg)
+ニコニコ動画から取得したコメントファイルやTwitterのタイムラインを、透明ウィンドウ上でニコニコ動画風に流せるデスクトップアプリ
 
-ニコニコ動画から取得したコメントファイルやTwitterのタイムラインを、透明なウィンドウの上にニコニコ動画コメント風に流せる実況閲覧アプリです。
+![jikkyo](https://rot1024.github.io/jikkyo/images/kinmoza_min.jpg)
 
-[jikkyo Webページ](https://rot1024.github.io/jikkyo/)
-
-[jikkyo ダウンロード](https://github.com/rot1024/jikkyo/releases/latest)
+[jikkyo Webページ](https://rot1024.github.io/jikkyo/) | [ダウンロード](https://github.com/rot1024/jikkyo/releases/latest)
 
 ## 特徴
 
@@ -36,21 +34,6 @@
 ## 更新履歴
 
 [Releases](https://github.com/rot1024/jikkyo/releases) をご覧下さい。
-
-## ライセンス
-
-このアプリケーションはオープンソースで、 [MIT License](LICENSE) の下 [GitHub](https://github.com/rot1024/jikkyo) にてソースコードを公開しています。
-
-バグや要望等がありましたら、作者の Twitter [@aayh](http://twitter.com/aayh) にお知らせいただくか、 GitHub の issues に投げてください。プルリクエスト歓迎。
-
-## 今後の予定
-
-* Electronへの移行
-* 動画再生機能
-* ニコニコ実況対応
-* 2ch実況スレ対応
-
-...etc
 
 ## For Developers
 
