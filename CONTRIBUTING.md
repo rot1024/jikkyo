@@ -23,6 +23,12 @@ yarn run package # package for current OS
 yarn run package-all # package for all OS
 ```
 
+## How to Upgrade Electron
+
+1. Upgrade electron: `yarn upgrade-interactive`
+2. Rewrite `"Chrome >= XX"` and `"node": X.X` on `.babelrc` and `postcss.config.js` into latest electron chromium and node versions
+3. Done!
+
 ## How to Contribute
 
 1. Fork this repository
