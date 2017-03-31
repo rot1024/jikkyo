@@ -1,0 +1,19 @@
+.titlebar {
+  position: absolute;
+  top: -24px;
+  left: 0;
+  right: 0;
+  z-index: 5;
+  font-size: 14px;
+  height: 24px;
+  line-height: 24px;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+  transition: top ease-in-out 0.2s;
+  -webkit-app-region: drag;
+}
+
+.visible {
+  top: 0;
+}
