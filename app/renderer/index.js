@@ -20,7 +20,7 @@ function render() {
   );
 }
 
-render(App);
+render();
 
 if (module.hot) {
   module.hot.accept("./app", () => { render(); });
