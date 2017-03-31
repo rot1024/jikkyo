@@ -1,4 +1,8 @@
 import { app, BrowserWindow } from "electron";
+import createStore from "./store";
+
+// eslint-disable-next-line no-unused-vars
+const store = createStore();
 
 let win;
 
