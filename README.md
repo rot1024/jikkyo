@@ -2,7 +2,7 @@
 
  [![repo](https://david-dm.org/rot1024/jikkyo.svg)](https://david-dm.org/rot1024/jikkyo)
 
-ニコニコ動画から取得したコメントファイルやTwitterのタイムラインを、透明ウィンドウ上でニコニコ動画風に流せるデスクトップアプリ
+ニコニコ動画のコメントファイルやTwitterのタイムラインを、透明ウィンドウ上でニコニコ動画風に流せるデスクトップアプリ
 
 ![jikkyo](https://rot1024.github.io/jikkyo/images/kinmoza_min.jpg)
 
@@ -35,22 +35,6 @@
 
 [Releases](https://github.com/rot1024/jikkyo/releases) をご覧下さい。
 
-## For Developers
+## 開発者向け
 
-```sh
-git clone https://github.com/rot1024/jikkyo.git
-cd jikkyo
-npm i
-npm start
-
-# Building
-npm run release
-```
-
-### Contributing
-
-1. Fork this repository
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+コントリビュートしたい方は、[開発者向けドキュメント](CONTRIBUTING.md)をご覧下さい。

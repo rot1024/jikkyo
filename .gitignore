@@ -1,7 +1,9 @@
 Thumbs.db
 .DS_Store
 node_modules
-bower_components
 npm-debug.log
-/cache
 /build
+/dist
+coverage
+.nyc_output
+

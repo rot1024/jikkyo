@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>jikkyo</title>
+    <script>
+      (function() {
+        "use strict";
+        if (process.env.NODE_ENV !== "development") {
+          const link = document.createElement("link");
+          link.rel = "stylesheet";
+          link.href = "../../build/style.css";
+          document.head.appendChild(link);
+        }
+      }());
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      (function() {
+        "use strict";
+        const script = document.createElement("script");
+        script.src = process.env.NODE_ENV === "development" ?
+          "http://localhost:3000/build/bundle.js" : "../../build/bundle.js";
+        document.body.appendChild(script);
+      }());
+    </script>
+  </body>
+</html>

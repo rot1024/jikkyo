@@ -1,20 +1,30 @@
 {
   "name": "jikkyo",
-  "version": "1.2.4",
-  "description": "Jikkyo App",
+  "productName": "jikkyo",
+  "version": "2.0.0-alpha.1",
+  "description": "jikkyo",
+  "main": "build",
   "scripts": {
-    "install": "cd src && npm i",
-    "start": "nw src",
-    "test": "npm run lint",
-    "ct": "nw src --disable-gpu --force-cpu-draw",
-    "lint": "eslint .",
-    "nw": "gulp nw",
-    "clean": "gulp clean",
-    "release": "gulp release:all"
+    "start": "run-s dev",
+    "postinstall": "electron-rebuild",
+    "test": "cross-env NODE_ENV=test nyc ava",
+    "test-watch": "run-s test -- --watch",
+    "lint": "run-p eslint stylelint",
+    "eslint": "eslint app tasks",
+    "stylelint": "stylelint app/**/*.css",
+    "start-prod": "electron .",
+    "start-dev": "cross-env BABEL_ENV=electron NODE_ENV=development electron -r babel-register app/main",
+    "dev": "run-p dev-server start-dev",
+    "dev-server": "webpack-dev-server",
+    "build": "run-p build-main build-renderer",
+    "build-main": "cross-env BABEL_ENV=electron-build webpack --env.platform=electron --env.prod --colors --progress",
+    "build-renderer": "webpack --env.prod --colors --progress",
+    "package": "node tasks/package",
+    "package-all": "run-s package -- --all"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/rot1024/jikkyo"
+    "url": "https://github.com/rot1024/jikkyo.git"
   },
   "author": "rot1024",
   "license": "MIT",
@@ -22,17 +32,71 @@
     "url": "https://github.com/rot1024/jikkyo/issues"
   },
   "homepage": "https://rot1024.github.io/jikkyo",
+  "engines": {
+    "node": ">=6"
+  },
+  "ava": {
+    "babel": "inherit",
+    "files": [
+      "app/**/*.test.js"
+    ],
+    "require": [
+      "babel-register",
+      "./app/test/setup"
+    ],
+    "source": [
+      "app/**/*.js"
+    ]
+  },
   "devDependencies": {
-    "archiver": "^1.0.0",
+    "ava": "^0.18.2",
+    "babel-core": "^6.24.0",
+    "babel-eslint": "^7.2.1",
+    "babel-loader": "^6.4.1",
+    "babel-plugin-transform-class-properties": "^6.23.0",
+    "babel-plugin-transform-decorators-legacy": "^1.3.4",
+    "babel-plugin-transform-export-extensions": "^6.22.0",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.3.2",
+    "babel-preset-react": "^6.23.0",
+    "babel-register": "^6.24.0",
+    "babili-webpack-plugin": "^0.0.11",
+    "cross-env": "^4.0.0",
+    "css-loader": "^0.28.0",
     "del": "^2.2.1",
-    "eslint": "^3.11.1",
-    "eslint-plugin-node": "^3.0.4",
-    "gulp": "^3.9.1",
-    "gulp-util": "^3.0.7",
-    "nw-builder": "^3.1.2",
-    "run-sequence": "^1.2.2"
+    "devtron": "^1.2.1",
+    "electron": "^1.6.2",
+    "electron-debug": "^1.1.0",
+    "electron-devtools-installer": "^2.1.0",
+    "electron-packager": "^8.6.0",
+    "electron-rebuild": "^1.5.7",
+    "enzyme": "^2.8.0",
+    "eslint": "^3.18.0",
+    "eslint-plugin-babel": "^4.1.1",
+    "eslint-plugin-node": "^4.2.2",
+    "eslint-plugin-react": "^6.10.3",
+    "extract-text-webpack-plugin": "^2.1.0",
+    "jsdom": "^9.12.0",
+    "minimist": "^1.2.0",
+    "npm-run-all": "^4.0.2",
+    "nyc": "^10.2.0",
+    "postcss-cssnext": "^2.10.0",
+    "postcss-loader": "^1.3.3",
+    "postcss-smart-import": "^0.4.4",
+    "react-addons-test-utils": "^15.4.2",
+    "react-hot-loader": "3.0.0-beta.6",
+    "sinon": "^2.1.0",
+    "source-map-support": "^0.4.14",
+    "spectron": "^3.6.1",
+    "style-loader": "^0.16.1",
+    "stylelint": "^7.9.0",
+    "stylelint-config-standard": "^16.0.0",
+    "webpack": "^2.3.2",
+    "webpack-dev-server": "^2.4.2"
   },
   "dependencies": {
-    "nw": "^0.12.3"
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2"
   }
 }
