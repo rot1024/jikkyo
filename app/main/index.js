@@ -6,7 +6,9 @@ function createWindow() {
   win = new BrowserWindow({
     show: false,
     width: 800,
-    height: 600
+    height: 600,
+    transparent: true,
+    frame: false
   });
 
   if (process.env.NODE_ENV === "development") {
