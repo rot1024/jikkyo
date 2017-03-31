@@ -8,6 +8,7 @@ function createWindow() {
     width: 800,
     height: 600,
     transparent: true,
+    hasShadow: false,
     frame: false
   });
 
