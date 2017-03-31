@@ -1,0 +1,16 @@
+.border {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  pointer-events: none;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 6px; /* mac */
+  transition: border ease-in-out 0.2s;
+}
+
+.visible {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
