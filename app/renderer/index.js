@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
+// eslint-disable-next-line node/no-unpublished-import
 import { AppContainer } from "react-hot-loader";
 import { Provider } from "react-redux";
 

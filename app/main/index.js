@@ -17,6 +17,7 @@ function createWindow() {
   });
 
   if (process.env.NODE_ENV === "development") {
+    // eslint-disable-next-line node/no-unpublished-require
     require("electron-debug")();
     win.loadURL(`file://${__dirname}/../renderer/index.html`);
   } else {
@@ -33,12 +34,9 @@ function createWindow() {
   });
 }
 
-if (process.env.NODE_ENV === "development") {
-  require("electron-debug")();
-}
-
 app.on("ready", async () => {
   if (process.env.NODE_ENV === "development") {
+    // eslint-disable-next-line node/no-unpublished-require
     const installer = require("electron-devtools-installer");
     const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
     const extensions = [

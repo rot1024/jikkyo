@@ -12,6 +12,12 @@ module.exports = {
     "babel/no-invalid-this": 2,
     "babel/new-cap": 2,
     "babel/object-curly-spacing": [1, "always"],
+    "node/no-unpublished-import": [2, {
+      "allowModules": ["electron"]
+    }],
+    "node/no-unpublished-require": [2, {
+      "allowModules": ["electron"]
+    }],
     "node/no-unsupported-features": 0,
     "react/display-name": 1,
     "react/forbid-component-props": 0,
