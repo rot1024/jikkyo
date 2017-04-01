@@ -1,6 +1,8 @@
 import { app, BrowserWindow } from "electron";
 import createStore from "./store";
 
+const PORT = 3000;
+
 // eslint-disable-next-line no-unused-vars
 const store = createStore();
 
@@ -19,9 +21,9 @@ function createWindow() {
   if (process.env.NODE_ENV === "development") {
     // eslint-disable-next-line node/no-unpublished-require
     require("electron-debug")();
-    win.loadURL(`file://${__dirname}/../renderer/index.html`);
+    win.loadURL(`http://localhost:${PORT}/build/index.html`);
   } else {
-    win.loadURL(`file://${__dirname}/../app/renderer/index.html`);
+    win.loadURL(`file://${__dirname}/index.html`);
   }
 
   win.webContents.on("did-finish-load", () => {

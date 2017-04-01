@@ -15,9 +15,7 @@ const options = {
   electronVersion: pkg.devDependencies.electron.replace(/^\^/, ""),
   icon: pkg.electronIcon,
   ignore: [
-    /^\/(?!app|build|package.json$)/,
-    /^\/app\/(?!resources|renderer)/,
-    /^\/app\/renderer\/(?!index.html)/
+    /^\/(?!build|package.json$)/
   ],
   name: pkg.productName || pkg.name,
   out: "dist"
