@@ -2,6 +2,7 @@ import { app, BrowserWindow } from "electron";
 import createStore from "./store";
 
 const PORT = 3000;
+const dev = process.env.NODE_ENV === "development";
 
 // eslint-disable-next-line no-unused-vars
 const store = createStore();
@@ -18,7 +19,7 @@ function createWindow() {
     frame: false
   });
 
-  if (process.env.NODE_ENV === "development") {
+  if (dev) {
     // eslint-disable-next-line node/no-unpublished-require
     require("electron-debug")();
     win.loadURL(`http://localhost:${PORT}/build/index.html`);
@@ -37,7 +38,7 @@ function createWindow() {
 }
 
 app.on("ready", async () => {
-  if (process.env.NODE_ENV === "development") {
+  if (dev) {
     // eslint-disable-next-line node/no-unpublished-require
     const installer = require("electron-devtools-installer");
     const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
