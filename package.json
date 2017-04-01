@@ -6,6 +6,7 @@
   "electron": {
     "categoryType": "public.app-category.entertainment",
     "copyright": "(c) 2017 rot1024",
+    "icon": "resources/jikkyo",
     "name": "jikkyo"
   },
   "scripts": {
