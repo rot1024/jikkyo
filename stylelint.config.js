@@ -1,10 +1,12 @@
 "use strict";
 
 module.exports = {
-  extends: "stylelint-config-standard",
+  extends: [
+    "stylelint-config-standard",
+    "stylelint-config-css-modules"
+  ],
   rules: {
     "no-empty-source": null,
-    "property-no-unknown": [true, { ignoreProperties: ["composes"] }],
     "selector-list-comma-newline-after": null
   }
 };
