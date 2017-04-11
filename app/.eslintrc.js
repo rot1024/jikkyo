@@ -7,11 +7,12 @@ module.exports = {
     sourceType: "module",
     allowImportExportEverywhere: false
   },
-  plugins: ["babel", "react"],
+  plugins: ["babel", "react", "compat"],
   rules: {
     "babel/no-invalid-this": 2,
     "babel/new-cap": 2,
     "babel/object-curly-spacing": [1, "always"],
+    "compat/compat": 2,
     "node/no-unpublished-import": [2, {
       "allowModules": ["electron"]
     }],
