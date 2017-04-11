@@ -22,8 +22,8 @@
     "dev": "run-p dev-server start-dev",
     "dev-server": "webpack-dev-server",
     "build": "run-p build-main build-renderer",
-    "build-main": "cross-env BABEL_ENV=electron-build webpack --env.platform=electron --env.prod --colors --progress",
-    "build-renderer": "cross-env BABEL_ENV=build webpack --env.prod --colors --progress",
+    "build-main": "cross-env BABEL_ENV=electron-build webpack --env.platform=electron --env.prod",
+    "build-renderer": "cross-env BABEL_ENV=build webpack --env.prod",
     "package": "node tasks/package",
     "package-all": "run-s package -- --all"
   },
