@@ -1,7 +1,7 @@
 {
   "presets": [
     ["env", {
-      "targets": { "browsers": ["Chrome >= 56"] },
+      "targets": { "electron": 1.6 },
       "modules": false
     }],
     "react"

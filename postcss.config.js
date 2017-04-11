@@ -8,8 +8,6 @@ module.exports = {
     cssimport({
       path: ["node_modules", "./app/renderer"]
     }),
-    cssnext({
-      browsers: ["Chrome >= 56"]
-    })
+    cssnext()
   ]
 };

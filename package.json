@@ -40,6 +40,9 @@
   "engines": {
     "node": ">=6"
   },
+  "browserslist": [
+    "Electron 1.6"
+  ],
   "ava": {
     "babel": "inherit",
     "files": [
