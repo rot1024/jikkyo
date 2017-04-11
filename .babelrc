@@ -14,6 +14,9 @@
     ["transform-runtime", { "polyfill": false }]
   ],
   "env": {
+    "build": {
+      "presets": ["react-optimize"]
+    },
     "electron": {
       "presets": [
         ["env", {
@@ -26,7 +29,8 @@
         ["env", {
           "targets": { "node": 7.4 },
           "modules": false
-        }]
+        }],
+        "react-optimize"
       ]
     },
     "test": {
