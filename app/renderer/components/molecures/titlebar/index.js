@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import classNames from "classnames";
 
 import styles from "./style.css";
@@ -10,8 +11,8 @@ const TitleBar = ({ title, visible }) => (
 );
 
 TitleBar.propTypes = {
-  title: React.PropTypes.string,
-  visible: React.PropTypes.bool
+  title: PropTypes.string,
+  visible: PropTypes.bool
 };
 
 export default TitleBar;

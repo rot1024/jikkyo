@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import classNames from "classnames";
 
 import styles from "./style.css";
@@ -8,7 +9,7 @@ const WindowBorder = ({ visible }) => (
 );
 
 WindowBorder.propTypes = {
-  visible: React.PropTypes.bool
+  visible: PropTypes.bool
 };
 
 export default WindowBorder;
