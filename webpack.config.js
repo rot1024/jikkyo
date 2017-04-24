@@ -65,6 +65,10 @@ module.exports = ({ platform, prod } = {}) => {
             use: cssLoaders
           }) : ["style-loader", ...cssLoaders],
           exclude: /node_modules/
+        },
+        {
+          test: /\.node$/,
+          use: "node-loader"
         }
       ]
     },

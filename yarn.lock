@@ -5110,6 +5110,10 @@ node-libs-browser@^2.0.0:
     util "^0.10.3"
     vm-browserify "0.0.4"
 
+node-loader@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/node-loader/-/node-loader-0.6.0.tgz#c797ef51095ed5859902b157f6384f6361e05ae8"
+
 node-pre-gyp@^0.6.29:
   version "0.6.34"
   resolved "https://registry.yarnpkg.com/node-pre-gyp/-/node-pre-gyp-0.6.34.tgz#94ad1c798a11d7fc67381b50d47f8cc18d9799f7"
