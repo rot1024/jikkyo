@@ -114,7 +114,7 @@
     "react-dom": "^15.5.4",
     "react-redux": "^5.0.4",
     "redux": "^3.6.0",
-    "redux-actions": "^2.0.1",
+    "redux-actions": "^2.0.2",
     "redux-electron-store": "^0.4.1"
   }
 }
