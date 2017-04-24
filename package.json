@@ -16,7 +16,7 @@
     "test-watch": "run-s test -- --watch",
     "lint": "run-p eslint stylelint",
     "eslint": "eslint app tasks",
-    "stylelint": "stylelint app/**/*.css",
+    "stylelint": "stylelint \"app/**/*.css\"",
     "start-prod": "electron .",
     "start-dev": "cross-env BABEL_ENV=electron NODE_ENV=development electron -r babel-register app/main",
     "dev": "run-p dev-server start-dev",
