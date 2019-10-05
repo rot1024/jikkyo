@@ -21,10 +21,15 @@ const App: React.FC = () => {
   const handlePlayButtonClick = useCallback(() => setPlaying(p => !p), []);
   const handleVideoEvent = useCallback(
     (e: EventType, ct: number, d: number) => {
-      if (e === "load" || e === "pause") {
+      if (e === "load") {
+        setPlaying(false);
+        setCanPlay(false);
+      } else if (e === "pause") {
         setPlaying(false);
       } else if (e === "play") {
         setPlaying(true);
+      } else if (e === "canplay") {
+        setCanPlay(true);
       }
       setCurrentTime(ct);
       setDuration(d);
@@ -56,6 +61,7 @@ const App: React.FC = () => {
       <Controller
         hidden={controllerHidden}
         playing={playing}
+        canPlay={canPlay}
         onPlayButtonClick={handlePlayButtonClick}
         onSeek={setSeekTime}
         onMenuButtonClick={handleOpen}

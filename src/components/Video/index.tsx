@@ -2,7 +2,13 @@
 import React, { useRef, useMemo, useEffect, useCallback } from "react";
 import { css, jsx } from "@emotion/core";
 
-export type EventType = "load" | "play" | "pause" | "seeking" | "seeked";
+export type EventType =
+  | "load"
+  | "canplay"
+  | "play"
+  | "pause"
+  | "seeking"
+  | "seeked";
 
 export interface Props {
   className?: string;
@@ -19,7 +25,8 @@ const event = (
   handler?: (type: EventType, currentTime: number, duration: number) => void
 ) => (e: React.SyntheticEvent<HTMLVideoElement>) => {
   if (!handler) return;
-  const { currentTime, duration } = e.currentTarget;
+  const currentTime = type === "load" ? 0 : e.currentTarget.currentTime;
+  const duration = type === "load" ? 0 : e.currentTarget.duration;
   handler(type, currentTime, duration);
 };
 
