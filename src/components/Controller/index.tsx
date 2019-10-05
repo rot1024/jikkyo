@@ -14,6 +14,8 @@ export interface Props {
   canPlay?: boolean;
   onSeek?: (time: number) => void;
   onPlayButtonClick?: () => void;
+  onVideoButtonClick?: () => void;
+  onCommentButtonClick?: () => void;
   onMenuButtonClick?: () => void;
 }
 
@@ -26,6 +28,8 @@ const Controller: React.FC<Props> = ({
   onSeek,
   canPlay,
   onPlayButtonClick,
+  onVideoButtonClick,
+  onCommentButtonClick,
   onMenuButtonClick
 }) => {
   const disabled =
@@ -77,6 +81,16 @@ const Controller: React.FC<Props> = ({
       >
         {humanReadableTime(currentTime)}
       </div>
+      <Button
+        icon="video"
+        title="Open video file"
+        onClick={onVideoButtonClick}
+      />
+      <Button
+        icon="comment"
+        title="Open comment file"
+        onClick={onCommentButtonClick}
+      />
       <Button icon="bars" onClick={onMenuButtonClick} />
     </div>
   );

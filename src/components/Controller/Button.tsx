@@ -3,14 +3,22 @@ import React from "react";
 import { css, jsx } from "@emotion/core";
 import { IconDefinition } from "@fortawesome/fontawesome-common-types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlay, faPause, faBars } from "@fortawesome/free-solid-svg-icons";
+import {
+  faPlay,
+  faPause,
+  faBars,
+  faFilm,
+  faComment
+} from "@fortawesome/free-solid-svg-icons";
 
-export type Icon = "play" | "pause" | "bars";
+export type Icon = "play" | "pause" | "bars" | "video" | "comment";
 
 const icons: Record<Icon, IconDefinition> = {
   play: faPlay,
   pause: faPause,
-  bars: faBars
+  bars: faBars,
+  video: faFilm,
+  comment: faComment
 };
 
 export interface Props {
@@ -20,6 +28,7 @@ export interface Props {
   highlightOnHover?: boolean;
   checked?: boolean;
   large?: boolean;
+  title?: string;
   onClick?: () => void;
 }
 
@@ -31,12 +40,14 @@ const Button: React.FC<Props> = ({
   highlightOnHover,
   checked,
   large,
+  title,
   onClick
 }) => {
   return (
     <button
       className={className}
       onClick={onClick}
+      title={title}
       css={css`
         border: none;
         border-radius: 0.5em;
