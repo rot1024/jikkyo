@@ -9,6 +9,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 import globalStyles from "./styles";
 import Video, { EventType, Methods } from "./components/Video";
 import Controller from "./components/Controller";
+import SettingPanel from "./components/SettingPanel";
 
 const App: React.FC = () => {
   const videoRef = useRef<Methods>(null);
@@ -19,6 +20,7 @@ const App: React.FC = () => {
   const [seekTime, setSeekTime] = useState<number>();
   const [duration, setDuration] = useState<number>();
   const [controllerHidden, setControllerHidden] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
   const handleVideoClick = useCallback(() => setControllerHidden(p => !p), []);
   const handlePlayButtonClick = useCallback(() => {
     if (!videoRef.current) return;
@@ -41,7 +43,7 @@ const App: React.FC = () => {
     },
     []
   );
-  const handleOpen = useFileInput(
+  const handleVideoOpen = useFileInput(
     files => {
       if (files.length === 0) return;
       const url = URL.createObjectURL(files[0]);
@@ -49,6 +51,12 @@ const App: React.FC = () => {
     },
     { accept: "video/*", multiple: true }
   );
+  const handleCommentOpen = useFileInput(files => {
+    if (files.length === 0) return;
+    // const url = URL.createObjectURL(files[0]);
+    // setSrc(url);
+  });
+  const handleMenuClose = useCallback(() => setMenuVisible(false), []);
 
   useHotkeys("space", handlePlayButtonClick);
 
@@ -69,7 +77,12 @@ const App: React.FC = () => {
         canPlay={canPlay}
         onPlayButtonClick={handlePlayButtonClick}
         onSeek={setSeekTime}
-        onMenuButtonClick={handleOpen}
+        onVideoButtonClick={handleVideoOpen}
+        onCommentButtonClick={handleCommentOpen}
+        onMenuButtonClick={() => {
+          console.log(menuVisible);
+          if (!menuVisible) setMenuVisible(true);
+        }}
         currentTime={currentTime}
         duration={duration}
         css={css`
@@ -77,6 +90,7 @@ const App: React.FC = () => {
           bottom: 0;
         `}
       />
+      <SettingPanel shown={menuVisible} onClose={handleMenuClose} />
     </Fragment>
   );
 };
