@@ -9,7 +9,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 import globalStyles from "./styles";
 import Video, { EventType, Methods } from "./components/Video";
 import Controller from "./components/Controller";
-import SettingPanel from "./components/SettingPanel";
+import SettingPanel, { Settings } from "./components/SettingPanel";
 
 const App: React.FC = () => {
   const videoRef = useRef<Methods>(null);
@@ -57,6 +57,7 @@ const App: React.FC = () => {
     // setSrc(url);
   });
   const handleMenuClose = useCallback(() => setMenuVisible(false), []);
+  const [, setSettings] = useState<Settings>();
 
   useHotkeys("space", handlePlayButtonClick);
 
@@ -90,7 +91,11 @@ const App: React.FC = () => {
           bottom: 0;
         `}
       />
-      <SettingPanel shown={menuVisible} onClose={handleMenuClose} />
+      <SettingPanel
+        shown={menuVisible}
+        onClose={handleMenuClose}
+        onChange={setSettings}
+      />
     </Fragment>
   );
 };

@@ -1,16 +1,29 @@
 /** @jsx jsx */
-import React, { useRef, useCallback } from "react";
+import React, { useCallback } from "react";
 import { css, jsx } from "@emotion/core";
 import useTransition from "@rot1024/use-transition";
 import { useHotkeys } from "react-hotkeys-hook";
 
+import Form from "./Form";
+import { settingSchema, Settings } from "./setting";
+
+export type Settings = Settings;
+
 export interface Props {
   className?: string;
   shown?: boolean;
+  initialSettings?: Settings;
+  onChange?: (s: Settings) => void;
   onClose?: () => void;
 }
 
-const SettingPanel: React.FC<Props> = ({ className, shown, onClose }) => {
+const SettingPanel: React.FC<Props> = ({
+  className,
+  shown,
+  onClose,
+  initialSettings,
+  onChange
+}) => {
   const state = useTransition(!!shown, 100, {
     mountOnEnter: true,
     unmountOnExit: true
@@ -53,10 +66,10 @@ const SettingPanel: React.FC<Props> = ({ className, shown, onClose }) => {
           position: absolute;
           bottom: 5em;
           right: 1em;
-          width: 90vw;
-          max-width: 200px;
-          height: 90vh;
-          max-height: 400px;
+          width: calc(100vw - 2em);
+          max-width: 250px;
+          height: calc(100vh - 6em);
+          max-height: 450px;
           background-color: #333;
           border-radius: 0.3em;
           overflow-y: auto;
@@ -64,7 +77,11 @@ const SettingPanel: React.FC<Props> = ({ className, shown, onClose }) => {
           box-shadow: 0 3px 20px #000000aa;
         `}
       >
-        settings
+        <Form
+          schema={settingSchema}
+          initialValues={initialSettings}
+          onChange={onChange}
+        />
       </div>
     </div>
   );
