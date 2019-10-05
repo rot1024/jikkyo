@@ -21,6 +21,7 @@
     "react": "^16.10.2",
     "react-dom": "^16.10.2",
     "react-hot-loader": "^4.12.14",
+    "react-hotkeys-hook": "^1.5.3",
     "react-scripts": "3.2.0",
     "rxjs": "^6.5.3",
     "rxjs-hooks": "^0.5.1",
