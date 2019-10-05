@@ -15,35 +15,40 @@ const icons: Record<Icon, IconDefinition> = {
 
 export interface Props {
   className?: string;
-  disable?: boolean;
+  disabled?: boolean;
   icon?: Icon;
   highlightOnHover?: boolean;
   checked?: boolean;
+  large?: boolean;
+  onClick?: () => void;
 }
 
 const Button: React.FC<Props> = ({
   className,
   children,
-  disable,
+  disabled,
   icon,
   highlightOnHover,
-  checked
+  checked,
+  large,
+  onClick
 }) => {
   return (
     <button
       className={className}
+      onClick={onClick}
       css={css`
         border: none;
         border-radius: 0.5em;
-        padding: 0.8em 2em;
-        font-size: 1rem;
+        padding: ${large ? "0.5em 1.5em" : "0.5em 0.7em"};
+        font-size: 1.1rem;
         background: transparent;
         outline: none;
-        color: ${checked ? "#ff9d00" : "#aaa"};
+        color: ${checked ? "#ff9d00" : "#aaaaaaaa"};
         cursor: pointer;
-        transition: all ease-in-out 0.2s;
+        transition: color ease-in-out 0.2s;
 
-        ${disable
+        ${disabled
           ? null
           : css`
               &:hover {
