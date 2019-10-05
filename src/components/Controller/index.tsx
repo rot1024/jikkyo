@@ -69,6 +69,8 @@ const Controller: React.FC<Props> = ({
         css={css`
           font-size: 0.9em;
           padding: 1em;
+          width: 4em;
+          text-align: center;
         `}
       >
         {humanReadableTime(currentTime)}
