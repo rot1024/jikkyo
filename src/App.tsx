@@ -4,6 +4,7 @@ import { css, jsx } from "@emotion/core";
 import { hot } from "react-hot-loader/root";
 import { Global } from "@emotion/core";
 import useFileInput from "use-file-input";
+import { useHotkeys } from "react-hotkeys-hook";
 
 import globalStyles from "./styles";
 import Video, { EventType } from "./components/Video";
@@ -38,6 +39,8 @@ const App: React.FC = () => {
     },
     { accept: "video/*", multiple: true }
   );
+
+  useHotkeys("space", handlePlayButtonClick);
 
   return (
     <Fragment>
