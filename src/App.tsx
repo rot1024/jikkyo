@@ -1,4 +1,5 @@
 import React from "react";
+import { hot } from "react-hot-loader/root";
 import { Global } from "@emotion/core";
 
 import globalStyles from "./styles";
@@ -12,4 +13,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+export default hot(App);
