@@ -18,10 +18,12 @@ const globalStyles = css`
     width: 100%;
     height: 100%;
     overflow: hidden;
+    color: #fff;
   }
 
   html {
     position: fixed;
+    background-color: #000;
   }
 `;
 
