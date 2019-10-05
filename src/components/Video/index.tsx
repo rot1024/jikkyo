@@ -1,5 +1,12 @@
 /** @jsx jsx */
-import React, { useRef, useMemo, useEffect, useCallback } from "react";
+import React, {
+  useRef,
+  useMemo,
+  useEffect,
+  useCallback,
+  forwardRef,
+  useImperativeHandle
+} from "react";
 import { css, jsx } from "@emotion/core";
 
 export type EventType =
@@ -13,11 +20,16 @@ export type EventType =
 export interface Props {
   className?: string;
   src?: string;
-  playing?: boolean;
   currentTime?: number;
   onEvent?: (type: EventType, currentTime: number, duration: number) => void;
   onClick?: () => void;
   onTimeUpdate?: (currentTime: number) => void;
+}
+
+export interface Methods {
+  play: () => void;
+  stop: () => void;
+  toggle: () => boolean;
 }
 
 const event = (
@@ -30,17 +42,14 @@ const event = (
   handler(type, currentTime, duration);
 };
 
-const Video: React.FC<Props> = ({
-  className,
-  src,
-  playing,
-  currentTime,
-  onEvent,
-  onTimeUpdate,
-  onClick
-}) => {
+const Video: React.FC<Props> = (
+  { className, src, currentTime, onEvent, onTimeUpdate, onClick },
+  ref
+) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const playing = useRef(false);
   const handleLoad = useMemo(() => event("load", onEvent), [onEvent]);
+  const handleCanPlay = useMemo(() => event("canplay", onEvent), [onEvent]);
   const handlePlay = useMemo(() => event("play", onEvent), [onEvent]);
   const handlePause = useMemo(() => event("pause", onEvent), [onEvent]);
   const handleSeeking = useMemo(() => event("seeking", onEvent), [onEvent]);
@@ -53,15 +62,31 @@ const Video: React.FC<Props> = ({
     [onTimeUpdate]
   );
 
-  useEffect(() => {
-    if (videoRef.current) {
-      if (playing) {
+  // In iOS safari, the video cannnot be started playing without a user interaction
+  // such as a mouse event, so we have to expose some methods to outside via ref.
+  useImperativeHandle<any, Methods>(ref, () => ({
+    play: () => {
+      if (!videoRef.current) return;
+      playing.current = true;
+      videoRef.current.play();
+    },
+    stop: () => {
+      if (!videoRef.current) return;
+      playing.current = false;
+      videoRef.current.pause();
+    },
+    toggle: () => {
+      if (!videoRef.current) return false;
+      const next = !playing.current;
+      playing.current = next;
+      if (next) {
         videoRef.current.play();
       } else {
         videoRef.current.pause();
       }
+      return next;
     }
-  }, [playing]);
+  }));
 
   useEffect(() => {
     if (!videoRef.current || typeof currentTime !== "number") return;
@@ -71,6 +96,10 @@ const Video: React.FC<Props> = ({
       videoRef.current.currentTime = currentTime;
     }
   }, [currentTime]);
+
+  useEffect(() => {
+    playing.current = false;
+  }, [src]);
 
   return !src ? (
     <div
@@ -88,6 +117,7 @@ const Video: React.FC<Props> = ({
       src={src}
       playsInline
       controls={false}
+      onCanPlay={handleCanPlay}
       onPlay={handlePlay}
       onPause={handlePause}
       onSeeking={handleSeeking}
@@ -104,4 +134,4 @@ const Video: React.FC<Props> = ({
   );
 };
 
-export default Video;
+export default forwardRef<Methods, Props>(Video);
