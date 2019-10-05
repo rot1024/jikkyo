@@ -3,13 +3,14 @@ import React from "react";
 import { css, jsx } from "@emotion/core";
 import { IconDefinition } from "@fortawesome/fontawesome-common-types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlay, faPause } from "@fortawesome/free-solid-svg-icons";
+import { faPlay, faPause, faBars } from "@fortawesome/free-solid-svg-icons";
 
-export type Icon = "play" | "pause";
+export type Icon = "play" | "pause" | "bars";
 
 const icons: Record<Icon, IconDefinition> = {
   play: faPlay,
-  pause: faPause
+  pause: faPause,
+  bars: faBars
 };
 
 export interface Props {
