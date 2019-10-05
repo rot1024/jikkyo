@@ -71,6 +71,7 @@ const App: React.FC = () => {
         onTimeUpdate={setCurrentTime}
         onEvent={handleVideoEvent}
         onClick={handleVideoClick}
+        onDoubleClick={handlePlayButtonClick}
       />
       <Controller
         hidden={controllerHidden}
