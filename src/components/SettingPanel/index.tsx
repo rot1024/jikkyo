@@ -64,11 +64,11 @@ const SettingPanel: React.FC<Props> = ({
         className={className}
         css={css`
           position: absolute;
-          bottom: 5em;
+          bottom: 4em;
           right: 1em;
           width: calc(100vw - 2em);
           max-width: 250px;
-          height: calc(100vh - 6em);
+          height: calc(100vh - 5em);
           max-height: 450px;
           background-color: #333;
           border-radius: 0.3em;
