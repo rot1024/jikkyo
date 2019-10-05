@@ -6,6 +6,9 @@
     "@craco/craco": "^5.5.0",
     "@emotion/core": "^10.0.20",
     "@emotion/styled": "^10.0.17",
+    "@fortawesome/fontawesome-svg-core": "^1.2.25",
+    "@fortawesome/free-solid-svg-icons": "^5.11.2",
+    "@fortawesome/react-fontawesome": "^0.1.5",
     "@hot-loader/react-dom": "^16.9.0",
     "@types/jest": "24.0.18",
     "@types/node": "12.7.11",
@@ -19,7 +22,10 @@
     "react-dom": "^16.10.2",
     "react-hot-loader": "^4.12.14",
     "react-scripts": "3.2.0",
-    "typescript": "3.6.3"
+    "rxjs": "^6.5.3",
+    "rxjs-hooks": "^0.5.1",
+    "typescript": "3.6.3",
+    "use-file-input": "^1.0.0"
   },
   "scripts": {
     "start": "craco start",
