@@ -11,6 +11,7 @@ export interface Props {
   duration?: number;
   playing?: boolean;
   hidden?: boolean;
+  canPlay?: boolean;
   onSeek?: (time: number) => void;
   onPlayButtonClick?: () => void;
   onMenuButtonClick?: () => void;
@@ -23,6 +24,7 @@ const Controller: React.FC<Props> = ({
   playing,
   hidden,
   onSeek,
+  canPlay,
   onPlayButtonClick,
   onMenuButtonClick
 }) => {
@@ -50,7 +52,7 @@ const Controller: React.FC<Props> = ({
     >
       <Button
         icon={playing ? "pause" : "play"}
-        disabled={disabled}
+        disabled={disabled || !canPlay}
         highlightOnHover
         large
         onClick={onPlayButtonClick}
