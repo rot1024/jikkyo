@@ -2,8 +2,8 @@
 import React from "react";
 import { css, jsx } from "@emotion/core";
 
-import Button from "../Button";
-import SeekBar from "../SeekBar";
+import Button from "./Button";
+import SeekBar from "./Seekbar";
 
 export interface Props {
   className?: string;
