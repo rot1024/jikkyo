@@ -79,6 +79,7 @@ export const readComments = async (xml: string): Promise<Comment[]> => {
         id: i + "",
         text: node.textContent || "",
         date: new Date(parseInt(node.getAttribute("date") || "", 10) * 1000),
+        // vpos: convert into ms
         vpos: parseInt(node.getAttribute("vpos") || "", 10) * 10,
         commenter: node.getAttribute("user_id") || "",
         pos: mail.includes("ue")
@@ -106,12 +107,6 @@ export const readComments = async (xml: string): Promise<Comment[]> => {
   const invalidCommnents = comments.length - validComments.length;
   if (invalidCommnents > 0) {
     console.warn(`${invalidCommnents} invalid comments are ignored.`);
-  }
-
-  // adjust vpos
-  if (validComments[0] && validComments[0].vpos < 0) {
-    const first = validComments[0].vpos;
-    validComments = validComments.map(c => ({ ...c, vpos: c.vpos - first }));
   }
 
   return validComments;
