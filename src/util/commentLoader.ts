@@ -4,8 +4,40 @@ export interface Comment {
   date: Date;
   vpos: number;
   commenter: string;
-  mail: string;
+  pos?: "ue" | "shita";
+  size?: "big" | "small";
+  color?: string;
 }
+
+const niconicoColors = {
+  // white: "#fff", // default
+  red: "#f00",
+  pink: "#ff8080",
+  orange: "#ffc000",
+  yellow: "#ff0",
+  green: "#0f0",
+  cyan: "#0ff",
+  blue: "#00f",
+  purple: "#c000ff",
+  black: "#000",
+  white2: "#cc9",
+  niconicowhite: "#cc9",
+  red2: "#c03",
+  truered: "#c03",
+  pink2: "#f3c",
+  orange2: "#f60",
+  passionorange: "#f60",
+  yellow2: "#99d",
+  madyellow: "#99d",
+  green2: "#0c6",
+  elementalgreen: "#0c6",
+  cyan2: "#0cc",
+  blue2: "#39f", // #33FFFC in niconama
+  marineblue: "#39f", // #33FFFC in niconama
+  purple2: "#63c",
+  nobleviolet: "#63c",
+  black2: "#666"
+};
 
 export const readText = (file: File) =>
   new Promise<string>((resolve, reject) => {
@@ -27,17 +59,42 @@ export const readComments = async (xml: string): Promise<Comment[]> => {
     throw new Error("xml parse error");
   }
 
-  const comments = Array.from(dom.querySelectorAll("chat")).map((node, i) => {
-    const c: Comment = {
-      id: i + "",
-      text: node.textContent || "",
-      date: new Date(parseInt(node.getAttribute("date") || "", 10) * 1000),
-      vpos: parseInt(node.getAttribute("vpos") || "", 10) * 10,
-      commenter: node.getAttribute("user_id") || "",
-      mail: node.getAttribute("mail") || ""
-    };
-    return c;
-  });
+  const comments = Array.from(dom.querySelectorAll("chat")).map(
+    (node, i): Comment => {
+      const mail = (node.getAttribute("mail") || "").split(" ");
+      let color;
+      mail.some(m => {
+        if (m in niconicoColors) {
+          color = (niconicoColors as any)[m];
+          return true;
+        }
+        if (/^#([\w\d]{3}|[\w\d]{6})$/) {
+          color = m;
+          return true;
+        }
+        return false;
+      });
+
+      return {
+        id: i + "",
+        text: node.textContent || "",
+        date: new Date(parseInt(node.getAttribute("date") || "", 10) * 1000),
+        vpos: parseInt(node.getAttribute("vpos") || "", 10) * 10,
+        commenter: node.getAttribute("user_id") || "",
+        pos: mail.includes("ue")
+          ? "ue"
+          : mail.includes("shita")
+          ? "shita"
+          : undefined,
+        size: mail.includes("big")
+          ? "big"
+          : mail.includes("small")
+          ? "small"
+          : undefined,
+        color
+      };
+    }
+  );
 
   let validComments = comments
     .filter(
