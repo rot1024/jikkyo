@@ -22,8 +22,6 @@ export interface Props {
   src?: string;
   currentTime?: number;
   onEvent?: (type: EventType, currentTime: number, duration: number) => void;
-  onClick?: () => void;
-  onDoubleClick?: () => void;
   onTimeUpdate?: (currentTime: number) => void;
 }
 
@@ -44,15 +42,7 @@ const event = (
 };
 
 const Video: React.FC<Props> = (
-  {
-    className,
-    src,
-    currentTime,
-    onEvent,
-    onTimeUpdate,
-    onClick,
-    onDoubleClick
-  },
+  { className, src, currentTime, onEvent, onTimeUpdate },
   ref
 ) => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -110,16 +100,7 @@ const Video: React.FC<Props> = (
     playing.current = false;
   }, [src]);
 
-  return !src ? (
-    <div
-      onClick={onClick}
-      css={css`
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-      `}
-    />
-  ) : (
+  return !src ? null : (
     <video
       ref={videoRef}
       className={className}
@@ -133,8 +114,6 @@ const Video: React.FC<Props> = (
       onSeeked={handleSeeked}
       onLoadedMetadata={handleLoad}
       onTimeUpdate={handleTimeUpdate}
-      onClick={onClick}
-      onDoubleClick={onDoubleClick}
       css={css`
         width: 100%;
         height: 100%;

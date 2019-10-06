@@ -11,6 +11,7 @@ import loadComment, { Comment } from "./util/commentLoader";
 import Video, { EventType, Methods } from "./components/Video";
 import Controller from "./components/Controller";
 import SettingPanel, { Settings } from "./components/SettingPanel";
+import CommentArea from "./components/CommentArea";
 
 const App: React.FC = () => {
   const videoRef = useRef<Methods>(null);
@@ -58,7 +59,7 @@ const App: React.FC = () => {
   );
   const handleCommentOpen = useFileInput(
     async files => {
-    if (files.length === 0) return;
+      if (files.length === 0) return;
       const comments = await loadComment(files[0]);
       setComments(comments);
     },
@@ -78,6 +79,11 @@ const App: React.FC = () => {
         currentTime={seekTime}
         onTimeUpdate={setCurrentTime}
         onEvent={handleVideoEvent}
+      />
+      <CommentArea
+        comments={comments}
+        currentTime={(currentTime || 0) * 1000}
+        playing={playing}
         onClick={handleVideoClick}
         onDoubleClick={handlePlayButtonClick}
       />
@@ -90,7 +96,6 @@ const App: React.FC = () => {
         onVideoButtonClick={handleVideoOpen}
         onCommentButtonClick={handleCommentOpen}
         onMenuButtonClick={() => {
-          console.log(menuVisible);
           if (!menuVisible) setMenuVisible(true);
         }}
         currentTime={currentTime}
