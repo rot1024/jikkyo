@@ -7,6 +7,7 @@ import useFileInput from "use-file-input";
 import { useHotkeys } from "react-hotkeys-hook";
 
 import globalStyles from "./styles";
+import loadComment, { Comment } from "./util/commentLoader";
 import Video, { EventType, Methods } from "./components/Video";
 import Controller from "./components/Controller";
 import SettingPanel, { Settings } from "./components/SettingPanel";
@@ -14,6 +15,7 @@ import SettingPanel, { Settings } from "./components/SettingPanel";
 const App: React.FC = () => {
   const videoRef = useRef<Methods>(null);
   const [src, setSrc] = useState<string>();
+  const [comments, setComments] = useState<Comment[]>();
   const [canPlay, setCanPlay] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState<number>();
@@ -31,6 +33,7 @@ const App: React.FC = () => {
       if (e === "load") {
         setPlaying(false);
         setCanPlay(false);
+        setSeekTime(0);
       } else if (e === "pause") {
         setPlaying(false);
       } else if (e === "play") {
@@ -48,14 +51,19 @@ const App: React.FC = () => {
       if (files.length === 0) return;
       const url = URL.createObjectURL(files[0]);
       setSrc(url);
+      setPlaying(false);
+      setSeekTime(0);
     },
     { accept: "video/*", multiple: true }
   );
-  const handleCommentOpen = useFileInput(files => {
+  const handleCommentOpen = useFileInput(
+    async files => {
     if (files.length === 0) return;
-    // const url = URL.createObjectURL(files[0]);
-    // setSrc(url);
-  });
+      const comments = await loadComment(files[0]);
+      setComments(comments);
+    },
+    { accept: "application/xml" }
+  );
   const handleMenuClose = useCallback(() => setMenuVisible(false), []);
   const [, setSettings] = useState<Settings>();
 
