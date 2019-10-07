@@ -49,7 +49,7 @@ const ChatComponent: React.FC<Props> = ({
       chat
         ? (chat.text || "")
             .split("\n")
-            .map((s, i) => (i === 0 ? [s] : [<br />, s]))
+            .map((s, i) => (i === 0 ? [s] : [<br key={i} />, s]))
             .reduce((a, b) => [...a, ...b], [])
         : null,
     [chat]
