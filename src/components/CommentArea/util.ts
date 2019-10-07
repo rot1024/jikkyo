@@ -87,7 +87,7 @@ export const getVisibleChats = (
   if (chats.length === 0) return [];
   const start = binarySearch(chats, frame - duration, c => c.vpos);
   const end = binarySearch(chats, frame, c => c.vpos);
-  return chats.slice(start, end);
+  return chats.slice(start, end).filter(c => frame < c.vpos + c.duration);
 };
 
 export const commentsToChats = (
