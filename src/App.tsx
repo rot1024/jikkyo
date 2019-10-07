@@ -19,9 +19,9 @@ const App: React.FC = () => {
   const [comments, setComments] = useState<Comment[]>();
   const [canPlay, setCanPlay] = useState(false);
   const [playing, setPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState<number>();
-  const [seekTime, setSeekTime] = useState<number>();
-  const [duration, setDuration] = useState<number>();
+  const [currentTime, setCurrentTime] = useState<number>(0);
+  const [seekTime, setSeekTime] = useState<number>(0);
+  const [duration, setDuration] = useState<number>(0);
   const [controllerHidden, setControllerHidden] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
   const handleVideoClick = useCallback(() => setControllerHidden(p => !p), []);
@@ -47,6 +47,10 @@ const App: React.FC = () => {
     },
     []
   );
+  const handleSeek = useCallback((t: number, relative?: boolean) => {
+    if (!setSeekTime) return;
+    setSeekTime(relative ? s => s + t : t);
+  }, []);
   const handleVideoOpen = useFileInput(
     files => {
       if (files.length === 0) return;
@@ -92,7 +96,7 @@ const App: React.FC = () => {
         playing={playing}
         canPlay={canPlay}
         onPlayButtonClick={handlePlayButtonClick}
-        onSeek={setSeekTime}
+        onSeek={handleSeek}
         onVideoButtonClick={handleVideoOpen}
         onCommentButtonClick={handleCommentOpen}
         onMenuButtonClick={() => {

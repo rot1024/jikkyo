@@ -1,18 +1,19 @@
 /** @jsx jsx */
-import React from "react";
+import React, { useCallback } from "react";
 import { css, jsx } from "@emotion/core";
+import { useHotkeys } from "react-hotkeys-hook";
 
 import Button from "./Button";
 import SeekBar from "./Seekbar";
 
 export interface Props {
   className?: string;
-  currentTime?: number;
+  currentTime?: number; // seconds
   duration?: number;
   playing?: boolean;
   hidden?: boolean;
   canPlay?: boolean;
-  onSeek?: (time: number) => void;
+  onSeek?: (time: number, relative?: boolean) => void;
   onPlayButtonClick?: () => void;
   onVideoButtonClick?: () => void;
   onCommentButtonClick?: () => void;
@@ -34,6 +35,27 @@ const Controller: React.FC<Props> = ({
 }) => {
   const disabled =
     typeof currentTime !== "number" || typeof duration !== "number";
+  const handleSeek = useCallback((t: number) => onSeek && onSeek(t / 1000), [
+    onSeek
+  ]);
+  const handleSeekPlus10 = useCallback(() => onSeek && onSeek(10, true), [
+    onSeek
+  ]);
+  const handleSeekMinus10 = useCallback(() => onSeek && onSeek(-10, true), [
+    onSeek
+  ]);
+  const handleSeekPlus1 = useCallback(() => onSeek && onSeek(1, true), [
+    onSeek
+  ]);
+  const handleSeekMinus1 = useCallback(() => onSeek && onSeek(-1, true), [
+    onSeek
+  ]);
+
+  useHotkeys("left", handleSeekMinus10);
+  useHotkeys("right", handleSeekPlus10);
+  useHotkeys("shift + left", handleSeekMinus1);
+  useHotkeys("shift + right", handleSeekPlus1);
+
   return (
     <div
       className={className}
@@ -61,11 +83,23 @@ const Controller: React.FC<Props> = ({
         large
         onClick={onPlayButtonClick}
       />
-      <SeekBar
-        value={currentTime}
-        max={duration}
+      <Button
+        icon="undo"
+        title="Go back 10s"
         disabled={disabled}
-        onChange={onSeek}
+        onClick={handleSeekMinus10}
+      />
+      <Button
+        icon="redo"
+        title="Advance 10s"
+        disabled={disabled}
+        onClick={handleSeekPlus10}
+      />
+      <SeekBar
+        value={currentTime ? currentTime * 1000 : 0}
+        max={duration ? duration * 1000 : 0}
+        disabled={disabled}
+        onChange={handleSeek}
         css={css`
           flex: auto;
           margin-left: 1em;

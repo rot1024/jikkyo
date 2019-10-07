@@ -8,17 +8,28 @@ import {
   faPause,
   faBars,
   faFilm,
-  faComment
+  faComment,
+  faUndo,
+  faRedo
 } from "@fortawesome/free-solid-svg-icons";
 
-export type Icon = "play" | "pause" | "bars" | "video" | "comment";
+export type Icon =
+  | "play"
+  | "pause"
+  | "bars"
+  | "video"
+  | "comment"
+  | "undo"
+  | "redo";
 
 const icons: Record<Icon, IconDefinition> = {
   play: faPlay,
   pause: faPause,
   bars: faBars,
   video: faFilm,
-  comment: faComment
+  comment: faComment,
+  undo: faUndo,
+  redo: faRedo
 };
 
 export interface Props {
