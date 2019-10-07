@@ -61,11 +61,7 @@ const ChatComponent: React.FC<Props> = ({
         ? css`
             line-height: ${styles.lineHeight};
             color: ${chat.color};
-            font-size: ${(chat.size === "big"
-              ? styles.bigSizeScale
-              : chat.size === "small"
-              ? styles.smallSizeScale
-              : 1) * 100}%;
+            font-size: ${chat.fontSize}px;
             opacity: ${chat.danmaku ? styles.opacityDanmaku : styles.opacity};
             top: ${chat.y}px;
             ${chat.ueshita &&
@@ -93,12 +89,7 @@ const ChatComponent: React.FC<Props> = ({
   }, [chat, innerFrame, playing]);
 
   return (
-    <div
-      className={className}
-      css={[commonStyles, chatStyles, animatonStyles]}
-      data-width={chat && chat.width}
-      data-height={chat && chat.height}
-    >
+    <div className={className} css={[commonStyles, chatStyles, animatonStyles]}>
       {text}
     </div>
   );

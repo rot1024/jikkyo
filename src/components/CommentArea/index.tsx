@@ -12,8 +12,7 @@ import {
   Chat,
   Comment,
   ChatStyle,
-  getChatActualStyle,
-  chatSizeMeasurer
+  getChatActualStyle
 } from "./util";
 
 export type Comment = Comment;
@@ -43,12 +42,13 @@ const CommentArea: React.FC<Props> = ({
   onDoubleClick
 }) => {
   const ref = useRef<HTMLDivElement>(null);
-  const height = useThrottle(useComponentSize(ref).height, 1000);
-  const innerStyles = useMemo(() => getChatActualStyle(styles, height), [
-    height,
+  const size = useComponentSize(ref);
+  const screenWidth = useThrottle(size.width, 1000);
+  const screenHeight = useThrottle(size.height, 1000);
+  const innerStyles = useMemo(() => getChatActualStyle(styles, screenHeight), [
+    screenHeight,
     styles
   ]);
-  const measurer = useMemo(() => chatSizeMeasurer(innerStyles), [innerStyles]);
 
   const [commentIdPrefix, setCommentIdPrefix] = useState(0);
   useEffect(() => {
@@ -57,27 +57,13 @@ const CommentArea: React.FC<Props> = ({
   const [chats, setChats] = useState(emptyChats);
 
   useEffect(() => {
-    if (height === 0) return;
+    if (screenHeight === 0) return;
     if (!comments || comments.length === 0) {
       setChats([]);
       return;
     }
-    setChats(
-      commentsToChats(
-        comments,
-        height,
-        innerStyles.duration,
-        innerStyles.ueshitaDuration,
-        measurer
-      )
-    );
-  }, [
-    comments,
-    height,
-    innerStyles.duration,
-    innerStyles.ueshitaDuration,
-    measurer
-  ]);
+    setChats(commentsToChats(comments, screenWidth, screenHeight, innerStyles));
+  }, [comments, screenWidth, screenHeight, innerStyles]);
 
   const prevTime = useRef(Date.now());
   const [frame, setFrame] = useState(currentTime);
@@ -126,7 +112,6 @@ const CommentArea: React.FC<Props> = ({
         left: 0;
         right: 0;
         bottom: 0;
-        font-size: ${innerStyles.size}px;
       `}
     >
       {visibleChats.map(c => (

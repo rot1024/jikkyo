@@ -17,6 +17,8 @@ export interface Chat extends Comment {
   duration: number;
   danmaku: boolean;
   ueshita: boolean;
+  speed: number;
+  fontSize?: number;
 }
 
 export interface ChatCommonStyle {
@@ -48,7 +50,7 @@ export const defaultChatStyle: ChatStyle = {
   bigSizeScale: 1.5,
   smallSizeScale: 0.5,
   opacity: 1,
-  opacityDanmaku: 1,
+  opacityDanmaku: 0.4,
   duration: 5000,
   ueshitaDuration: 3000,
   sizing: "rows",
@@ -92,42 +94,65 @@ export const getVisibleChats = (
 
 export const commentsToChats = (
   comments: Comment[],
+  screenWidth: number,
   screenHeight: number,
-  duration: number,
-  ueshitaDuration: number,
-  measurer: Measurer
+  style: ChatActualStyle
 ): Chat[] => {
+  const { duration, ueshitaDuration } = style;
   const chats: Chat[] = [];
-
-  type ChatLine = { y: number; h: number; end: number };
-  let naka: ChatLine[] = [];
-  let ue: ChatLine[] = [];
-  let shita: ChatLine[] = [];
+  let naka: Chat[] = [];
+  let ue: Chat[] = [];
+  let shita: Chat[] = [];
 
   for (const c of comments) {
-    const dur =
-      c.pos === "ue" || c.pos === "shita" ? ueshitaDuration : duration;
-    const { width, height } = measurer(c.text, c.size);
     const ueshita = c.pos === "ue" || c.pos === "shita";
+    const dur = ueshita ? ueshitaDuration : duration;
+    const { width, height, size } = measureSize(
+      c.text,
+      c.size,
+      screenWidth,
+      style
+    );
+    const speed = (screenWidth + width) / dur;
 
     let lines = c.pos === "ue" ? ue : c.pos === "shita" ? shita : naka;
 
     // advance time
-    lines = lines
-      .filter(l => l.end > c.vpos)
-      .map(l => ({ ...l, end: l.end - c.vpos }));
+    lines = lines.filter(l => l.vpos + l.duration > c.vpos);
 
-    // find gap
     let y = 0;
-    const ok =
-      lines.length === 0 ||
-      lines.some(l => {
-        if (y + height <= l.y) {
-          return true;
+    let danmaku = false;
+
+    if (height < screenHeight) {
+      // find gap
+      if (lines.length > 0) {
+        for (const l of lines) {
+          // empty
+          if (y + height <= l.y) {
+            break;
+          }
+
+          if (!ueshita) {
+            // TODO
+            y = -1000;
+            break;
+          }
+
+          y = l.y + l.height;
+
+          // overflowed
+          if (y + height > screenHeight) {
+            danmaku = true;
+            y = Math.random() * (screenHeight - height);
+            break;
+          }
         }
-        y = l.y + l.h;
-        return false;
-      });
+      }
+    } else {
+      // when height is too large, y is fixed to 0
+      danmaku = true;
+      y = 0;
+    }
 
     const chat: Chat = {
       ...c,
@@ -135,28 +160,15 @@ export const commentsToChats = (
       width,
       height,
       duration: dur,
-      danmaku: false,
-      ueshita
+      danmaku,
+      ueshita,
+      speed,
+      fontSize: size
     };
 
-    if (!ok) {
-      // danmaku
-      chat.danmaku = true;
-      chat.y = Math.random() * (screenHeight - height);
-    } else {
-      // normal
-      lines.push({
-        y,
-        h: height,
-        end:
-          c.vpos +
-          (c.pos === "ue" || c.pos === "shita" ? ueshitaDuration : duration)
-      });
+    if (!danmaku) {
+      lines.push(chat);
       lines.sort((a, b) => a.y - b.y);
-
-      if (c.pos === "shita") {
-        chat.y = screenHeight - chat.y - chat.height;
-      }
     }
 
     chats.push(chat);
@@ -174,35 +186,47 @@ export const commentsToChats = (
     }
   }
 
-  return chats;
+  return chats.map(c =>
+    c.pos === "shita" ? { ...c, y: screenHeight - c.y - c.height } : c
+  );
 };
 
-export const chatSizeMeasurer = (style: ChatActualStyle): Measurer => {
-  const s = { ...style };
-  const c = document.createElement("canvas");
+const canvas = document.createElement("canvas");
 
-  return (text: string, size?: "big" | "small") => {
-    const ctx = c.getContext("2d") as CanvasRenderingContext2D;
-    const fontSize = Math.floor(
-      (size === "big"
-        ? s.bigSizeScale
-        : size === "small"
-        ? s.smallSizeScale
-        : 1) * s.size
-    );
+const measureSize = (
+  text: string,
+  size: "big" | "small" | undefined,
+  screenWidth: number,
+  s: ChatActualStyle
+) => {
+  const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+  let fontSize = Math.floor(
+    (size === "big"
+      ? s.bigSizeScale
+      : size === "small"
+      ? s.smallSizeScale
+      : 1) * s.size
+  );
 
-    ctx.font = `${s.fontWeight || ""} ${fontSize}px ${s.fontFamily ||
-      "sans-serif"}`.trim();
-    const lines = text.split("\n");
+  ctx.font = `${s.fontWeight || ""} ${fontSize}px ${s.fontFamily ||
+    "sans-serif"}`.trim();
+  const lines = text.split("\n");
 
-    const width = lines
-      .map(t => ctx.measureText(t).width)
-      .reduce((a, b) => (a < b ? b : a), 0);
-    const height = lines.length * fontSize * s.lineHeight;
+  let width = lines
+    .map(t => ctx.measureText(t).width)
+    .reduce((a, b) => (a < b ? b : a), 0);
+  let height = lines.length * fontSize * s.lineHeight;
 
-    return {
-      width: Math.round(width),
-      height: Math.round(height)
-    };
+  const r = screenWidth / width;
+  if (r < 1) {
+    width = screenWidth;
+    height *= r;
+    fontSize *= r;
+  }
+
+  return {
+    width: Math.round(width),
+    height: Math.round(height),
+    size: fontSize
   };
 };
