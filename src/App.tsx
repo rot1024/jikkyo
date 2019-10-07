@@ -49,7 +49,7 @@ const App: React.FC = () => {
   );
   const handleSeek = useCallback((t: number, relative?: boolean) => {
     if (!setSeekTime) return;
-    setSeekTime(relative ? s => s + t : t);
+    setSeekTime(s => (relative ? s + t : t));
   }, []);
   const handleVideoOpen = useFileInput(
     files => {
@@ -86,8 +86,11 @@ const App: React.FC = () => {
       />
       <CommentArea
         comments={comments}
-        currentTime={(currentTime || 0) * 1000}
+        currentTime={currentTime * 1000}
+        duration={duration}
         playing={playing}
+        seekable
+        onSeek={handleSeek}
         onClick={handleVideoClick}
         onDoubleClick={handlePlayButtonClick}
       />
