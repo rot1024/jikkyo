@@ -121,6 +121,7 @@ const CommentArea: React.FC<Props> = ({
           chat={c}
           playing={playing}
           styles={innerStyles}
+          screenWidth={screenWidth}
         />
       ))}
     </div>

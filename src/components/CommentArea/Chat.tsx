@@ -7,23 +7,12 @@ import useLatest from "../../util/useLatest";
 
 export interface Props {
   className?: string;
-  frame: number;
+  frame?: number;
   chat?: Chat;
   styles: ChatActualStyle;
   playing?: boolean;
+  screenWidth: number;
 }
-
-const animation = keyframes`
-  from {
-    left: 100%;
-    transform: translate(0%);
-  }
-
-  to {
-    left: 0%;
-    transform: translate(-100%);
-  }
-`;
 
 const commonStyles = css`
   display: inline-block;
@@ -38,10 +27,11 @@ const commonStyles = css`
 
 const ChatComponent: React.FC<Props> = ({
   className,
-  frame,
+  frame = 0,
   chat,
   playing,
-  styles
+  styles,
+  screenWidth
 }) => {
   const innerFrame = useLatest(frame, playing);
 
@@ -65,14 +55,33 @@ const ChatComponent: React.FC<Props> = ({
             font-size: ${chat.fontSize}px;
             opacity: ${chat.danmaku ? styles.opacityDanmaku : styles.opacity};
             top: ${chat.y}px;
-            ${chat.ueshita &&
-              css`
-                left: 50%;
-                transform: translateX(-50%);
-              `}
+            ${chat.ueshita
+              ? css`
+                  left: 50%;
+                  transform: translateX(-50%);
+                `
+              : css`
+                  left: 100%;
+                `}
           `
         : undefined,
     [chat, styles]
+  );
+
+  const chatW = chat ? chat.width : 0;
+  const animation = useMemo(
+    () => keyframes`
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+
+    to {
+      transform: translate3d(-${
+        chatW === 0 ? 0 : ((screenWidth + chatW) / chatW) * 100
+      }%, 0, 0);
+    }
+    `,
+    [chatW, screenWidth]
   );
 
   const animatonStyles = useMemo(() => {
@@ -87,7 +96,7 @@ const ChatComponent: React.FC<Props> = ({
           left: ${(1 - x) * 100}%;
           transform: translateX(${x * -100}%);
         `;
-  }, [chat, innerFrame, playing]);
+  }, [animation, chat, innerFrame, playing]);
 
   return (
     <div className={className} css={[commonStyles, chatStyles, animatonStyles]}>
