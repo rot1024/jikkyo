@@ -31,6 +31,7 @@ const commonStyles = css`
   white-space: nowrap;
   box-sizing: content-box;
   font-weight: bold;
+  user-select: none;
   -webkit-text-stroke: 1px #000;
   /* text-stroke: 1px #000; */
 `;
