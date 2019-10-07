@@ -68,7 +68,7 @@ export const readComments = async (xml: string): Promise<Comment[]> => {
           color = (niconicoColors as any)[m];
           return true;
         }
-        if (/^#([\w\d]{3}|[\w\d]{6})$/) {
+        if (/^#([\w\d]{3}|[\w\d]{6})$/.test(m)) {
           color = m;
           return true;
         }
