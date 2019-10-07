@@ -2,19 +2,16 @@
 import React, { useMemo } from "react";
 import { css, jsx, keyframes } from "@emotion/core";
 
-import { Chat } from "./util";
+import { Chat, ChatActualStyle } from "./util";
 import useLatest from "../../util/useLatest";
 
 export interface Props {
   className?: string;
   frame: number;
   chat?: Chat;
-  opacity?: number;
-  opacityDanmaku?: number;
+  styles: ChatActualStyle;
   playing?: boolean;
 }
-
-const lh = 1.4;
 
 const animation = keyframes`
   from {
@@ -29,6 +26,7 @@ const animation = keyframes`
 `;
 
 const commonStyles = css`
+  display: inline-block;
   position: absolute;
   white-space: nowrap;
   box-sizing: content-box;
@@ -42,8 +40,7 @@ const ChatComponent: React.FC<Props> = ({
   frame,
   chat,
   playing,
-  opacity = 1,
-  opacityDanmaku = 1
+  styles
 }) => {
   const innerFrame = useLatest(frame, playing);
 
@@ -58,14 +55,18 @@ const ChatComponent: React.FC<Props> = ({
     [chat]
   );
 
-  const styles = useMemo(
+  const chatStyles = useMemo(
     () =>
       chat
         ? css`
-            line-height: ${lh};
+            line-height: ${styles.lineHeight};
             color: ${chat.color};
-            font-size: ${chat.fontSize / lh}px;
-            opacity: ${chat.danmaku ? opacityDanmaku : opacity};
+            font-size: ${(chat.size === "big"
+              ? styles.bigSizeScale
+              : chat.size === "small"
+              ? styles.smallSizeScale
+              : 1) * 100}%;
+            opacity: ${chat.danmaku ? styles.opacityDanmaku : styles.opacity};
             top: ${chat.y}px;
             ${chat.ueshita &&
               css`
@@ -74,7 +75,7 @@ const ChatComponent: React.FC<Props> = ({
               `}
           `
         : undefined,
-    [chat, opacity, opacityDanmaku]
+    [chat, styles]
   );
 
   const animatonStyles = useMemo(() => {
@@ -92,7 +93,12 @@ const ChatComponent: React.FC<Props> = ({
   }, [chat, innerFrame, playing]);
 
   return (
-    <div className={className} css={[commonStyles, styles, animatonStyles]}>
+    <div
+      className={className}
+      css={[commonStyles, chatStyles, animatonStyles]}
+      data-width={chat && chat.width}
+      data-height={chat && chat.height}
+    >
       {text}
     </div>
   );

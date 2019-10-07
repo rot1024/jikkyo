@@ -12,12 +12,72 @@ export interface Comment {
 
 export interface Chat extends Comment {
   y: number;
+  width: number;
   height: number;
   duration: number;
-  fontSize: number;
   danmaku: boolean;
   ueshita: boolean;
 }
+
+export interface ChatCommonStyle {
+  fontFamily: string;
+  fontWeight: string;
+  lineHeight: number;
+  bigSizeScale: number;
+  smallSizeScale: number;
+  opacity: number;
+  opacityDanmaku: number;
+  duration: number;
+  ueshitaDuration: number;
+}
+
+export interface ChatStyle extends ChatCommonStyle {
+  sizing: "rows" | "fontSize";
+  rows: number;
+  fontSize: number;
+}
+
+export interface ChatActualStyle extends ChatCommonStyle {
+  size: number;
+}
+
+export const defaultChatStyle: ChatStyle = {
+  fontFamily: "sans-serif",
+  fontWeight: "bold",
+  lineHeight: 1.4,
+  bigSizeScale: 1.5,
+  smallSizeScale: 0.5,
+  opacity: 1,
+  opacityDanmaku: 1,
+  duration: 5000,
+  ueshitaDuration: 3000,
+  sizing: "rows",
+  rows: 10,
+  fontSize: 32
+};
+
+export const getChatActualStyle = (
+  s: Partial<ChatStyle> | undefined,
+  height: number
+): ChatActualStyle => {
+  const styles = {
+    ...defaultChatStyle,
+    ...s
+  };
+  return {
+    ...styles,
+    size: Math.round(
+      styles.sizing === "fontSize"
+        ? styles.fontSize
+        : height / styles.rows / styles.lineHeight
+    )
+  };
+};
+
+export type Measurer = (
+  text: string,
+  size?: "big" | "small"
+) => { width: number; height: number };
 
 export const getVisibleChats = (
   chats: Chat[],
@@ -32,10 +92,10 @@ export const getVisibleChats = (
 
 export const commentsToChats = (
   comments: Comment[],
+  screenHeight: number,
   duration: number,
   ueshitaDuration: number,
-  screenHeight: number,
-  fontSize: number
+  measurer: Measurer
 ): Chat[] => {
   const chats: Chat[] = [];
 
@@ -47,13 +107,7 @@ export const commentsToChats = (
   for (const c of comments) {
     const dur =
       c.pos === "ue" || c.pos === "shita" ? ueshitaDuration : duration;
-    const fs =
-      c.size === "big"
-        ? fontSize * 1.5
-        : c.size === "small"
-        ? fontSize * 0.5
-        : fontSize;
-    const height = c.text.split("\n").length * fontSize;
+    const { width, height } = measurer(c.text, c.size);
     const ueshita = c.pos === "ue" || c.pos === "shita";
 
     let lines = c.pos === "ue" ? ue : c.pos === "shita" ? shita : naka;
@@ -78,8 +132,8 @@ export const commentsToChats = (
     const chat: Chat = {
       ...c,
       y,
+      width,
       height,
-      fontSize: fs,
       duration: dur,
       danmaku: false,
       ueshita
@@ -121,4 +175,34 @@ export const commentsToChats = (
   }
 
   return chats;
+};
+
+export const chatSizeMeasurer = (style: ChatActualStyle): Measurer => {
+  const s = { ...style };
+  const c = document.createElement("canvas");
+
+  return (text: string, size?: "big" | "small") => {
+    const ctx = c.getContext("2d") as CanvasRenderingContext2D;
+    const fontSize = Math.floor(
+      (size === "big"
+        ? s.bigSizeScale
+        : size === "small"
+        ? s.smallSizeScale
+        : 1) * s.size
+    );
+
+    ctx.font = `${s.fontWeight || ""} ${fontSize}px ${s.fontFamily ||
+      "sans-serif"}`.trim();
+    const lines = text.split("\n");
+
+    const width = lines
+      .map(t => ctx.measureText(t).width)
+      .reduce((a, b) => (a < b ? b : a), 0);
+    const height = lines.length * fontSize * s.lineHeight;
+
+    return {
+      width: Math.round(width),
+      height: Math.round(height)
+    };
+  };
 };

@@ -6,7 +6,15 @@ import { useThrottle } from "react-use";
 
 import useRequestAnimationFrame from "../../util/useRequestAnimationFrame";
 import ChatComponent from "./Chat";
-import { getVisibleChats, commentsToChats, Chat, Comment } from "./util";
+import {
+  getVisibleChats,
+  commentsToChats,
+  Chat,
+  Comment,
+  ChatStyle,
+  getChatActualStyle,
+  chatSizeMeasurer
+} from "./util";
 
 export type Comment = Comment;
 
@@ -15,13 +23,7 @@ export interface Props {
   comments?: Comment[];
   currentTime?: number;
   playing?: boolean;
-  duration?: number;
-  ueshitaDuration?: number;
-  sizing?: "rows" | "fontSize";
-  rows?: number;
-  fontSize?: number;
-  opacity?: number;
-  opacityDanmaku?: number;
+  styles?: Partial<ChatStyle>;
   visibleCommentCount?: number;
   onClick?: () => void;
   onDoubleClick?: () => void;
@@ -35,26 +37,24 @@ const CommentArea: React.FC<Props> = ({
   playing,
   comments = emptyComents,
   currentTime = 0,
-  duration = 5000,
-  ueshitaDuration = 3000,
-  sizing = "rows",
-  rows = 10,
-  fontSize = 36,
-  opacity = 1,
-  opacityDanmaku = 1,
+  styles,
   visibleCommentCount = Infinity,
   onClick,
   onDoubleClick
 }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const height = useThrottle(useComponentSize(ref).height, 1000);
+  const innerStyles = useMemo(() => getChatActualStyle(styles, height), [
+    height,
+    styles
+  ]);
+  const measurer = useMemo(() => chatSizeMeasurer(innerStyles), [innerStyles]);
+
   const [commentIdPrefix, setCommentIdPrefix] = useState(0);
   useEffect(() => {
     setCommentIdPrefix(i => i + 1);
   }, [comments]);
   const [chats, setChats] = useState(emptyChats);
-
-  const ref = useRef<HTMLDivElement>(null);
-  const height = useThrottle(useComponentSize(ref).height, 1000);
-  const chatSize = sizing === "fontSize" ? fontSize : height / rows;
 
   useEffect(() => {
     if (height === 0) return;
@@ -63,9 +63,21 @@ const CommentArea: React.FC<Props> = ({
       return;
     }
     setChats(
-      commentsToChats(comments, duration, ueshitaDuration, height, chatSize)
+      commentsToChats(
+        comments,
+        height,
+        innerStyles.duration,
+        innerStyles.ueshitaDuration,
+        measurer
+      )
     );
-  }, [chatSize, comments, duration, height, ueshitaDuration]);
+  }, [
+    comments,
+    height,
+    innerStyles.duration,
+    innerStyles.ueshitaDuration,
+    measurer
+  ]);
 
   const prevTime = useRef(Date.now());
   const [frame, setFrame] = useState(currentTime);
@@ -87,8 +99,19 @@ const CommentArea: React.FC<Props> = ({
   }, !!playing);
 
   const visibleChats = useMemo(
-    () => getVisibleChats(chats, frame, duration).slice(-visibleCommentCount),
-    [chats, duration, frame, visibleCommentCount]
+    () =>
+      getVisibleChats(
+        chats,
+        frame,
+        Math.max(innerStyles.duration, innerStyles.ueshitaDuration)
+      ).slice(-visibleCommentCount),
+    [
+      chats,
+      frame,
+      innerStyles.duration,
+      innerStyles.ueshitaDuration,
+      visibleCommentCount
+    ]
   );
 
   return (
@@ -103,6 +126,7 @@ const CommentArea: React.FC<Props> = ({
         left: 0;
         right: 0;
         bottom: 0;
+        font-size: ${innerStyles.size}px;
       `}
     >
       {visibleChats.map(c => (
@@ -110,9 +134,8 @@ const CommentArea: React.FC<Props> = ({
           key={commentIdPrefix + "_" + c.id}
           frame={frame}
           chat={c}
-          opacity={opacity}
-          opacityDanmaku={opacityDanmaku}
           playing={playing}
+          styles={innerStyles}
         />
       ))}
     </div>
