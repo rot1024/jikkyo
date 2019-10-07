@@ -126,25 +126,77 @@ export const commentsToChats = (
     if (height < screenHeight) {
       // find gap
       if (lines.length > 0) {
-        for (const l of lines) {
-          // empty
-          if (y + height <= l.y) {
-            break;
+        if (ueshita) {
+          for (const l of lines) {
+            // empty
+            if (y + height <= l.y) {
+              break;
+            }
+
+            y = l.y + l.height;
+
+            // overflowed
+            if (y + height > screenHeight) {
+              danmaku = true;
+              y = Math.random() * (screenHeight - height);
+              break;
+            }
           }
+        } else {
+          while (true) {
+            const bottom = y + height;
 
-          if (!ueshita) {
-            // TODO
-            y = -1000;
-            break;
-          }
+            // Extract all chats that intersect from the top to the bottom of the current comment on the Y axis
+            const y2 = y;
+            const intersectedChats = lines.filter(
+              l =>
+                (y2 < l.y && l.y + l.height < bottom) ||
+                (y2 < l.y + l.height && l.y < bottom) ||
+                (l.y < bottom && y2 < l.y + l.height) ||
+                (l.y < y2 && bottom < l.y + l.height)
+            );
 
-          y = l.y + l.height;
+            if (intersectedChats.length === 0) break;
 
-          // overflowed
-          if (y + height > screenHeight) {
-            danmaku = true;
-            y = Math.random() * (screenHeight - height);
-            break;
+            const overlappedChats = intersectedChats.filter(l => {
+              const diffVpos = c.vpos - l.vpos;
+              if (diffVpos <= 0) return true; // already overlapping
+
+              const diffDistance = diffVpos * l.speed - l.width;
+              if (diffDistance < 0) return true; // already overlapping
+
+              const relativeSpeed = speed - l.speed;
+              if (relativeSpeed <= 0) return false; // never overlap
+
+              // Time until the comment is completely hidden at the left edge of the screen
+              const leftTime = l.duration - diffVpos;
+
+              return diffDistance / relativeSpeed < leftTime;
+            });
+
+            if (overlappedChats.length === 0) {
+              // Does not overlap
+              break;
+            }
+
+            // Set new Y
+            const maxBottom = overlappedChats.reduce((a, b) => {
+              const bottom = b.y + b.height;
+              return a < bottom ? bottom : a;
+            }, 0);
+            if (maxBottom <= y) {
+              // invalid
+              danmaku = true;
+              break;
+            }
+            y = maxBottom;
+
+            // overflowed
+            if (y + height > screenHeight) {
+              danmaku = true;
+              y = Math.random() * (screenHeight - height);
+              break;
+            }
           }
         }
       }
