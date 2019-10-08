@@ -24,7 +24,6 @@ const App: React.FC = () => {
   const [canPlay, setCanPlay] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
-  const [seekTime, setSeekTime] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
   const [controllerHidden, setControllerHidden] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
@@ -38,7 +37,6 @@ const App: React.FC = () => {
       if (e === "load") {
         setPlaying(false);
         setCanPlay(false);
-        setSeekTime(0);
       } else if (e === "pause") {
         setPlaying(false);
       } else if (e === "play") {
@@ -52,8 +50,12 @@ const App: React.FC = () => {
     []
   );
   const handleSeek = useCallback((t: number, relative?: boolean) => {
-    if (!setSeekTime) return;
-    setSeekTime(s => (relative ? s + t : t));
+    if (!videoRef.current) return;
+    if (relative) {
+      videoRef.current.seekRelative(t);
+    } else {
+      videoRef.current.seek(t);
+    }
   }, []);
   const handleVideoOpen = useFileInput(
     files => {
@@ -61,7 +63,7 @@ const App: React.FC = () => {
       const url = URL.createObjectURL(files[0]);
       setSrc(url);
       setPlaying(false);
-      setSeekTime(0);
+      setCurrentTime(0);
     },
     { accept: "video/*", multiple: true }
   );
@@ -108,7 +110,6 @@ const App: React.FC = () => {
       <Video
         ref={videoRef}
         src={src}
-        currentTime={seekTime}
         onTimeUpdate={setCurrentTime}
         onEvent={handleVideoEvent}
       />

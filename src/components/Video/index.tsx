@@ -20,7 +20,6 @@ export type EventType =
 export interface Props {
   className?: string;
   src?: string;
-  currentTime?: number;
   onEvent?: (type: EventType, currentTime: number, duration: number) => void;
   onTimeUpdate?: (currentTime: number) => void;
 }
@@ -29,6 +28,8 @@ export interface Methods {
   play: () => void;
   stop: () => void;
   toggle: () => boolean;
+  seek: (t: number) => void;
+  seekRelative: (t: number) => void;
 }
 
 const event = (
@@ -42,7 +43,7 @@ const event = (
 };
 
 const Video: React.FC<Props> = (
-  { className, src, currentTime, onEvent, onTimeUpdate },
+  { className, src, onEvent, onTimeUpdate },
   ref
 ) => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -84,17 +85,16 @@ const Video: React.FC<Props> = (
         videoRef.current.pause();
       }
       return next;
+    },
+    seek: t => {
+      if (!videoRef.current) return;
+      videoRef.current.currentTime = t;
+    },
+    seekRelative: t => {
+      if (!videoRef.current) return;
+      videoRef.current.currentTime = videoRef.current.currentTime + t;
     }
   }));
-
-  useEffect(() => {
-    if (!videoRef.current || typeof currentTime !== "number") return;
-    if ((videoRef.current as any).fastSeek) {
-      (videoRef.current as any).fastSeek(currentTime);
-    } else {
-      videoRef.current.currentTime = currentTime;
-    }
-  }, [currentTime]);
 
   useEffect(() => {
     playing.current = false;
