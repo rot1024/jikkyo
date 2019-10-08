@@ -1,11 +1,12 @@
 /** @jsx jsx */
-import React, { useCallback } from "react";
+import React, { useCallback, useRef } from "react";
 import { css, jsx } from "@emotion/core";
 import useTransition from "@rot1024/use-transition";
 import { useHotkeys } from "react-hotkeys-hook";
 
 import Form from "./Form";
 import { settingSchema, Settings } from "./setting";
+import useDebounce from "../../util/useDebounce";
 
 export type Settings = Settings;
 
@@ -15,6 +16,7 @@ export interface Props {
   initialSettings?: Settings;
   onChange?: (s: Settings) => void;
   onClose?: () => void;
+  debounce?: boolean;
 }
 
 const SettingPanel: React.FC<Props> = ({
@@ -22,7 +24,8 @@ const SettingPanel: React.FC<Props> = ({
   shown,
   onClose,
   initialSettings,
-  onChange
+  onChange,
+  debounce
 }) => {
   const state = useTransition(!!shown, 100, {
     mountOnEnter: true,
@@ -36,9 +39,17 @@ const SettingPanel: React.FC<Props> = ({
     },
     [onClose]
   );
+
   const handleClose = useCallback(() => {
     if (onClose) onClose();
   }, [onClose]);
+
+  const changedValue = useRef<Settings>({});
+  const handleChange = useCallback((v: Settings) => {
+    changedValue.current = v;
+  }, []);
+  useDebounce(changedValue.current, debounce ? 3000 : 0, onChange);
+
   useHotkeys("esc", handleClose);
 
   return state === "unmounted" ? null : (
@@ -54,6 +65,7 @@ const SettingPanel: React.FC<Props> = ({
         display: flex;
         align-items: center;
         justify-content: center;
+        font-size: 1.2rem;
         transition: ${state === "entering" || state === "exiting"
           ? "all 0.1s ease-in-out"
           : ""};
@@ -67,7 +79,7 @@ const SettingPanel: React.FC<Props> = ({
           bottom: 4em;
           right: 1em;
           width: calc(100vw - 2em);
-          max-width: 250px;
+          max-width: 300px;
           height: calc(100vh - 5em);
           max-height: 450px;
           background-color: #333;
@@ -80,7 +92,7 @@ const SettingPanel: React.FC<Props> = ({
         <Form
           schema={settingSchema}
           initialValues={initialSettings}
-          onChange={onChange}
+          onChange={handleChange}
         />
       </div>
     </div>

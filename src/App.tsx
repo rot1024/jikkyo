@@ -89,7 +89,6 @@ const App: React.FC = () => {
         currentTime={currentTime * 1000}
         duration={duration}
         playing={playing}
-        seekable
         onSeek={handleSeek}
         onClick={handleVideoClick}
         onDoubleClick={handlePlayButtonClick}
@@ -116,6 +115,7 @@ const App: React.FC = () => {
         shown={menuVisible}
         onClose={handleMenuClose}
         onChange={setSettings}
+        debounce
       />
     </Fragment>
   );
