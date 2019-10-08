@@ -110,6 +110,11 @@ export const settingSchema: SettingSchema = [
     enum: ["1", "2", "3", "4", "5"],
     defaultValue: "1",
     when: ["devision", "5"]
+  },
+  {
+    id: "muteKeywords",
+    type: "text",
+    name: "Mute keywords"
   }
 ];
 

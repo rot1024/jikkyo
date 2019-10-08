@@ -13,7 +13,7 @@ export interface Props {
   onChange?: (v: number) => void;
 }
 
-const range: React.FC<Props> = ({
+const Range: React.FC<Props> = ({
   className,
   min,
   max,
@@ -76,4 +76,4 @@ const range: React.FC<Props> = ({
   );
 };
 
-export default range;
+export default Range;

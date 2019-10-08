@@ -4,6 +4,7 @@ import { css, jsx } from "@emotion/core";
 
 import Switch from "./Switch";
 import Range from "./Range";
+import Text from "./Text";
 
 export type SettingSchema = ({
   id: string;
@@ -17,6 +18,11 @@ export type SettingSchema = ({
       step?: number;
       suffix?: string;
       defaultValue: number;
+    }
+  | {
+      type: "text";
+      defaultValue?: string;
+      suffix?: string;
     }
   | {
       type: "enum";
@@ -137,6 +143,19 @@ const Form: React.FC<Props> = ({
                 enum={[[s.id, s.name || s.id]]}
                 canToggle
                 onChange={v => handleChange({ [s.id]: !!v })}
+              />
+            )}
+            {s.type === "text" && (
+              <Text
+                value={
+                  ((values &&
+                    typeof values[s.id] === "string" &&
+                    values[s.id]) as string) ||
+                  s.defaultValue ||
+                  ""
+                }
+                suffix={s.suffix}
+                onChange={v => handleChange({ [s.id]: v })}
               />
             )}
           </div>
