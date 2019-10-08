@@ -1,8 +1,9 @@
 /** @jsx jsx */
-import React, { Fragment, useState, useCallback, useRef } from "react";
+import React, { Fragment, useState, useCallback, useRef, useMemo } from "react";
 import { css, jsx } from "@emotion/core";
 import { hot } from "react-hot-loader/root";
 import { Global } from "@emotion/core";
+import { useLocalStorage } from "react-use";
 import useFileInput from "use-file-input";
 import { useHotkeys } from "react-hotkeys-hook";
 
@@ -11,7 +12,7 @@ import loadComment, { Comment } from "./util/commentLoader";
 import Video, { EventType, Methods } from "./components/Video";
 import Controller from "./components/Controller";
 import SettingPanel, { Settings } from "./components/SettingPanel";
-import CommentArea from "./components/CommentArea";
+import CommentArea, { CommentStyle } from "./components/CommentArea";
 
 const App: React.FC = () => {
   const videoRef = useRef<Methods>(null);
@@ -70,7 +71,29 @@ const App: React.FC = () => {
     { accept: "application/xml" }
   );
   const handleMenuClose = useCallback(() => setMenuVisible(false), []);
-  const [, setSettings] = useState<Settings>();
+  const [settings, setSettings] = useLocalStorage<Settings>(
+    "jikkyo_settings",
+    {}
+  );
+  const styles = useMemo<CommentStyle>(
+    () => ({
+      // bigSizeScale: settings.bigSizeScale,
+      // smallSizeScale: settings.smallSizeScale,
+      duration: settings.commentDuration,
+      ueshitaDuration: settings.ueShitaCommentDuration,
+      opacity: settings.commentOpacity ? settings.commentOpacity / 100 : 0,
+      opacityDanmaku: settings.danmakuCommentOpacity
+        ? settings.danmakuCommentOpacity / 100
+        : 0,
+      fontSize: settings.fontSize,
+      rows: settings.rows,
+      sizing: settings.sizeCalcMethod
+      // fontFamily: settings.fontFamily,
+      // fontWeight: settings.fontWeight,
+      // lineHeight: settings.lineHeight,
+    }),
+    [settings]
+  );
 
   useHotkeys("space", handlePlayButtonClick);
 
@@ -92,6 +115,7 @@ const App: React.FC = () => {
         onSeek={handleSeek}
         onClick={handleVideoClick}
         onDoubleClick={handlePlayButtonClick}
+        styles={styles}
       />
       <Controller
         hidden={controllerHidden}
@@ -113,6 +137,7 @@ const App: React.FC = () => {
       />
       <SettingPanel
         shown={menuVisible}
+        initialSettings={settings}
         onClose={handleMenuClose}
         onChange={setSettings}
         debounce

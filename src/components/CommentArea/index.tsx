@@ -22,6 +22,7 @@ import {
 } from "./util";
 
 export type Comment = Comment;
+export type CommentStyle = Partial<ChatStyle>;
 
 export interface Props {
   className?: string;

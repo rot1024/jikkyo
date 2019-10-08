@@ -13,7 +13,7 @@ export const settingSchema: SettingSchema = [
     min: 10,
     max: 50,
     when: ["sizeCalcMethod", "rows"],
-    defaultValue: 20
+    defaultValue: 10
   },
   {
     id: "fontSize",
@@ -21,7 +21,7 @@ export const settingSchema: SettingSchema = [
     min: 5,
     max: 50,
     when: ["sizeCalcMethod", "fontSize"],
-    defaultValue: 16
+    defaultValue: 32
   },
   {
     id: "commentDuration",
@@ -41,7 +41,7 @@ export const settingSchema: SettingSchema = [
     min: 500,
     max: 15000,
     step: 500,
-    defaultValue: 5000
+    defaultValue: 3000
   },
   {
     id: "commentOpacity",
@@ -61,7 +61,7 @@ export const settingSchema: SettingSchema = [
     min: 0,
     max: 100,
     step: 5,
-    defaultValue: 100
+    defaultValue: 80
   },
   {
     id: "commentTimeCorrection",
