@@ -17,6 +17,9 @@ import SettingPanel, {
 } from "./components/SettingPanel";
 import CommentArea, { CommentStyle } from "./components/CommentArea";
 
+const safari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+const ios = !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
+
 const App: React.FC = () => {
   const videoRef = useRef<Methods>(null);
   const [src, setSrc] = useState<string>();
@@ -65,7 +68,7 @@ const App: React.FC = () => {
       setPlaying(false);
       setCurrentTime(0);
     },
-    { accept: "video/*", multiple: true }
+    { accept: !safari || ios ? "video/*" : "*", multiple: ios }
   );
   const handleCommentOpen = useFileInput(
     async files => {
