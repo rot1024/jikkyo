@@ -62,9 +62,13 @@ export const getChatActualStyle = (
   s: Partial<ChatStyle> | undefined,
   height: number
 ): ChatActualStyle => {
+  const ss = Object.entries(s || {}).reduce(
+    (a, [k, v]) => (typeof v === "undefined" ? a : { ...a, [k]: v }),
+    {}
+  );
   const styles = {
     ...defaultChatStyle,
-    ...s
+    ...ss
   };
   return {
     ...styles,
@@ -86,7 +90,7 @@ export const getVisibleChats = (
   frame: number,
   duration: number
 ) => {
-  if (chats.length === 0) return [];
+  if (chats.length === 0 || isNaN(duration)) return [];
   const start = binarySearch(chats, frame - duration, c => c.vpos);
   const end = binarySearch(chats, frame, c => c.vpos);
   return chats.slice(start, end).filter(c => frame < c.vpos + c.duration);

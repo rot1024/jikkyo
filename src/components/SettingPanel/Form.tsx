@@ -21,7 +21,7 @@ export type SettingSchema = ({
     }
   | {
       type: "text";
-      defaultValue?: string;
+      defaultValue: string;
       suffix?: string;
     }
   | {
@@ -31,7 +31,7 @@ export type SettingSchema = ({
     }
   | {
       type: "check";
-      defaultValue?: boolean;
+      defaultValue: boolean;
     }))[];
 
 export type SettingValues = {

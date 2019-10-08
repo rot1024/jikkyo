@@ -11,7 +11,10 @@ import globalStyles from "./styles";
 import loadComment, { Comment } from "./util/commentLoader";
 import Video, { EventType, Methods } from "./components/Video";
 import Controller from "./components/Controller";
-import SettingPanel, { Settings } from "./components/SettingPanel";
+import SettingPanel, {
+  Settings,
+  defaultSettings
+} from "./components/SettingPanel";
 import CommentArea, { CommentStyle } from "./components/CommentArea";
 
 const App: React.FC = () => {
@@ -73,7 +76,7 @@ const App: React.FC = () => {
   const handleMenuClose = useCallback(() => setMenuVisible(false), []);
   const [settings, setSettings] = useLocalStorage<Settings>(
     "jikkyo_settings",
-    {}
+    defaultSettings
   );
   const styles = useMemo<CommentStyle>(
     () => ({
@@ -81,10 +84,12 @@ const App: React.FC = () => {
       // smallSizeScale: settings.smallSizeScale,
       duration: settings.commentDuration,
       ueshitaDuration: settings.ueShitaCommentDuration,
-      opacity: settings.commentOpacity ? settings.commentOpacity / 100 : 0,
-      opacityDanmaku: settings.danmakuCommentOpacity
-        ? settings.danmakuCommentOpacity / 100
-        : 0,
+      ...(settings.commentOpacity
+        ? { opacity: settings.commentOpacity / 100 }
+        : {}),
+      ...(settings.danmakuCommentOpacity
+        ? { opacityDanmaku: settings.danmakuCommentOpacity / 100 }
+        : {}),
       fontSize: settings.fontSize,
       rows: settings.rows,
       sizing: settings.sizeCalcMethod

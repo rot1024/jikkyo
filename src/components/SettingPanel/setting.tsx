@@ -76,12 +76,14 @@ export const settingSchema: SettingSchema = [
   {
     id: "cleanComment",
     name: "Remove hashtags and URLs",
-    type: "check"
+    type: "check",
+    defaultValue: false
   },
   {
     id: "coloriseComments",
     name: "Colorize comments",
-    type: "check"
+    type: "check",
+    defaultValue: false
   },
   {
     id: "devision",
@@ -114,11 +116,17 @@ export const settingSchema: SettingSchema = [
   {
     id: "muteKeywords",
     type: "text",
-    name: "Mute keywords"
+    name: "Mute keywords",
+    defaultValue: ""
   }
 ];
 
-export type Settings = Partial<{
+export const defaultSettings = settingSchema.reduce(
+  (a, b) => ({ ...a, [b.id]: b.defaultValue }),
+  {} as Settings
+);
+
+export type Settings = {
   sizeCalcMethod: "rows" | "fontSize";
   rows: number;
   fontSize: number;
@@ -133,4 +141,4 @@ export type Settings = Partial<{
   devision2: "1" | "2";
   devision3: "1" | "2" | "3";
   devision5: "1" | "2" | "3" | "5";
-}>;
+};

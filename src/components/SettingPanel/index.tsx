@@ -4,11 +4,12 @@ import { css, jsx } from "@emotion/core";
 import useTransition from "@rot1024/use-transition";
 import { useHotkeys } from "react-hotkeys-hook";
 
-import Form from "./Form";
-import { settingSchema, Settings } from "./setting";
+import Form, { SettingValues } from "./Form";
+import { settingSchema, Settings, defaultSettings } from "./setting";
 import useDebounce from "../../util/useDebounce";
 
 export type Settings = Settings;
+export { defaultSettings };
 
 export interface Props {
   className?: string;
@@ -44,11 +45,11 @@ const SettingPanel: React.FC<Props> = ({
     if (onClose) onClose();
   }, [onClose]);
 
-  const changedValue = useRef<Settings>({});
-  const handleChange = useCallback((v: Settings) => {
-    changedValue.current = v;
+  const changedValue = useRef<Settings>(initialSettings || defaultSettings);
+  const handleChange = useCallback((v: SettingValues) => {
+    changedValue.current = v as any;
   }, []);
-  useDebounce(changedValue.current, debounce ? 3000 : 0, onChange);
+  useDebounce(changedValue.current, debounce ? 1000 : 0, onChange);
 
   useHotkeys("esc", handleClose);
 
