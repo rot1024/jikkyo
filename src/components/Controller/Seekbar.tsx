@@ -25,6 +25,9 @@ const SeekBar: React.FC<Props> = ({
     },
     [onChange]
   );
+  const handleClick = useCallback((e: React.MouseEvent<HTMLInputElement>) => {
+    e.currentTarget.blur();
+  }, []);
 
   return (
     <div
@@ -40,6 +43,7 @@ const SeekBar: React.FC<Props> = ({
         min={0}
         disabled={disabled}
         onChange={handleChange}
+        onClick={handleClick}
         css={css`
           width: 100%;
           position: absolute;
