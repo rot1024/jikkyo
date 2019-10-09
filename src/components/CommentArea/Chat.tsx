@@ -12,6 +12,9 @@ export interface Props {
   styles: ChatActualStyle;
   playing?: boolean;
   screenWidth: number;
+  opacity?: number;
+  opacityDanmaku?: number;
+  thinning?: [number, number];
 }
 
 const commonStyles = css`
@@ -31,9 +34,13 @@ const ChatComponent: React.FC<Props> = ({
   chat,
   playing,
   styles,
-  screenWidth
+  screenWidth,
+  opacity = 1,
+  opacityDanmaku = 0.4,
+  thinning
 }) => {
   const innerFrame = useLatest(frame, playing);
+  const hidden = chat && thinning && chat.id % thinning[1] !== thinning[0] - 1;
 
   const text = useMemo(
     () =>
@@ -53,7 +60,7 @@ const ChatComponent: React.FC<Props> = ({
             line-height: ${styles.lineHeight};
             color: ${chat.color};
             font-size: ${chat.fontSize}px;
-            opacity: ${chat.danmaku ? styles.opacityDanmaku : styles.opacity};
+            opacity: ${chat.danmaku ? opacityDanmaku : opacity};
             top: ${chat.y}px;
             ${chat.ueshita
               ? css`
@@ -65,7 +72,7 @@ const ChatComponent: React.FC<Props> = ({
                 `}
           `
         : undefined,
-    [chat, styles]
+    [chat, opacity, opacityDanmaku, styles.lineHeight]
   );
 
   const chatW = chat ? chat.width : 0;
@@ -99,7 +106,11 @@ const ChatComponent: React.FC<Props> = ({
   }, [animation, chat, innerFrame, playing]);
 
   return (
-    <div className={className} css={[commonStyles, chatStyles, animatonStyles]}>
+    <div
+      className={className}
+      css={[commonStyles, chatStyles, animatonStyles]}
+      style={{ visibility: hidden ? "hidden" : "visible" }}
+    >
       {text}
     </div>
   );

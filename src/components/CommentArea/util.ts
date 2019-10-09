@@ -1,7 +1,7 @@
 import binarySearch from "../../util/binarySearch";
 
 export interface Comment {
-  id: string;
+  id: number;
   text: string;
   vpos: number; // ms
   commenter: string;
@@ -27,8 +27,6 @@ export interface ChatCommonStyle {
   lineHeight: number;
   bigSizeScale: number;
   smallSizeScale: number;
-  opacity: number;
-  opacityDanmaku: number;
   duration: number;
   ueshitaDuration: number;
 }
@@ -49,8 +47,6 @@ export const defaultChatStyle: ChatStyle = {
   lineHeight: 1.4,
   bigSizeScale: 1.5,
   smallSizeScale: 0.5,
-  opacity: 1,
-  opacityDanmaku: 0.4,
   duration: 5000,
   ueshitaDuration: 3000,
   sizing: "rows",

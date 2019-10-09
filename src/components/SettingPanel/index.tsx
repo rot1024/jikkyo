@@ -1,11 +1,16 @@
 /** @jsx jsx */
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useRef, useMemo } from "react";
 import { css, jsx } from "@emotion/core";
 import useTransition from "@rot1024/use-transition";
 import { useHotkeys } from "react-hotkeys-hook";
 
 import Form, { SettingValues } from "./Form";
-import { settingSchema, Settings, defaultSettings } from "./setting";
+import {
+  settingSchema,
+  Settings,
+  defaultSettings,
+  getSettings
+} from "./setting";
 import useDebounce from "../../util/useDebounce";
 
 export type Settings = Settings;
@@ -17,7 +22,6 @@ export interface Props {
   initialSettings?: Settings;
   onChange?: (s: Settings) => void;
   onClose?: () => void;
-  debounce?: boolean;
 }
 
 const SettingPanel: React.FC<Props> = ({
@@ -25,8 +29,7 @@ const SettingPanel: React.FC<Props> = ({
   shown,
   onClose,
   initialSettings,
-  onChange,
-  debounce
+  onChange
 }) => {
   const state = useTransition(!!shown, 100, {
     mountOnEnter: true,
@@ -41,17 +44,37 @@ const SettingPanel: React.FC<Props> = ({
     [onClose]
   );
 
-  const handleClose = useCallback(() => {
-    if (onClose) onClose();
-  }, [onClose]);
+  const initialSettings2 = useMemo(() => getSettings(initialSettings), [
+    initialSettings
+  ]);
+  const changedValue = useRef(initialSettings2[0]);
+  const changedValueDebounced = useRef(initialSettings2[1]);
+  const handleChange = useCallback(
+    (v: SettingValues) => {
+      const newSettings = getSettings(v as Settings);
+      if (onChange) {
+        onChange({
+          ...newSettings[0],
+          ...changedValueDebounced.current
+        });
+      }
+      changedValue.current = newSettings[0];
+      changedValueDebounced.current = newSettings[1];
+    },
+    [onChange]
+  );
+  const handleDebounce = useCallback(
+    () =>
+      onChange &&
+      onChange({
+        ...changedValue.current,
+        ...changedValueDebounced.current
+      }),
+    [onChange]
+  );
+  useDebounce(changedValueDebounced.current, 1000, handleDebounce);
 
-  const changedValue = useRef<Settings>(initialSettings || defaultSettings);
-  const handleChange = useCallback((v: SettingValues) => {
-    changedValue.current = v as any;
-  }, []);
-  useDebounce(changedValue.current, debounce ? 1000 : 0, onChange);
-
-  useHotkeys("esc", handleClose);
+  useHotkeys("esc", () => onClose && onClose(), [onClose]);
 
   return state === "unmounted" ? null : (
     <div

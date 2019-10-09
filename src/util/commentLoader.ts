@@ -1,5 +1,5 @@
 export interface Comment {
-  id: string;
+  id: number;
   text: string;
   date: Date;
   vpos: number;
@@ -78,7 +78,7 @@ export const readComments = async (
       });
 
       return {
-        id: i + "",
+        id: i,
         text: node.textContent || "",
         date: new Date(parseInt(node.getAttribute("date") || "", 10) * 1000),
         // vpos: convert into ms

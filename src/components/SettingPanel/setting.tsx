@@ -5,7 +5,8 @@ export const settingSchema: SettingSchema = [
     id: "sizeCalcMethod",
     type: "enum",
     enum: [["rows", "Rows"], ["fontSize", "Font Size"]],
-    defaultValue: "rows"
+    defaultValue: "rows",
+    debounce: true
   },
   {
     id: "rows",
@@ -13,7 +14,8 @@ export const settingSchema: SettingSchema = [
     min: 10,
     max: 50,
     when: ["sizeCalcMethod", "rows"],
-    defaultValue: 10
+    defaultValue: 10,
+    debounce: true
   },
   {
     id: "fontSize",
@@ -21,7 +23,8 @@ export const settingSchema: SettingSchema = [
     min: 5,
     max: 50,
     when: ["sizeCalcMethod", "fontSize"],
-    defaultValue: 32
+    defaultValue: 32,
+    debounce: true
   },
   {
     id: "commentDuration",
@@ -31,7 +34,8 @@ export const settingSchema: SettingSchema = [
     min: 500,
     max: 15000,
     step: 500,
-    defaultValue: 5000
+    defaultValue: 5000,
+    debounce: true
   },
   {
     id: "ueShitaCommentDuration",
@@ -41,7 +45,8 @@ export const settingSchema: SettingSchema = [
     min: 500,
     max: 15000,
     step: 500,
-    defaultValue: 3000
+    defaultValue: 3000,
+    debounce: true
   },
   {
     id: "commentOpacity",
@@ -68,8 +73,8 @@ export const settingSchema: SettingSchema = [
     type: "number",
     name: "Comment Time Correction",
     suffix: "s",
-    min: -3600000,
-    max: 3600000,
+    min: -60 * 60 * 1000,
+    max: 60 * 60 * 1000,
     step: 1000,
     defaultValue: 0
   },
@@ -126,6 +131,43 @@ export const defaultSettings = settingSchema.reduce(
   {} as Settings
 );
 
+export const defaultDebouncedSettings = settingSchema.reduce(
+  (a, b) => (b.debounce ? { ...a, [b.id]: b.defaultValue } : a),
+  {} as Pick<Settings, SettingsDebounced>
+);
+
+export const getSettings = (s?: Settings) =>
+  settingSchema.reduce<
+    [Exclude<Settings, SettingsDebounced>, Pick<Settings, SettingsDebounced>]
+  >(
+    (a, b) =>
+      b.debounce
+        ? [
+            a[0],
+            {
+              ...a[1],
+              [b.id]:
+                typeof (s as any)[b.id] !== "undefined"
+                  ? (s as any)[b.id]
+                  : (defaultSettings as any)[b.id]
+            }
+          ]
+        : [
+            {
+              ...a[0],
+              [b.id]:
+                typeof (s as any)[b.id] !== "undefined"
+                  ? (s as any)[b.id]
+                  : (defaultSettings as any)[b.id]
+            },
+            a[1]
+          ],
+    [{}, {}] as [
+      Exclude<Settings, SettingsDebounced>,
+      Pick<Settings, SettingsDebounced>
+    ]
+  );
+
 export type Settings = {
   sizeCalcMethod: "rows" | "fontSize";
   rows: number;
@@ -142,3 +184,10 @@ export type Settings = {
   devision3: "1" | "2" | "3";
   devision5: "1" | "2" | "3" | "5";
 };
+
+export type SettingsDebounced =
+  | "sizeCalcMethod"
+  | "rows"
+  | "fontSize"
+  | "commentDuration"
+  | "ueShitaCommentDuration";

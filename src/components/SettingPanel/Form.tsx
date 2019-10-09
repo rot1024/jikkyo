@@ -10,6 +10,7 @@ export type SettingSchema = ({
   id: string;
   name?: string;
   when?: [string, any];
+  debounce?: boolean;
 } & (
   | {
       type: "number";

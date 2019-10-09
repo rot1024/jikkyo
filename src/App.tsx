@@ -99,25 +99,47 @@ const App: React.FC = () => {
   );
   const styles = useMemo<CommentStyle>(
     () => ({
-      // bigSizeScale: settings.bigSizeScale,
-      // smallSizeScale: settings.smallSizeScale,
       duration: settings.commentDuration,
       ueshitaDuration: settings.ueShitaCommentDuration,
-      ...(settings.commentOpacity
-        ? { opacity: settings.commentOpacity / 100 }
-        : {}),
-      ...(settings.danmakuCommentOpacity
-        ? { opacityDanmaku: settings.danmakuCommentOpacity / 100 }
-        : {}),
       fontSize: settings.fontSize,
       rows: settings.rows,
       sizing: settings.sizeCalcMethod
       // fontFamily: settings.fontFamily,
       // fontWeight: settings.fontWeight,
       // lineHeight: settings.lineHeight,
+      // bigSizeScale: settings.bigSizeScale,
+      // smallSizeScale: settings.smallSizeScale,
     }),
-    [settings]
+    [
+      settings.commentDuration,
+      settings.fontSize,
+      settings.rows,
+      settings.sizeCalcMethod,
+      settings.ueShitaCommentDuration
+    ]
   );
+  const thinning = useMemo<[number, number] | undefined>(() => {
+    if (!settings.devision) return undefined;
+    const denominator = parseInt(settings.devision, 10);
+    if (isNaN(denominator) || denominator === 1) return undefined;
+    const numeratorStr =
+      denominator === 2
+        ? settings.devision2 || 1
+        : denominator === 3
+        ? settings.devision3 || 1
+        : denominator === 5
+        ? settings.devision5 || 1
+        : undefined;
+    if (!numeratorStr) return undefined;
+    const numerator = parseInt(numeratorStr, 10);
+    if (isNaN(numerator)) return undefined;
+    return [numerator, denominator];
+  }, [
+    settings.devision,
+    settings.devision2,
+    settings.devision3,
+    settings.devision5
+  ]);
 
   useHotkeys("space", handlePlayButtonClick);
 
@@ -134,6 +156,18 @@ const App: React.FC = () => {
         onClick={handleVideoClick}
         onDoubleClick={handlePlayButtonClick}
         styles={styles}
+        opacity={
+          settings && settings.commentOpacity
+            ? settings.commentOpacity / 100
+            : undefined
+        }
+        opacityDanmaku={
+          settings && settings.danmakuCommentOpacity
+            ? settings.danmakuCommentOpacity / 100
+            : undefined
+        }
+        thinning={thinning}
+        timeCorrection={settings && settings.commentTimeCorrection}
       />
       <Controller
         hidden={controllerHidden}
@@ -158,7 +192,6 @@ const App: React.FC = () => {
         initialSettings={settings}
         onClose={handleMenuClose}
         onChange={setSettings}
-        debounce
       />
     </Fragment>
   );

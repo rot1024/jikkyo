@@ -34,6 +34,10 @@ export interface Props {
   styles?: Partial<ChatStyle>;
   visibleCommentCount?: number;
   seekable?: boolean;
+  opacity?: number;
+  opacityDanmaku?: number;
+  thinning?: [number, number];
+  timeCorrection?: number;
   onSeek?: (t: number, relative?: boolean) => void;
   onClick?: () => void;
   onDoubleClick?: () => void;
@@ -52,6 +56,10 @@ const CommentArea: React.FC<Props> = ({
   styles,
   visibleCommentCount = Infinity,
   seekable,
+  opacity,
+  opacityDanmaku,
+  thinning,
+  timeCorrection = 0,
   onClick,
   onDoubleClick,
   onSeek
@@ -108,16 +116,17 @@ const CommentArea: React.FC<Props> = ({
     prevTime.current = Date.now();
   }, !!playing);
 
+  const correctedFrame = frame + timeCorrection;
   const visibleChats = useMemo(
     () =>
       getVisibleChats(
         chats,
-        frame,
+        correctedFrame,
         Math.max(innerStyles.duration, innerStyles.ueshitaDuration)
       ).slice(-visibleCommentCount),
     [
       chats,
-      frame,
+      correctedFrame,
       innerStyles.duration,
       innerStyles.ueshitaDuration,
       visibleCommentCount
@@ -159,11 +168,14 @@ const CommentArea: React.FC<Props> = ({
       {visibleChats.map(c => (
         <ChatComponent
           key={commentIdPrefix + "_" + c.id}
-          frame={frame}
+          frame={correctedFrame}
           chat={c}
           playing={playing}
           styles={innerStyles}
           screenWidth={screenWidth}
+          opacity={opacity}
+          opacityDanmaku={opacityDanmaku}
+          thinning={thinning}
         />
       ))}
       {seekable && (
