@@ -1,10 +1,11 @@
 /** @jsx jsx */
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import { css, jsx } from "@emotion/core";
 import { useHotkeys } from "react-hotkeys-hook";
 
 import Button from "./Button";
 import SeekBar from "./Seekbar";
+import usePlayer from "./usePlayer";
 
 export interface Props {
   className?: string;
@@ -18,12 +19,13 @@ export interface Props {
   onVideoButtonClick?: () => void;
   onCommentButtonClick?: () => void;
   onMenuButtonClick?: () => void;
+  onEnd?: () => void;
 }
 
 const Controller: React.FC<Props> = ({
   className,
-  currentTime,
-  duration,
+  currentTime = 0,
+  duration = 0,
   playing,
   hidden,
   onSeek,
@@ -31,30 +33,40 @@ const Controller: React.FC<Props> = ({
   onPlayButtonClick,
   onVideoButtonClick,
   onCommentButtonClick,
-  onMenuButtonClick
+  onMenuButtonClick,
+  onEnd
 }) => {
-  const disabled =
-    typeof currentTime !== "number" || typeof duration !== "number";
+  const disabled = duration === 0;
+  const [seekTime, seek] = usePlayer(!!playing, currentTime, duration, onEnd);
+
   const handleSeek = useCallback((t: number) => onSeek && onSeek(t), [onSeek]);
-  const handleSeekPlus10 = useCallback(
-    () => onSeek && onSeek(10 * 1000, true),
-    [onSeek]
+  const handleSeekRelative = useCallback(
+    (second: number) => () => {
+      const st = second * 1000;
+      seek(st, true);
+      if (onSeek) {
+        onSeek(st, true);
+      }
+    },
+    [onSeek, seek]
   );
-  const handleSeekMinus10 = useCallback(
-    () => onSeek && onSeek(-10 * 1000, true),
-    [onSeek]
-  );
-  const handleSeekPlus1 = useCallback(() => onSeek && onSeek(1000, true), [
-    onSeek
+  const handleSeekMinus10 = useMemo(() => handleSeekRelative(-10), [
+    handleSeekRelative
   ]);
-  const handleSeekMinus1 = useCallback(() => onSeek && onSeek(-1000, true), [
-    onSeek
+  const handleSeekPlus10 = useMemo(() => handleSeekRelative(10), [
+    handleSeekRelative
+  ]);
+  const handleSeekMinus1 = useMemo(() => handleSeekRelative(-1), [
+    handleSeekRelative
+  ]);
+  const handleSeekPlus1 = useMemo(() => handleSeekRelative(1), [
+    handleSeekRelative
   ]);
 
-  useHotkeys("left", handleSeekMinus10);
-  useHotkeys("right", handleSeekPlus10);
-  useHotkeys("shift + left", handleSeekMinus1);
-  useHotkeys("shift + right", handleSeekPlus1);
+  useHotkeys("left", handleSeekMinus10, [handleSeekMinus10]);
+  useHotkeys("right", handleSeekPlus10, [handleSeekPlus10]);
+  useHotkeys("shift + left", handleSeekMinus1, [handleSeekMinus1]);
+  useHotkeys("shift + right", handleSeekPlus1, [handleSeekPlus1]);
 
   return (
     <div
@@ -96,7 +108,7 @@ const Controller: React.FC<Props> = ({
         onClick={handleSeekPlus10}
       />
       <SeekBar
-        value={currentTime}
+        value={seekTime}
         max={duration}
         disabled={disabled}
         onChange={handleSeek}
@@ -113,7 +125,7 @@ const Controller: React.FC<Props> = ({
           text-align: center;
         `}
       >
-        {humanReadableTime(currentTime)}
+        {humanReadableTime(seekTime)}
       </div>
       <Button
         icon="video"

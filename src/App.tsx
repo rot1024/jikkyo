@@ -105,22 +105,12 @@ const App: React.FC = () => {
     [settings]
   );
 
-  const handleVideoTimeUpdate = useCallback(
-    (t: number) => setCurrentTime(t * 1000),
-    []
-  );
-
   useHotkeys("space", handlePlayButtonClick);
 
   return (
     <Fragment>
       <Global styles={globalStyles} />
-      <Video
-        ref={videoRef}
-        src={src}
-        onTimeUpdate={handleVideoTimeUpdate}
-        onEvent={handleVideoEvent}
-      />
+      <Video ref={videoRef} src={src} onEvent={handleVideoEvent} />
       <CommentArea
         comments={comments}
         currentTime={currentTime}
