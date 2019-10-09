@@ -38,6 +38,7 @@ export interface Props {
   opacityDanmaku?: number;
   thinning?: [number, number];
   timeCorrection?: number;
+  colorize?: boolean;
   onSeek?: (t: number, relative?: boolean) => void;
   onClick?: () => void;
   onDoubleClick?: () => void;
@@ -60,6 +61,7 @@ const CommentArea: React.FC<Props> = ({
   opacityDanmaku,
   thinning,
   timeCorrection = 0,
+  colorize,
   onClick,
   onDoubleClick,
   onSeek
@@ -176,6 +178,7 @@ const CommentArea: React.FC<Props> = ({
           opacity={opacity}
           opacityDanmaku={opacityDanmaku}
           thinning={thinning}
+          colorize={colorize}
         />
       ))}
       {seekable && (

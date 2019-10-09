@@ -8,6 +8,7 @@ export interface Comment {
   pos?: "ue" | "shita";
   size?: "big" | "small";
   color?: string;
+  color2?: string;
 }
 
 export interface Chat extends Comment {

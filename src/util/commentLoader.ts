@@ -7,6 +7,8 @@ export interface Comment {
   pos?: "ue" | "shita";
   size?: "big" | "small";
   color?: string;
+  color2: string;
+  hash: number;
 }
 
 const niconicoColors = {
@@ -77,13 +79,21 @@ export const readComments = async (
         return false;
       });
 
+      const commenter = node.getAttribute("user_id") || "";
+      const hash = commenter
+        ? /^[0-9]+$/.test(commenter)
+          ? parseInt(commenter, 10)
+          : hashCode(commenter)
+        : Math.random() * 0xffffff;
+      const [r, g, b] = hashCode2Color(hash);
+
       return {
         id: i,
         text: node.textContent || "",
         date: new Date(parseInt(node.getAttribute("date") || "", 10) * 1000),
         // vpos: convert into ms
         vpos: parseInt(node.getAttribute("vpos") || "", 10) * 10,
-        commenter: node.getAttribute("user_id") || "",
+        commenter,
         pos: mail.includes("ue")
           ? "ue"
           : mail.includes("shita")
@@ -94,7 +104,9 @@ export const readComments = async (
           : mail.includes("small")
           ? "small"
           : undefined,
-        color
+        color,
+        color2: `#${toHex(r)}${toHex(g)}${toHex(b)}`,
+        hash
       };
     }
   );
@@ -118,5 +130,28 @@ export const readComments = async (
       : validComments[validComments.length - 1].vpos
   ];
 };
+
+function hashCode(str: string) {
+  let hash = 0,
+    i,
+    len;
+  if (str.length === 0) return hash;
+  for (i = 0, len = str.length; i < len; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return hash;
+}
+
+function hashCode2Color(hash: number): [number, number, number] {
+  const r = (hash & 0xff0000) >> 16;
+  const g = (hash & 0x00ff00) >> 8;
+  const b = hash & 0x0000ff;
+  return [r, g, b];
+}
+
+function toHex(num: number) {
+  return ("0" + num.toString(16)).slice(-2);
+}
 
 export default async (file: File) => readComments(await readText(file));

@@ -167,6 +167,7 @@ const App: React.FC = () => {
             : undefined
         }
         thinning={thinning}
+        colorize={settings.coloriseComments}
         timeCorrection={settings && settings.commentTimeCorrection}
       />
       <Controller

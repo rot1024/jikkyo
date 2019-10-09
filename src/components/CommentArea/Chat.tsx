@@ -15,6 +15,7 @@ export interface Props {
   opacity?: number;
   opacityDanmaku?: number;
   thinning?: [number, number];
+  colorize?: boolean;
 }
 
 const commonStyles = css`
@@ -37,7 +38,8 @@ const ChatComponent: React.FC<Props> = ({
   screenWidth,
   opacity = 1,
   opacityDanmaku = 0.4,
-  thinning
+  thinning,
+  colorize
 }) => {
   const innerFrame = useLatest(frame, playing);
   const hidden = chat && thinning && chat.id % thinning[1] !== thinning[0] - 1;
@@ -58,7 +60,7 @@ const ChatComponent: React.FC<Props> = ({
       chat
         ? css`
             line-height: ${styles.lineHeight};
-            color: ${chat.color};
+            color: ${colorize ? chat.color2 : chat.color};
             font-size: ${chat.fontSize}px;
             opacity: ${chat.danmaku ? opacityDanmaku : opacity};
             top: ${chat.y}px;
@@ -72,7 +74,7 @@ const ChatComponent: React.FC<Props> = ({
                 `}
           `
         : undefined,
-    [chat, opacity, opacityDanmaku, styles.lineHeight]
+    [chat, colorize, opacity, opacityDanmaku, styles.lineHeight]
   );
 
   const chatW = chat ? chat.width : 0;
