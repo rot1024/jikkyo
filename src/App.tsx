@@ -25,7 +25,6 @@ const App: React.FC = () => {
   const [[comments, commentDuration], setComments] = useState<
     [Comment[], number]
   >([[], 0]);
-  const [canPlay, setCanPlay] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
@@ -33,23 +32,21 @@ const App: React.FC = () => {
   const [menuVisible, setMenuVisible] = useState(false);
   const handleVideoClick = useCallback(() => setControllerHidden(p => !p), []);
   const handlePlayButtonClick = useCallback(() => {
+    if (duration === 0) return;
     if (videoRef.current && src) {
       setPlaying(videoRef.current.toggle());
     } else {
       setPlaying(p => !p);
     }
-  }, [src]);
+  }, [duration, src]);
   const handleVideoEvent = useCallback(
     (e: EventType, ct: number, d: number) => {
       if (e === "load") {
         setPlaying(false);
-        setCanPlay(false);
       } else if (e === "pause") {
         setPlaying(false);
       } else if (e === "play") {
         setPlaying(true);
-      } else if (e === "canplay") {
-        setCanPlay(true);
       }
       setCurrentTime(ct * 1000);
       setDuration(d * 1000);
@@ -85,9 +82,6 @@ const App: React.FC = () => {
       if (files.length === 0) return;
       const comments = await loadComment(files[0]);
       setComments(comments);
-      if (!src) {
-        setCanPlay(true);
-      }
     },
     { accept: "application/xml" }
   );
@@ -170,7 +164,6 @@ const App: React.FC = () => {
       <Controller
         hidden={controllerHidden}
         playing={playing}
-        canPlay={canPlay}
         onPlayButtonClick={handlePlayButtonClick}
         onSeek={handleSeek}
         onVideoButtonClick={handleVideoOpen}

@@ -13,7 +13,6 @@ export interface Props {
   duration?: number;
   playing?: boolean;
   hidden?: boolean;
-  canPlay?: boolean;
   onSeek?: (time: number, relative?: boolean) => void;
   onPlayButtonClick?: () => void;
   onVideoButtonClick?: () => void;
@@ -29,7 +28,6 @@ const Controller: React.FC<Props> = ({
   playing,
   hidden,
   onSeek,
-  canPlay,
   onPlayButtonClick,
   onVideoButtonClick,
   onCommentButtonClick,
@@ -70,11 +68,11 @@ const Controller: React.FC<Props> = ({
   useHotkeys(
     "space",
     () => {
-      if (onPlayButtonClick) {
+      if (onPlayButtonClick && duration > 0) {
         onPlayButtonClick();
       }
     },
-    [onPlayButtonClick]
+    [onPlayButtonClick, duration]
   );
 
   return (
@@ -99,7 +97,7 @@ const Controller: React.FC<Props> = ({
     >
       <Button
         icon={playing ? "pause" : "play"}
-        disabled={disabled || !canPlay}
+        disabled={disabled || duration === 0}
         highlightOnHover
         large
         onClick={onPlayButtonClick}
