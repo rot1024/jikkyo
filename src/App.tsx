@@ -23,7 +23,9 @@ const ios = !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
 const App: React.FC = () => {
   const videoRef = useRef<Methods>(null);
   const [src, setSrc] = useState<string>();
-  const [comments, setComments] = useState<Comment[]>();
+  const [[comments, commentDuration], setComments] = useState<
+    [Comment[], number]
+  >([[], 0]);
   const [canPlay, setCanPlay] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
@@ -32,9 +34,12 @@ const App: React.FC = () => {
   const [menuVisible, setMenuVisible] = useState(false);
   const handleVideoClick = useCallback(() => setControllerHidden(p => !p), []);
   const handlePlayButtonClick = useCallback(() => {
-    if (!videoRef.current) return;
-    setPlaying(videoRef.current.toggle());
-  }, []);
+    if (videoRef.current && src) {
+      setPlaying(videoRef.current.toggle());
+    } else {
+      setPlaying(p => !p);
+    }
+  }, [src]);
   const handleVideoEvent = useCallback(
     (e: EventType, ct: number, d: number) => {
       if (e === "load") {
@@ -52,14 +57,20 @@ const App: React.FC = () => {
     },
     []
   );
-  const handleSeek = useCallback((t: number, relative?: boolean) => {
-    if (!videoRef.current) return;
-    if (relative) {
-      videoRef.current.seekRelative(t / 1000);
-    } else {
-      videoRef.current.seek(t / 1000);
-    }
-  }, []);
+  const handleSeek = useCallback(
+    (t: number, relative?: boolean) => {
+      if (videoRef.current && src) {
+        if (relative) {
+          videoRef.current.seekRelative(t / 1000);
+        } else {
+          videoRef.current.seek(t / 1000);
+        }
+      } else {
+        setCurrentTime(t2 => (relative ? t + t2 : t));
+      }
+    },
+    [src]
+  );
   const handleVideoOpen = useFileInput(
     files => {
       if (files.length === 0) return;
@@ -75,6 +86,9 @@ const App: React.FC = () => {
       if (files.length === 0) return;
       const comments = await loadComment(files[0]);
       setComments(comments);
+      if (!src) {
+        setCanPlay(true);
+      }
     },
     { accept: "application/xml" }
   );
@@ -133,7 +147,7 @@ const App: React.FC = () => {
           if (!menuVisible) setMenuVisible(true);
         }}
         currentTime={currentTime}
-        duration={duration}
+        duration={Math.max(duration, commentDuration)}
         css={css`
           position: fixed;
           bottom: 0;

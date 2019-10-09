@@ -52,7 +52,9 @@ export const readText = (file: File) =>
     reader.readAsText(file);
   });
 
-export const readComments = async (xml: string): Promise<Comment[]> => {
+export const readComments = async (
+  xml: string
+): Promise<[Comment[], number]> => {
   const parser = new DOMParser();
   const dom = parser.parseFromString(xml, "application/xml");
   if (dom.documentElement.nodeName === "parsererror") {
@@ -109,7 +111,12 @@ export const readComments = async (xml: string): Promise<Comment[]> => {
     console.warn(`${invalidCommnents} invalid comments are ignored.`);
   }
 
-  return validComments;
+  return [
+    validComments,
+    validComments.length === 0
+      ? 0
+      : validComments[validComments.length - 1].vpos
+  ];
 };
 
 export default async (file: File) => readComments(await readText(file));
