@@ -5,7 +5,6 @@ import { hot } from "react-hot-loader/root";
 import { Global } from "@emotion/core";
 import { useLocalStorage } from "react-use";
 import useFileInput from "use-file-input";
-import { useHotkeys } from "react-hotkeys-hook";
 
 import globalStyles from "./styles";
 import loadComment, { Comment } from "./util/commentLoader";
@@ -140,8 +139,6 @@ const App: React.FC = () => {
     settings.devision3,
     settings.devision5
   ]);
-
-  useHotkeys("space", handlePlayButtonClick);
 
   return (
     <Fragment>

@@ -67,6 +67,15 @@ const Controller: React.FC<Props> = ({
   useHotkeys("right", handleSeekPlus10, [handleSeekPlus10]);
   useHotkeys("shift + left", handleSeekMinus1, [handleSeekMinus1]);
   useHotkeys("shift + right", handleSeekPlus1, [handleSeekPlus1]);
+  useHotkeys(
+    "space",
+    () => {
+      if (onPlayButtonClick) {
+        onPlayButtonClick();
+      }
+    },
+    [onPlayButtonClick]
+  );
 
   return (
     <div
