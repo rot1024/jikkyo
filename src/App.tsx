@@ -47,17 +47,17 @@ const App: React.FC = () => {
       } else if (e === "canplay") {
         setCanPlay(true);
       }
-      setCurrentTime(ct);
-      setDuration(d);
+      setCurrentTime(ct * 1000);
+      setDuration(d * 1000);
     },
     []
   );
   const handleSeek = useCallback((t: number, relative?: boolean) => {
     if (!videoRef.current) return;
     if (relative) {
-      videoRef.current.seekRelative(t);
+      videoRef.current.seekRelative(t / 1000);
     } else {
-      videoRef.current.seek(t);
+      videoRef.current.seek(t / 1000);
     }
   }, []);
   const handleVideoOpen = useFileInput(
@@ -105,6 +105,11 @@ const App: React.FC = () => {
     [settings]
   );
 
+  const handleVideoTimeUpdate = useCallback(
+    (t: number) => setCurrentTime(t * 1000),
+    []
+  );
+
   useHotkeys("space", handlePlayButtonClick);
 
   return (
@@ -113,12 +118,12 @@ const App: React.FC = () => {
       <Video
         ref={videoRef}
         src={src}
-        onTimeUpdate={setCurrentTime}
+        onTimeUpdate={handleVideoTimeUpdate}
         onEvent={handleVideoEvent}
       />
       <CommentArea
         comments={comments}
-        currentTime={currentTime * 1000}
+        currentTime={currentTime}
         duration={duration}
         playing={playing}
         onSeek={handleSeek}

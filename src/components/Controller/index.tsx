@@ -35,19 +35,19 @@ const Controller: React.FC<Props> = ({
 }) => {
   const disabled =
     typeof currentTime !== "number" || typeof duration !== "number";
-  const handleSeek = useCallback((t: number) => onSeek && onSeek(t / 1000), [
+  const handleSeek = useCallback((t: number) => onSeek && onSeek(t), [onSeek]);
+  const handleSeekPlus10 = useCallback(
+    () => onSeek && onSeek(10 * 1000, true),
+    [onSeek]
+  );
+  const handleSeekMinus10 = useCallback(
+    () => onSeek && onSeek(-10 * 1000, true),
+    [onSeek]
+  );
+  const handleSeekPlus1 = useCallback(() => onSeek && onSeek(1000, true), [
     onSeek
   ]);
-  const handleSeekPlus10 = useCallback(() => onSeek && onSeek(10, true), [
-    onSeek
-  ]);
-  const handleSeekMinus10 = useCallback(() => onSeek && onSeek(-10, true), [
-    onSeek
-  ]);
-  const handleSeekPlus1 = useCallback(() => onSeek && onSeek(1, true), [
-    onSeek
-  ]);
-  const handleSeekMinus1 = useCallback(() => onSeek && onSeek(-1, true), [
+  const handleSeekMinus1 = useCallback(() => onSeek && onSeek(-1000, true), [
     onSeek
   ]);
 
@@ -96,8 +96,8 @@ const Controller: React.FC<Props> = ({
         onClick={handleSeekPlus10}
       />
       <SeekBar
-        value={currentTime ? currentTime * 1000 : 0}
-        max={duration ? duration * 1000 : 0}
+        value={currentTime}
+        max={duration}
         disabled={disabled}
         onChange={handleSeek}
         css={css`
@@ -134,8 +134,9 @@ const humanReadableTime = (t?: number) => {
   if (typeof t !== "number") {
     return "00:00:00";
   }
-  const s = ~~(t % 60);
-  const m = ~~(t / 60);
+  const second = t / 1000;
+  const s = ~~(second % 60);
+  const m = ~~(second / 60);
   const h = ~~(m / 60);
   return `${h >= 100 ? h : ("0" + h).slice(-2)}:${("0" + m).slice(-2)}:${(
     "0" + s

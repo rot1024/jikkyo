@@ -60,7 +60,6 @@ const CommentArea: React.FC<Props> = ({
 
   const seeker = useRef<HTMLDivElement>(null);
   const seekerPrevScroll = useRef(scrollWidth / 2);
-  const seekerTimeout = useRef<number>();
 
   const size = useComponentSize(ref);
   const screenWidth = useThrottle(size.width, 1000);
@@ -133,14 +132,12 @@ const CommentArea: React.FC<Props> = ({
         true
       );
       seekerPrevScroll.current = e.currentTarget.scrollLeft;
-      if (seekerTimeout.current) {
-        window.clearTimeout(seekerTimeout.current);
-        seekerTimeout.current = window.setTimeout(() => {
-          if (!seeker.current) return;
-          seekerPrevScroll.current = scrollWidth / 2;
-          seeker.current.scrollLeft = scrollWidth / 2;
-        }, 1000);
-      }
+      const seekerTimeout = window.setTimeout(() => {
+        if (!seeker.current) return;
+        seekerPrevScroll.current = scrollWidth / 2;
+        seeker.current.scrollLeft = scrollWidth / 2;
+      }, 1000);
+      return () => window.clearTimeout(seekerTimeout);
     },
     [onSeek]
   );
