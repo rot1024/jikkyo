@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import React from "react";
+import React, { useCallback } from "react";
 import { css, jsx } from "@emotion/core";
 import { IconDefinition } from "@fortawesome/fontawesome-common-types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -54,10 +54,20 @@ const Button: React.FC<Props> = ({
   title,
   onClick
 }) => {
+  const handleClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.currentTarget.blur();
+      if (onClick) {
+        onClick();
+      }
+    },
+    [onClick]
+  );
+
   return (
     <button
       className={className}
-      onClick={onClick}
+      onClick={handleClick}
       title={title}
       css={css`
         border: none;
