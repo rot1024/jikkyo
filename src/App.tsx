@@ -9,6 +9,7 @@ import useFileInput from "use-file-input";
 import globalStyles from "./styles";
 import loadComment, { Comment } from "./util/commentLoader";
 import Video, { EventType, Methods } from "./components/Video";
+import SeekerAndDropZone from "./components/SeekerAndDropZone";
 import Controller from "./components/Controller";
 import SettingPanel, {
   Settings,
@@ -77,6 +78,20 @@ const App: React.FC = () => {
     },
     [src]
   );
+  const handleDrop = useCallback(async (file: File) => {
+    if (file.type.indexOf("video/") === 0) {
+      setSrc(URL.createObjectURL(file));
+      setPlaying(false);
+      setCurrentTime(0);
+    }
+    if (
+      file.type.indexOf("text/xml") === 0 ||
+      file.type.indexOf("application/xml") === 0
+    ) {
+      const comments = await loadComment(file);
+      setComments(comments);
+    }
+  }, []);
   const handleVideoOpen = useFileInput(
     files => {
       if (files.length === 0) return;
@@ -96,6 +111,7 @@ const App: React.FC = () => {
     { accept: "application/xml" }
   );
   const handleMenuClose = useCallback(() => setMenuVisible(false), []);
+
   const [settings, setSettings] = useLocalStorage<Settings>(
     "jikkyo_settings",
     defaultSettings
@@ -157,11 +173,7 @@ const App: React.FC = () => {
       <CommentArea
         comments={comments}
         currentTime={currentTime}
-        duration={duration}
         playing={playing}
-        onSeek={handleSeek}
-        onClick={handleVideoClick}
-        onDoubleClick={handlePlayButtonClick}
         styles={styles}
         opacity={
           settings.commentOpacity ? settings.commentOpacity / 100 : undefined
@@ -176,6 +188,14 @@ const App: React.FC = () => {
         timeCorrection={settings.commentTimeCorrection}
         muteKeywords={muteKeywords}
         filterKeywords={filterKeywords}
+      />
+      <SeekerAndDropZone
+        seekable={duration > 0}
+        droppable
+        onSeek={handleSeek}
+        onDrop={handleDrop}
+        onClick={handleVideoClick}
+        onDoubleClick={handlePlayButtonClick}
       />
       <Controller
         hidden={controllerHidden}

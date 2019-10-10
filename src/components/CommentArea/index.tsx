@@ -1,11 +1,5 @@
 /** @jsx jsx */
-import React, {
-  useEffect,
-  useRef,
-  useState,
-  useMemo,
-  useCallback
-} from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import { css, jsx } from "@emotion/core";
 import useComponentSize from "@rehooks/component-size";
 import { useThrottle } from "react-use";
@@ -28,12 +22,9 @@ export interface Props {
   className?: string;
   comments?: Comment[];
   currentTime?: number; // ms
-  seekTime?: number;
-  duration?: number;
   playing?: boolean;
   styles?: Partial<ChatStyle>;
   visibleCommentCount?: number;
-  seekable?: boolean;
   opacity?: number;
   opacityDanmaku?: number;
   thinning?: [number, number];
@@ -41,24 +32,18 @@ export interface Props {
   colorize?: boolean;
   muteKeywords?: RegExp;
   filterKeywords?: RegExp;
-  onSeek?: (t: number, relative?: boolean) => void;
-  onClick?: () => void;
-  onDoubleClick?: () => void;
 }
 
 const emptyComents: Comment[] = [];
 const emptyChats: Chat[] = [];
-const scrollWidth = 1000000;
 
 const CommentArea: React.FC<Props> = ({
   className,
   playing,
   comments = emptyComents,
   currentTime = 0,
-  duration = 0,
   styles,
   visibleCommentCount = Infinity,
-  seekable,
   opacity,
   opacityDanmaku,
   thinning,
@@ -66,14 +51,8 @@ const CommentArea: React.FC<Props> = ({
   colorize,
   muteKeywords,
   filterKeywords,
-  onClick,
-  onDoubleClick,
-  onSeek
 }) => {
   const ref = useRef<HTMLDivElement>(null);
-
-  const seeker = useRef<HTMLDivElement>(null);
-  const seekerPrevScroll = useRef(scrollWidth / 2);
 
   const size = useComponentSize(ref);
   const screenWidth = useThrottle(size.width, 1000);
@@ -105,11 +84,6 @@ const CommentArea: React.FC<Props> = ({
     setFrame(currentTime);
     prevTime.current = Date.now();
   }, [currentTime]);
-
-  useEffect(() => {
-    if (!seeker.current) return;
-    seeker.current.scrollLeft = scrollWidth / 2;
-  }, [duration]);
 
   useEffect(() => {
     if (playing) {
@@ -148,29 +122,9 @@ const CommentArea: React.FC<Props> = ({
     ]
   );
 
-  const handleScroll = useCallback(
-    (e: React.UIEvent<HTMLDivElement>) => {
-      if (!onSeek) return;
-      onSeek(
-        (e.currentTarget.scrollLeft - seekerPrevScroll.current) / 10,
-        true
-      );
-      seekerPrevScroll.current = e.currentTarget.scrollLeft;
-      const seekerTimeout = window.setTimeout(() => {
-        if (!seeker.current) return;
-        seekerPrevScroll.current = scrollWidth / 2;
-        seeker.current.scrollLeft = scrollWidth / 2;
-      }, 1000);
-      return () => window.clearTimeout(seekerTimeout);
-    },
-    [onSeek]
-  );
-
   return (
     <div
       className={className}
-      onClick={onClick}
-      onDoubleClick={onDoubleClick}
       ref={ref}
       css={css`
         position: absolute;
@@ -196,32 +150,6 @@ const CommentArea: React.FC<Props> = ({
           colorize={colorize}
         />
       ))}
-      {seekable && (
-        <div
-          ref={seeker}
-          onScroll={handleScroll}
-          css={css`
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-
-            &::-webkit-scrollbar {
-              display: none;
-            }
-          `}
-        >
-          <div
-            css={css`
-              width: ${scrollWidth}px;
-              height: 100%;
-            `}
-          />
-        </div>
-      )}
     </div>
   );
 };
