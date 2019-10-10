@@ -14,8 +14,8 @@ export interface Props {
   screenWidth: number;
   opacity?: number;
   opacityDanmaku?: number;
-  thinning?: [number, number];
   colorize?: boolean;
+  hidden?: boolean;
 }
 
 const commonStyles = css`
@@ -38,11 +38,10 @@ const ChatComponent: React.FC<Props> = ({
   screenWidth,
   opacity = 1,
   opacityDanmaku = 0.4,
-  thinning,
-  colorize
+  colorize,
+  hidden
 }) => {
   const innerFrame = useLatest(frame, playing);
-  const hidden = chat && thinning && chat.id % thinning[1] !== thinning[0] - 1;
 
   const text = useMemo(
     () =>

@@ -18,6 +18,16 @@ import CommentArea, { CommentStyle } from "./components/CommentArea";
 
 const safari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 const ios = !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
+const regexp = (p?: string) => {
+  if (!p) return undefined;
+  let r;
+  try {
+    r = new RegExp(p);
+  } catch (e) {
+    return undefined;
+  }
+  return r;
+};
 
 const App: React.FC = () => {
   const videoRef = useRef<Methods>(null);
@@ -133,6 +143,12 @@ const App: React.FC = () => {
     settings.devision3,
     settings.devision5
   ]);
+  const muteKeywords = useMemo(() => regexp(settings.muteKeywords), [
+    settings.muteKeywords
+  ]);
+  const filterKeywords = useMemo(() => regexp(settings.filterKeywords), [
+    settings.filterKeywords
+  ]);
 
   return (
     <Fragment>
@@ -148,18 +164,18 @@ const App: React.FC = () => {
         onDoubleClick={handlePlayButtonClick}
         styles={styles}
         opacity={
-          settings && settings.commentOpacity
-            ? settings.commentOpacity / 100
-            : undefined
+          settings.commentOpacity ? settings.commentOpacity / 100 : undefined
         }
         opacityDanmaku={
-          settings && settings.danmakuCommentOpacity
+          settings.danmakuCommentOpacity
             ? settings.danmakuCommentOpacity / 100
             : undefined
         }
         thinning={thinning}
         colorize={settings.coloriseComments}
-        timeCorrection={settings && settings.commentTimeCorrection}
+        timeCorrection={settings.commentTimeCorrection}
+        muteKeywords={muteKeywords}
+        filterKeywords={filterKeywords}
       />
       <Controller
         hidden={controllerHidden}

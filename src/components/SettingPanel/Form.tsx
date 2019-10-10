@@ -24,6 +24,7 @@ export type SettingSchema = ({
       type: "text";
       defaultValue: string;
       suffix?: string;
+      placeholder?: string;
     }
   | {
       type: "enum";
@@ -155,6 +156,7 @@ const Form: React.FC<Props> = ({
                   s.defaultValue ||
                   ""
                 }
+                placeholder={s.placeholder}
                 suffix={s.suffix}
                 onChange={v => handleChange({ [s.id]: v })}
               />

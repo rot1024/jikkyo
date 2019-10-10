@@ -122,7 +122,15 @@ export const settingSchema: SettingSchema = [
     id: "muteKeywords",
     type: "text",
     name: "Mute keywords",
-    defaultValue: ""
+    defaultValue: "",
+    placeholder: "Regexp"
+  },
+  {
+    id: "filterKeywords",
+    type: "text",
+    name: "Filter keywords",
+    defaultValue: "",
+    placeholder: "Regexp"
   }
 ];
 
@@ -183,6 +191,8 @@ export type Settings = {
   devision2: "1" | "2";
   devision3: "1" | "2" | "3";
   devision5: "1" | "2" | "3" | "5";
+  muteKeywords: string;
+  filterKeywords: string;
 };
 
 export type SettingsDebounced =

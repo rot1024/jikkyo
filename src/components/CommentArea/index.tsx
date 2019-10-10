@@ -39,6 +39,8 @@ export interface Props {
   thinning?: [number, number];
   timeCorrection?: number;
   colorize?: boolean;
+  muteKeywords?: RegExp;
+  filterKeywords?: RegExp;
   onSeek?: (t: number, relative?: boolean) => void;
   onClick?: () => void;
   onDoubleClick?: () => void;
@@ -62,6 +64,8 @@ const CommentArea: React.FC<Props> = ({
   thinning,
   timeCorrection = 0,
   colorize,
+  muteKeywords,
+  filterKeywords,
   onClick,
   onDoubleClick,
   onSeek
@@ -125,12 +129,21 @@ const CommentArea: React.FC<Props> = ({
         chats,
         correctedFrame,
         Math.max(innerStyles.duration, innerStyles.ueshitaDuration)
-      ).slice(-visibleCommentCount),
+      )
+        .slice(-visibleCommentCount)
+        .map(c => ({
+          ...c,
+          hidden:
+            (muteKeywords && muteKeywords.test(c.text)) ||
+            (filterKeywords && !filterKeywords.test(c.text))
+        })),
     [
       chats,
       correctedFrame,
+      filterKeywords,
       innerStyles.duration,
       innerStyles.ueshitaDuration,
+      muteKeywords,
       visibleCommentCount
     ]
   );
@@ -177,7 +190,9 @@ const CommentArea: React.FC<Props> = ({
           screenWidth={screenWidth}
           opacity={opacity}
           opacityDanmaku={opacityDanmaku}
-          thinning={thinning}
+          hidden={
+            c.hidden || (thinning && c.id % thinning[1] !== thinning[0] - 1)
+          }
           colorize={colorize}
         />
       ))}

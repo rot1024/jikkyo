@@ -6,10 +6,17 @@ export interface Props {
   className?: string;
   value?: string;
   suffix?: string;
+  placeholder?: string;
   onChange?: (v: string) => void;
 }
 
-const Text: React.FC<Props> = ({ className, value, onChange, suffix }) => {
+const Text: React.FC<Props> = ({
+  className,
+  value,
+  onChange,
+  suffix,
+  placeholder
+}) => {
   return (
     <div
       className={className}
@@ -21,6 +28,7 @@ const Text: React.FC<Props> = ({ className, value, onChange, suffix }) => {
       <input
         type="text"
         value={value}
+        placeholder={placeholder}
         onChange={e => onChange && onChange(e.currentTarget.value)}
         css={css`
           flex: auto;
