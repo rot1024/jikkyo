@@ -123,8 +123,19 @@ export const readComments = async (
     console.warn(`${invalidCommnents} invalid comments are ignored.`);
   }
 
+  // add random spread to vpos
+  const margin = validComments.reduce((m, chat) => {
+    for (; chat.vpos % m !== 0; ) m /= 10;
+    return Math.max(1, m);
+  }, 1000);
+
   return [
-    validComments,
+    margin === 1
+      ? validComments
+      : validComments.map(c => ({
+          ...c,
+          vpos: Math.floor(c.vpos + margin * Math.random() - margin / 2)
+        })),
     validComments.length === 0
       ? 0
       : validComments[validComments.length - 1].vpos
