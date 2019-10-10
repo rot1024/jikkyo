@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import React, { useEffect, useRef, useCallback, useState } from "react";
+import React, { useRef, useCallback, useState } from "react";
 import { css, jsx } from "@emotion/core";
 
 const scrollWidth = 1000000;
