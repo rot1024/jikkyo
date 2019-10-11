@@ -31,10 +31,7 @@ const SettingPanel: React.FC<Props> = ({
   initialSettings,
   onChange
 }) => {
-  const state = useTransition(!!shown, 100, {
-    mountOnEnter: true,
-    unmountOnExit: true
-  });
+  const state = useTransition(!!shown, 100);
 
   const handleOutsideClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
@@ -76,7 +73,7 @@ const SettingPanel: React.FC<Props> = ({
 
   useHotkeys("esc", () => onClose && onClose(), [onClose]);
 
-  return state === "unmounted" ? null : (
+  return (
     <div
       className={className}
       onClick={handleOutsideClick}
@@ -90,6 +87,7 @@ const SettingPanel: React.FC<Props> = ({
         align-items: center;
         justify-content: center;
         font-size: 1.2rem;
+        pointer-events: ${state === "entered" ? "auto" : "none"};
         transition: ${state === "entering" || state === "exiting"
           ? "all 0.1s ease-in-out"
           : ""};
