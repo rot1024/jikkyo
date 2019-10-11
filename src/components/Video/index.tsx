@@ -15,12 +15,18 @@ export type EventType =
   | "play"
   | "pause"
   | "seeking"
-  | "seeked";
+  | "seeked"
+  | "progress";
 
 export interface Props {
   className?: string;
   src?: string;
-  onEvent?: (type: EventType, currentTime: number, duration: number) => void;
+  onEvent?: (
+    type: EventType,
+    currentTime: number,
+    duration: number,
+    buffered: TimeRanges
+  ) => void;
   onTimeUpdate?: (currentTime: number) => void;
 }
 
@@ -34,12 +40,17 @@ export interface Methods {
 
 const event = (
   type: EventType,
-  handler?: (type: EventType, currentTime: number, duration: number) => void
+  handler?: (
+    type: EventType,
+    currentTime: number,
+    duration: number,
+    buffered: TimeRanges
+  ) => void
 ) => (e: React.SyntheticEvent<HTMLVideoElement>) => {
   if (!handler) return;
   const currentTime = type === "load" ? 0 : e.currentTarget.currentTime;
   const duration = type === "load" ? 0 : e.currentTarget.duration;
-  handler(type, currentTime, duration);
+  handler(type, currentTime, duration, e.currentTarget.buffered);
 };
 
 const Video: React.FC<Props> = (
@@ -54,6 +65,7 @@ const Video: React.FC<Props> = (
   const handlePause = useMemo(() => event("pause", onEvent), [onEvent]);
   const handleSeeking = useMemo(() => event("seeking", onEvent), [onEvent]);
   const handleSeeked = useMemo(() => event("seeked", onEvent), [onEvent]);
+  const handleProgress = useMemo(() => event("progress", onEvent), [onEvent]);
   const handleTimeUpdate = useCallback(
     (e: React.SyntheticEvent<HTMLVideoElement>) => {
       if (!onTimeUpdate) return;
@@ -114,6 +126,7 @@ const Video: React.FC<Props> = (
       onSeeked={handleSeeked}
       onLoadedMetadata={handleLoad}
       onTimeUpdate={handleTimeUpdate}
+      onProgress={handleProgress}
       css={css`
         width: 100%;
         height: 100%;
