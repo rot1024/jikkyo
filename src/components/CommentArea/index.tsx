@@ -50,7 +50,7 @@ const CommentArea: React.FC<Props> = ({
   timeCorrection = 0,
   colorize,
   muteKeywords,
-  filterKeywords,
+  filterKeywords
 }) => {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -62,10 +62,6 @@ const CommentArea: React.FC<Props> = ({
     styles
   ]);
 
-  const [commentIdPrefix, setCommentIdPrefix] = useState(0);
-  useEffect(() => {
-    setCommentIdPrefix(i => i + 1);
-  }, [comments]);
   const [chats, setChats] = useState(emptyChats);
 
   useEffect(() => {
@@ -123,20 +119,10 @@ const CommentArea: React.FC<Props> = ({
   );
 
   return (
-    <div
-      className={className}
-      ref={ref}
-      css={css`
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-      `}
-    >
+    <div className={className} ref={ref} css={wrapperStyles}>
       {visibleChats.map(c => (
         <ChatComponent
-          key={commentIdPrefix + "_" + c.id}
+          key={c.id}
           frame={correctedFrame}
           chat={c}
           playing={playing}
@@ -153,5 +139,13 @@ const CommentArea: React.FC<Props> = ({
     </div>
   );
 };
+
+const wrapperStyles = css`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+`;
 
 export default CommentArea;

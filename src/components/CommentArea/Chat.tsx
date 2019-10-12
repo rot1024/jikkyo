@@ -117,4 +117,4 @@ const ChatComponent: React.FC<Props> = ({
   );
 };
 
-export default ChatComponent;
+export default React.memo(ChatComponent);
