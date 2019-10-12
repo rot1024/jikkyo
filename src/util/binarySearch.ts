@@ -1,4 +1,5 @@
 const binarySearch = <T>(data: T[], s: number, c: (d: T) => number) => {
+  if (isNaN(s)) return NaN;
   if (data.length === 0) return 0;
   if (c(data[data.length - 1]) <= s) return data.length;
 
