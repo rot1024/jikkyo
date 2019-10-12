@@ -126,6 +126,10 @@ export const readComments = async (xml: string) => {
     for (; chat.vpos % m !== 0; ) m /= 10;
     return Math.max(1, m);
   }, 1000);
+  const duration =
+    validComments.length === 0
+      ? 0
+      : validComments[validComments.length - 1].vpos;
 
   return {
     comments:
@@ -135,10 +139,8 @@ export const readComments = async (xml: string) => {
             ...c,
             vpos: Math.floor(c.vpos + margin * Math.random() - margin / 2)
           })),
-    lastVpos:
-      validComments.length === 0
-        ? 0
-        : validComments[validComments.length - 1].vpos
+    duration,
+    influence: calcInfluence(validComments, duration, 100)
   };
 };
 
@@ -164,5 +166,22 @@ function hashCode2Color(hash: number): [number, number, number] {
 function toHex(num: number) {
   return ("0" + num.toString(16)).slice(-2);
 }
+
+const calcInfluence = (
+  chats: Comment[],
+  duration: number,
+  divisions: number
+): number[] => {
+  const influence: number[] = new Array(divisions).fill(0);
+  if (chats.length === 0) return influence;
+  const d = duration / divisions;
+  chats.forEach(c => {
+    if (c.vpos < 0) return;
+    const i = Math.floor(c.vpos / d);
+    influence[i]++;
+  });
+  console.log(influence);
+  return influence;
+};
 
 export default async (file: File) => readComments(await readText(file));

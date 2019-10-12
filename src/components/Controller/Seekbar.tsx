@@ -3,6 +3,7 @@ import React, { useCallback, useRef } from "react";
 import { css, jsx } from "@emotion/core";
 
 import { useDrag, useHover } from "./useDrag";
+import HeatMap from "./HeatMap";
 
 export interface Props {
   className?: string;
@@ -10,6 +11,7 @@ export interface Props {
   max?: number;
   buffered?: [number, number][];
   disabled?: boolean;
+  influence?: number[];
   onChange?: (value: number) => void;
 }
 
@@ -19,6 +21,7 @@ const SeekBar: React.FC<Props> = ({
   max = 0,
   buffered,
   disabled,
+  influence,
   onChange
 }) => {
   const ref = useRef<HTMLInputElement>(null);
@@ -47,10 +50,7 @@ const SeekBar: React.FC<Props> = ({
         onTouchStart={handleDragStart}
       >
         <div css={backgroundStyles}>
-          <div
-            css={hoverBarStyles(hovered)}
-            style={{ width: (max === 0 ? 0 : hoveredX * 100) + "%" }}
-          />
+          <HeatMap influence={influence} />
           {buffered &&
             buffered.map(([s, e], i) => {
               return (
@@ -64,6 +64,10 @@ const SeekBar: React.FC<Props> = ({
                 />
               );
             })}
+          <div
+            css={hoverBarStyles(hovered)}
+            style={{ width: (max === 0 ? 0 : hoveredX * 100) + "%" }}
+          />
           <div
             css={barStyles}
             style={{
@@ -120,7 +124,9 @@ const barStyles = css`
   top: 0;
   left: 0;
   height: 100%;
-  background-color: #ff9d00;
+  background-color: #cccccc70;
+  border-right: 3px solid #fff;
+  box-sizing: border-box;
 `;
 
 const bufferedBarStyles = css`
@@ -128,7 +134,7 @@ const bufferedBarStyles = css`
   position: absolute;
   left: 0;
   height: 100%;
-  background-color: #ccc;
+  background-color: #cccccc70;
   transition: background-color 0.2s ease;
 `;
 
@@ -138,7 +144,7 @@ const hoverBarStyles = (hovered: boolean) => css`
   top: 0;
   left: 0;
   height: 100%;
-  background-color: ${hovered ? "#ccc" : "transparent"};
+  background-color: ${hovered ? "#cccccc80" : "transparent"};
   transition: background-color 0.2s ease;
 `;
 

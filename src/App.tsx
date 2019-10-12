@@ -1,5 +1,12 @@
 /** @jsx jsx */
-import React, { Fragment, useState, useCallback, useRef, useMemo } from "react";
+import React, {
+  Fragment,
+  useState,
+  useCallback,
+  useRef,
+  useMemo,
+  useEffect
+} from "react";
 import { css, jsx } from "@emotion/core";
 import { hot } from "react-hot-loader/root";
 import { Global } from "@emotion/core";
@@ -33,19 +40,23 @@ const regexp = (p?: string) => {
 const App: React.FC = () => {
   const videoRef = useRef<Methods>(null);
   const [src, setSrc] = useState<string>();
-  const [comments, setComments] = useState<{
-    comments: Comment[];
-    lastVpos: number;
-  }>();
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
   const [timeRanges, setTimeRanges] = useState<[number, number][]>();
+
+  const [comments, setComments] = useState<{
+    comments: Comment[];
+    duration: number;
+    influence: number[];
+  }>();
+  const [influence, setInfluence] = useState<number[]>();
+
   const [controllerHidden, setControllerHidden] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
   const handleVideoClick = useCallback(() => setControllerHidden(p => !p), []);
   const handlePlayButtonClick = useCallback(() => {
-    if (!comments || (duration === 0 && comments.lastVpos === 0)) return;
+    if (!comments || (duration === 0 && comments.duration === 0)) return;
     if (videoRef.current && src) {
       setPlaying(videoRef.current.toggle());
     } else {
@@ -74,7 +85,7 @@ const App: React.FC = () => {
   );
   const handleSeek = useCallback(
     (t: number, relative?: boolean) => {
-      if (!comments || comments.lastVpos === 0) return;
+      if (!comments || comments.duration === 0) return;
       if (videoRef.current && src) {
         if (relative) {
           videoRef.current.seekRelative(t / 1000);
@@ -87,20 +98,27 @@ const App: React.FC = () => {
     },
     [comments, src]
   );
-  const handleDrop = useCallback(async (file: File) => {
-    if (file.type.indexOf("video/") === 0) {
-      setSrc(URL.createObjectURL(file));
-      setPlaying(false);
-      setCurrentTime(0);
-    }
-    if (
-      file.type.indexOf("text/xml") === 0 ||
-      file.type.indexOf("application/xml") === 0
-    ) {
-      const comments = await loadComment(file);
-      setComments(comments);
-    }
+
+  const handleLoadComment = useCallback(async (file: File) => {
+    setComments(await loadComment(file));
   }, []);
+
+  const handleDrop = useCallback(
+    async (file: File) => {
+      if (file.type.indexOf("video/") === 0) {
+        setSrc(URL.createObjectURL(file));
+        setPlaying(false);
+        setCurrentTime(0);
+      }
+      if (
+        file.type.indexOf("text/xml") === 0 ||
+        file.type.indexOf("application/xml") === 0
+      ) {
+        await handleLoadComment(file);
+      }
+    },
+    [handleLoadComment]
+  );
   const handleVideoOpen = useFileInput(
     files => {
       if (files.length === 0) return;
@@ -114,8 +132,7 @@ const App: React.FC = () => {
   const handleCommentOpen = useFileInput(
     async files => {
       if (files.length === 0) return;
-      const comments = await loadComment(files[0]);
-      setComments(comments);
+      await handleLoadComment(files[0]);
     },
     { accept: "application/xml" }
   );
@@ -175,6 +192,43 @@ const App: React.FC = () => {
     settings.filterKeywords
   ]);
 
+  useEffect(() => {
+    if (!comments) {
+      setInfluence(undefined);
+      return;
+    }
+
+    const len = comments.influence.length;
+    let influence;
+
+    if (duration === 0) {
+      influence = comments.influence;
+    } else if (duration >= comments.duration) {
+      influence = comments.influence.concat(
+        new Array(
+          Math.floor((duration - comments.duration) * (len / comments.duration))
+        ).fill(0)
+      );
+    } else {
+      const index = Math.floor((duration / comments.duration) * len);
+      influence = comments.influence.slice(0, index);
+    }
+
+    const tc = Math.floor(
+      (settings.commentTimeCorrection * influence.length) / comments.duration
+    );
+    setInfluence(
+      tc === 0
+        ? influence
+        : tc < 0
+        ? [
+            ...new Array(-tc).fill(0),
+            ...influence.slice(0, influence.length - tc)
+          ]
+        : [...influence.slice(tc), ...new Array(tc).fill(0)]
+    );
+  }, [comments, duration, settings.commentTimeCorrection]);
+
   return (
     <Fragment>
       <Global styles={globalStyles} />
@@ -217,8 +271,9 @@ const App: React.FC = () => {
           if (!menuVisible) setMenuVisible(true);
         }}
         currentTime={currentTime}
-        duration={comments ? comments.lastVpos : duration}
+        duration={duration > 0 ? duration : comments ? comments.duration : 0}
         buffered={timeRanges}
+        influence={influence}
         css={css`
           position: fixed;
           bottom: 0;
