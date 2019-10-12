@@ -39,6 +39,7 @@ const App: React.FC = () => {
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
+  const [timeRanges, setTimeRanges] = useState<[number, number][]>();
   const [controllerHidden, setControllerHidden] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
   const handleVideoClick = useCallback(() => setControllerHidden(p => !p), []);
@@ -51,9 +52,15 @@ const App: React.FC = () => {
     }
   }, [duration, src]);
   const handleVideoEvent = useCallback(
-    (e: EventType, ct: number, d: number) => {
+    (e: EventType, ct: number, d: number, buffered: TimeRanges) => {
       if (e === "load") {
         setPlaying(false);
+      } else if (e === "progress") {
+        setTimeRanges(
+          new Array(buffered.length)
+            .fill(0)
+            .map((e, i) => [buffered.start(i) * 1000, buffered.end(i) * 1000])
+        );
       } else if (e === "pause") {
         setPlaying(false);
       } else if (e === "play") {
@@ -209,6 +216,7 @@ const App: React.FC = () => {
         }}
         currentTime={currentTime}
         duration={Math.max(duration, commentDuration)}
+        buffered={timeRanges}
         css={css`
           position: fixed;
           bottom: 0;

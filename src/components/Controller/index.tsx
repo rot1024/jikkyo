@@ -13,6 +13,7 @@ export interface Props {
   duration?: number;
   playing?: boolean;
   hidden?: boolean;
+  buffered?: [number, number][];
   onSeek?: (time: number, relative?: boolean) => void;
   onPlayButtonClick?: () => void;
   onVideoButtonClick?: () => void;
@@ -27,6 +28,7 @@ const Controller: React.FC<Props> = ({
   duration = 0,
   playing,
   hidden,
+  buffered,
   onSeek,
   onPlayButtonClick,
   onVideoButtonClick,
@@ -118,6 +120,7 @@ const Controller: React.FC<Props> = ({
         value={seekTime}
         max={duration}
         disabled={disabled}
+        buffered={buffered}
         onChange={handleSeek}
         css={css`
           flex: auto;
