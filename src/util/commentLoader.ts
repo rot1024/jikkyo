@@ -180,7 +180,6 @@ const calcInfluence = (
     const i = Math.floor(c.vpos / d);
     influence[i]++;
   });
-  console.log(influence);
   return influence;
 };
 
