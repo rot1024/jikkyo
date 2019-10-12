@@ -44,13 +44,13 @@ const App: React.FC = () => {
   const [menuVisible, setMenuVisible] = useState(false);
   const handleVideoClick = useCallback(() => setControllerHidden(p => !p), []);
   const handlePlayButtonClick = useCallback(() => {
-    if (duration === 0) return;
+    if (duration === 0 && commentDuration === 0) return;
     if (videoRef.current && src) {
       setPlaying(videoRef.current.toggle());
     } else {
       setPlaying(p => !p);
     }
-  }, [duration, src]);
+  }, [commentDuration, duration, src]);
   const handleVideoEvent = useCallback(
     (e: EventType, ct: number, d: number, buffered: TimeRanges) => {
       if (e === "load") {
@@ -73,6 +73,7 @@ const App: React.FC = () => {
   );
   const handleSeek = useCallback(
     (t: number, relative?: boolean) => {
+      if (duration === 0 && commentDuration === 0) return;
       if (videoRef.current && src) {
         if (relative) {
           videoRef.current.seekRelative(t / 1000);
@@ -83,7 +84,7 @@ const App: React.FC = () => {
         setCurrentTime(t2 => (relative ? t + t2 : t));
       }
     },
-    [src]
+    [commentDuration, duration, src]
   );
   const handleDrop = useCallback(async (file: File) => {
     if (file.type.indexOf("video/") === 0) {
@@ -215,7 +216,7 @@ const App: React.FC = () => {
           if (!menuVisible) setMenuVisible(true);
         }}
         currentTime={currentTime}
-        duration={Math.max(duration, commentDuration)}
+        duration={duration === 0 ? commentDuration : duration}
         buffered={timeRanges}
         css={css`
           position: fixed;
