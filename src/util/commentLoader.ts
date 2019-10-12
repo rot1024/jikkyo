@@ -54,9 +54,7 @@ export const readText = (file: File) =>
     reader.readAsText(file);
   });
 
-export const readComments = async (
-  xml: string
-): Promise<[Comment[], number]> => {
+export const readComments = async (xml: string) => {
   const parser = new DOMParser();
   const dom = parser.parseFromString(xml, "application/xml");
   if (dom.documentElement.nodeName === "parsererror") {
@@ -129,17 +127,19 @@ export const readComments = async (
     return Math.max(1, m);
   }, 1000);
 
-  return [
-    margin === 1
-      ? validComments
-      : validComments.map(c => ({
-          ...c,
-          vpos: Math.floor(c.vpos + margin * Math.random() - margin / 2)
-        })),
-    validComments.length === 0
-      ? 0
-      : validComments[validComments.length - 1].vpos
-  ];
+  return {
+    comments:
+      margin === 1
+        ? validComments
+        : validComments.map(c => ({
+            ...c,
+            vpos: Math.floor(c.vpos + margin * Math.random() - margin / 2)
+          })),
+    lastVpos:
+      validComments.length === 0
+        ? 0
+        : validComments[validComments.length - 1].vpos
+  };
 };
 
 function hashCode(str: string) {

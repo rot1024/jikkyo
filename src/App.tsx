@@ -33,9 +33,10 @@ const regexp = (p?: string) => {
 const App: React.FC = () => {
   const videoRef = useRef<Methods>(null);
   const [src, setSrc] = useState<string>();
-  const [[comments, commentDuration], setComments] = useState<
-    [Comment[], number]
-  >([[], 0]);
+  const [comments, setComments] = useState<{
+    comments: Comment[];
+    lastVpos: number;
+  }>();
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
@@ -44,13 +45,13 @@ const App: React.FC = () => {
   const [menuVisible, setMenuVisible] = useState(false);
   const handleVideoClick = useCallback(() => setControllerHidden(p => !p), []);
   const handlePlayButtonClick = useCallback(() => {
-    if (duration === 0 && commentDuration === 0) return;
+    if (!comments || (duration === 0 && comments.lastVpos === 0)) return;
     if (videoRef.current && src) {
       setPlaying(videoRef.current.toggle());
     } else {
       setPlaying(p => !p);
     }
-  }, [commentDuration, duration, src]);
+  }, [comments, duration, src]);
   const handleVideoEvent = useCallback(
     (e: EventType, ct: number, d: number, buffered: TimeRanges) => {
       if (e === "load") {
@@ -73,7 +74,7 @@ const App: React.FC = () => {
   );
   const handleSeek = useCallback(
     (t: number, relative?: boolean) => {
-      if (duration === 0 && commentDuration === 0) return;
+      if (!comments || comments.lastVpos === 0) return;
       if (videoRef.current && src) {
         if (relative) {
           videoRef.current.seekRelative(t / 1000);
@@ -84,7 +85,7 @@ const App: React.FC = () => {
         setCurrentTime(t2 => (relative ? t + t2 : t));
       }
     },
-    [commentDuration, duration, src]
+    [comments, src]
   );
   const handleDrop = useCallback(async (file: File) => {
     if (file.type.indexOf("video/") === 0) {
@@ -179,7 +180,7 @@ const App: React.FC = () => {
       <Global styles={globalStyles} />
       <Video ref={videoRef} src={src} onEvent={handleVideoEvent} />
       <CommentArea
-        comments={comments}
+        comments={comments ? comments.comments : undefined}
         currentTime={currentTime}
         playing={playing}
         styles={styles}
@@ -216,7 +217,7 @@ const App: React.FC = () => {
           if (!menuVisible) setMenuVisible(true);
         }}
         currentTime={currentTime}
-        duration={duration === 0 ? commentDuration : duration}
+        duration={comments ? comments.lastVpos : duration}
         buffered={timeRanges}
         css={css`
           position: fixed;
