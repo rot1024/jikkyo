@@ -50,6 +50,8 @@ export default function useConfig() {
         ? settings.devision3 || "1"
         : denominator === 5
         ? settings.devision5 || "1"
+        : denominator === 10
+        ? settings.devision10 || "1"
         : undefined;
     if (!numeratorStr) return undefined;
     const numerator = parseInt(numeratorStr, 10);
@@ -57,6 +59,7 @@ export default function useConfig() {
     return [numerator, denominator];
   }, [
     settings.devision,
+    settings.devision10,
     settings.devision2,
     settings.devision3,
     settings.devision5

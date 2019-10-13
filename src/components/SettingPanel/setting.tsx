@@ -108,7 +108,7 @@ export const settingSchema: SettingSchema = [
     id: "devision",
     name: "Devision",
     type: "enum",
-    enum: ["1", "2", "3", "5"],
+    enum: ["1", "2", "3", "5", "10"],
     defaultValue: "1"
   },
   {
@@ -131,6 +131,13 @@ export const settingSchema: SettingSchema = [
     enum: ["1", "2", "3", "4", "5"],
     defaultValue: "1",
     when: ["devision", "5"]
+  },
+  {
+    id: "devision10",
+    type: "enum",
+    enum: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+    defaultValue: "1",
+    when: ["devision", "10"]
   },
   {
     id: "muteKeywords",
@@ -201,10 +208,11 @@ export type Settings = {
   commentTimeCorrection: number;
   cleanComment: boolean;
   coloriseComments: boolean;
-  devision: "1" | "2" | "3" | "5";
+  devision: "1" | "2" | "3" | "5" | "10";
   devision2: "1" | "2";
   devision3: "1" | "2" | "3";
-  devision5: "1" | "2" | "3" | "5";
+  devision5: "1" | "2" | "3" | "4" | "5";
+  devision10: "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "10";
   muteKeywords: string;
   filterKeywords: string;
   limitComments: boolean;
