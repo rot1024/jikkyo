@@ -168,6 +168,7 @@ const CommentArea: React.FC<Props> = (
     if (playing) {
       prevTime.current = Date.now();
     }
+    nextVpos.current = -1;
   }, [playing]);
 
   useRequestAnimationFrame(() => {
@@ -182,30 +183,41 @@ const CommentArea: React.FC<Props> = (
   }, !!playing && !manual);
 
   const correctedFrame = frame + timeCorrection;
-  const visibleChats = useMemo(
-    () =>
-      getVisibleChats(
-        chats,
-        correctedFrame,
-        Math.max(innerStyles.duration, innerStyles.ueshitaDuration)
-      )
-        .slice(-visibleCommentCount)
-        .map(c => ({
-          ...c,
-          hidden:
-            (muteKeywords && muteKeywords.test(c.text)) ||
-            (filterKeywords && !filterKeywords.test(c.text))
-        })),
-    [
+  const nextVpos = useRef(-1);
+  const [visibleChats, setVisibleChats] = useState<Chat[]>([]);
+  useEffect(() => {
+    if (playing && nextVpos.current >= 0 && correctedFrame < nextVpos.current) {
+      return;
+    }
+
+    const [newVisibleChats, end] = getVisibleChats(
       chats,
       correctedFrame,
-      filterKeywords,
-      innerStyles.duration,
-      innerStyles.ueshitaDuration,
-      muteKeywords,
-      visibleCommentCount
-    ]
-  );
+      Math.max(innerStyles.duration, innerStyles.ueshitaDuration)
+    );
+
+    setVisibleChats(
+      newVisibleChats.slice(-visibleCommentCount).map(c => ({
+        ...c,
+        hidden:
+          (muteKeywords && muteKeywords.test(c.text)) ||
+          (filterKeywords && !filterKeywords.test(c.text))
+      }))
+    );
+
+    const next = chats[end];
+    nextVpos.current = next ? next.vpos : -1;
+  }, [
+    chats,
+    correctedFrame,
+    filterKeywords,
+    frame,
+    innerStyles.duration,
+    innerStyles.ueshitaDuration,
+    muteKeywords,
+    playing,
+    visibleCommentCount
+  ]);
 
   return (
     <div className={className} ref={wrapperRef} css={wrapperStyles}>

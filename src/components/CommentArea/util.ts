@@ -87,11 +87,14 @@ export const getVisibleChats = (
   chats: Chat[],
   frame: number,
   duration: number
-) => {
-  if (chats.length === 0 || isNaN(duration)) return [];
+): [Chat[], number] => {
+  if (chats.length === 0 || isNaN(duration)) return [[], 0];
   const start = binarySearch(chats, frame - duration, c => c.vpos);
   const end = binarySearch(chats, frame, c => c.vpos);
-  return chats.slice(start, end).filter(c => frame < c.vpos + c.duration);
+  return [
+    chats.slice(start, end).filter(c => frame < c.vpos + c.duration),
+    end
+  ];
 };
 
 export const commentsToChats = (
