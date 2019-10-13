@@ -96,10 +96,12 @@ const App: React.FC = () => {
           videoRef.current.seek(t / 1000);
         }
       } else {
-        setCurrentTime(t2 => (relative ? t + t2 : t));
+        setCurrentTime(t2 =>
+          Math.max(0, Math.min(seekbarDuration, relative ? t + t2 : t))
+        );
       }
     },
-    [commentDuration, comments, setCurrentTime, src, videoRef]
+    [commentDuration, comments, seekbarDuration, setCurrentTime, src, videoRef]
   );
 
   const handleDrop = useCallback(
