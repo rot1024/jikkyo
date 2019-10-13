@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import React, { useRef, useCallback, useState } from "react";
+import React, { useRef, useCallback, useState, useEffect } from "react";
 import { css, jsx } from "@emotion/core";
 
 const scrollWidth = 1000000;
@@ -26,6 +26,11 @@ const SeekerAndDropZone: React.FC<Props> = ({
   const seeker = useRef<HTMLDivElement>(null);
   const seekerTimeout = useRef(0);
   const seekerPrevScroll = useRef(scrollWidth / 2);
+
+  useEffect(() => {
+    if (!seeker.current) return;
+    seeker.current.scrollLeft = scrollWidth / 2;
+  }, []);
 
   const handleScroll = useCallback(
     (e: React.UIEvent<HTMLDivElement>) => {
@@ -65,6 +70,7 @@ const SeekerAndDropZone: React.FC<Props> = ({
     },
     [droppable, onDrop]
   );
+
   const handleDragOver = useCallback(
     (e: React.DragEvent<HTMLDivElement>) => {
       e.preventDefault();
@@ -73,16 +79,29 @@ const SeekerAndDropZone: React.FC<Props> = ({
     },
     [droppable]
   );
+
   const handleDragLeave = useCallback(() => {
     setDropping(false);
   }, []);
+
+  const handleClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      e.currentTarget.blur();
+      document.body.focus();
+      if (onClick) {
+        onClick();
+      }
+    },
+    [onClick]
+  );
 
   return (
     <div
       ref={seeker}
       onScroll={handleScroll}
       className={className}
-      onClick={onClick}
+      onClick={handleClick}
       onDoubleClick={onDoubleClick}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
@@ -93,7 +112,7 @@ const SeekerAndDropZone: React.FC<Props> = ({
         left: 0;
         right: 0;
         bottom: 0;
-        overflow-y: ${seekable ? "scroll" : "hidden"};
+        overflow-x: ${seekable ? "scroll" : "hidden"};
         border: 10px dotted transparent;
         transition: all 0.2s ease-in-out;
         ${dropping &&
