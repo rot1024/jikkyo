@@ -30,7 +30,7 @@ export interface Props {
   onTimeUpdate?: (currentTime: number) => void;
 }
 
-export interface Methods {
+export interface Ref {
   play: () => void;
   stop: () => void;
   toggle: () => boolean;
@@ -76,7 +76,7 @@ const Video: React.FC<Props> = (
 
   // In iOS safari, the video cannnot be started playing without a user interaction
   // such as a mouse event, so we have to expose some methods to outside via ref.
-  useImperativeHandle<any, Methods>(ref, () => ({
+  useImperativeHandle<any, Ref>(ref, () => ({
     play: () => {
       if (!videoRef.current) return;
       playing.current = true;
@@ -136,4 +136,4 @@ const Video: React.FC<Props> = (
   );
 };
 
-export default forwardRef<Methods, Props>(Video);
+export default forwardRef<Ref, Props>(Video);

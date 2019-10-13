@@ -1,6 +1,6 @@
 import { useRef, useState, useCallback } from "react";
 
-import { EventType, Methods } from "./components/Video";
+import { EventType, Ref } from "./components/Video";
 
 const convertTimeRanges = (buffered: TimeRanges): [number, number][] =>
   new Array(buffered.length)
@@ -8,7 +8,7 @@ const convertTimeRanges = (buffered: TimeRanges): [number, number][] =>
     .map((e, i) => [buffered.start(i) * 1000, buffered.end(i) * 1000]);
 
 export default function useViode() {
-  const videoRef = useRef<Methods>(null);
+  const videoRef = useRef<Ref>(null);
   const [src, setSrc] = useState<string>();
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
