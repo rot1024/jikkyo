@@ -15,6 +15,7 @@ export interface Props {
   hidden?: boolean;
   buffered?: [number, number][];
   influence?: number[];
+  manual?: boolean;
   onSeek?: (time: number, relative?: boolean) => void;
   onPlayButtonClick?: () => void;
   onVideoButtonClick?: () => void;
@@ -31,6 +32,7 @@ const Controller: React.FC<Props> = ({
   hidden,
   buffered,
   influence,
+  manual,
   onSeek,
   onPlayButtonClick,
   onVideoButtonClick,
@@ -39,7 +41,13 @@ const Controller: React.FC<Props> = ({
   onEnd
 }) => {
   const disabled = duration === 0;
-  const [seekTime, seek] = usePlayer(!!playing, currentTime, duration, onEnd);
+  const [seekTime, seek] = usePlayer(
+    !!playing,
+    currentTime,
+    duration,
+    !!manual,
+    onEnd
+  );
 
   const handleSeek = useCallback((t: number) => onSeek && onSeek(t), [onSeek]);
   const handleSeekRelative = useCallback(

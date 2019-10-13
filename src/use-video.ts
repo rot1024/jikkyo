@@ -11,8 +11,8 @@ export default function useViode() {
   const videoRef = useRef<Ref>(null);
   const [src, setSrc] = useState<string>();
   const [playing, setPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState<number>(0);
-  const [duration, setDuration] = useState<number>(0);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
   const [timeRanges, setTimeRanges] = useState<[number, number][]>();
 
   const loadVideo = useCallback((file: File) => {
@@ -37,6 +37,10 @@ export default function useViode() {
     []
   );
 
+  const handleTimeUpdate = useCallback((ct: number) => {
+    setCurrentTime(ct * 1000);
+  }, []);
+
   return {
     videoRef,
     loadVideo,
@@ -47,6 +51,7 @@ export default function useViode() {
     setCurrentTime,
     duration,
     timeRanges,
-    handleVideoEvent
+    handleVideoEvent,
+    handleTimeUpdate
   };
 }

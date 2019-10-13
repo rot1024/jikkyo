@@ -8,6 +8,7 @@ export default (
   playing: boolean,
   currentTime: number,
   duration: number,
+  manual: boolean,
   onEnd?: () => void
 ): [number, (t: number, relative?: boolean) => void] => {
   const [seekTime, setSeekTime] = useState(0);
@@ -24,9 +25,9 @@ export default (
   );
 
   const handleInterval = useCallback(() => {
-    if (!innerPlaying.current) return;
+    if (!innerPlaying.current || manual) return;
     seek(Date.now() - prevTime.current, true);
-  }, [seek]);
+  }, [manual, seek]);
   useInterval(handleInterval, 100);
 
   useEffect(() => {

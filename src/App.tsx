@@ -41,7 +41,8 @@ const App: React.FC = () => {
     setCurrentTime,
     duration,
     timeRanges,
-    handleVideoEvent
+    handleVideoEvent,
+    handleTimeUpdate
   } = useVideo();
 
   const {
@@ -133,7 +134,12 @@ const App: React.FC = () => {
   return (
     <Fragment>
       <Global styles={globalStyles} />
-      <Video ref={videoRef} src={src} onEvent={handleVideoEvent} />
+      <Video
+        ref={videoRef}
+        src={src}
+        onEvent={handleVideoEvent}
+        onTimeUpdate={handleTimeUpdate}
+      />
       <CommentArea
         ref={commentAreaRef}
         comments={comments}
@@ -166,6 +172,7 @@ const App: React.FC = () => {
       <Controller
         hidden={controllerHidden}
         playing={playing}
+        manual={!!src}
         onPlayButtonClick={handlePlayButtonClick}
         onSeek={handleSeek}
         onVideoButtonClick={handleVideoOpen}
