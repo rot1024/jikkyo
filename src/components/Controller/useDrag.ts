@@ -7,12 +7,12 @@ const getOffset = (
   if (!element) return undefined;
   const rect = element.getBoundingClientRect();
   if (e instanceof TouchEvent) {
-    const offsetX = e.touches[0].clientX - window.pageXOffset - rect.left;
-    const offsetY = e.touches[0].clientY - window.pageYOffset - rect.top;
+    const offsetX = e.targetTouches[0].pageX - rect.left;
+    const offsetY = e.targetTouches[0].pageY - rect.top;
     return [offsetX / rect.width, offsetY / rect.height];
   } else if (e instanceof MouseEvent) {
-    const offsetX = e.clientX - window.pageXOffset - rect.left;
-    const offsetY = e.clientY - window.pageYOffset - rect.top;
+    const offsetX = e.pageX - rect.left;
+    const offsetY = e.pageY - rect.top;
     return [offsetX / rect.width, offsetY / rect.height];
   }
 };
