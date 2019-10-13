@@ -116,6 +116,7 @@ const Form: React.FC<Props> = ({
                 }
                 max={s.max}
                 min={s.min}
+                step={s.step}
                 onChange={v => handleChange({ [s.id]: v })}
                 onValueClick={() => handleChange({ [s.id]: s.defaultValue })}
                 suffix={s.suffix}
