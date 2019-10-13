@@ -91,6 +91,20 @@ export const settingSchema: SettingSchema = [
     defaultValue: false
   },
   {
+    id: "limitComments",
+    name: "Comment limtiation",
+    type: "check",
+    defaultValue: false
+  },
+  {
+    id: "visibleCommentCount",
+    type: "number",
+    min: 0,
+    max: 100,
+    defaultValue: 30,
+    when: ["limitComments", true]
+  },
+  {
     id: "devision",
     name: "Devision",
     type: "enum",
@@ -193,6 +207,8 @@ export type Settings = {
   devision5: "1" | "2" | "3" | "5";
   muteKeywords: string;
   filterKeywords: string;
+  limitComments: boolean;
+  visibleCommentCount: number;
 };
 
 export type SettingsDebounced =

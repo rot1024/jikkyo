@@ -168,6 +168,9 @@ const App: React.FC = () => {
         filterKeywords={filterKeywords}
         onCommentsRemeasurementRequire={handleCommentUpdateRequire}
         getCurrentTime={!!src ? handleGetCurrentTime : undefined}
+        visibleCommentCount={
+          settings.limitComments ? settings.visibleCommentCount : undefined
+        }
       />
       <SeekerAndDropZone
         seekable={seekbarDuration > 0}
