@@ -11,8 +11,7 @@ import { css, jsx } from "@emotion/core";
 import useComponentSize from "@rehooks/component-size";
 
 import useRequestAnimationFrame from "../../util/useRequestAnimationFrame";
-import DOMRenderer from "./dom";
-// import Canvas2dRenderer from "./canvas2d";
+import Canvas2dRenderer from "./canvas2d";
 import {
   getVisibleChats,
   commentsToChats,
@@ -199,7 +198,16 @@ const CommentArea: React.FC<Props> = (
 
   return (
     <div className={className} ref={wrapperRef} css={wrapperStyles}>
-      <DOMRenderer
+      <Canvas2dRenderer
+        frame={correctedFrame}
+        chats={visibleChats}
+        styles={innerStyles}
+        opacity={opacity}
+        opacityDanmaku={opacityDanmaku}
+        thinning={thinning}
+        colorize={colorize}
+      />
+      {/* <DOMRenderer
         frame={correctedFrame}
         chats={visibleChats}
         playing={playing}
@@ -208,7 +216,7 @@ const CommentArea: React.FC<Props> = (
         opacityDanmaku={opacityDanmaku}
         thinning={thinning}
         colorize={colorize}
-      />
+      /> */}
     </div>
   );
 };

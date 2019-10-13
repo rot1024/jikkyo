@@ -4,7 +4,7 @@ import { css, jsx } from "@emotion/core";
 import useComponentSize from "@rehooks/component-size";
 import { useThrottle } from "react-use";
 
-import ChatComponent from "./Chat";
+import ChatComponent from "./dom-chat";
 import { Chat, ChatActualStyle } from "./util";
 
 export interface Props {
