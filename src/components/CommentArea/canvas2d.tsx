@@ -38,6 +38,12 @@ const Canvas2DRenderer: React.FC<Props> = ({
     ctx.clearRect(0, 0, w, h);
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
+    ctx.strokeStyle = "rgba(0, 0, 0, 0.5)";
+    ctx.lineWidth = 0.5;
+    ctx.shadowColor = "rgba(0, 0, 0, 1)";
+    ctx.shadowBlur = 2;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
 
     for (const c of chats) {
       if (c.hidden || frame <= c.vpos || frame >= c.vpos + c.duration) continue;
@@ -49,8 +55,6 @@ const Canvas2DRenderer: React.FC<Props> = ({
       ctx.fillStyle = (colorize ? c.color2 : c.color) || "#fff";
       const x = (w + c.width) * (1 - (frame - c.vpos) / c.duration) - c.width;
       ctx.fillText(c.text, x, c.y);
-      ctx.strokeStyle = "#000";
-      ctx.lineWidth = 1;
       ctx.strokeText(c.text, x, c.y);
     }
   }, [
