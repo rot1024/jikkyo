@@ -11,10 +11,12 @@ import SeekerAndDropZone from "./components/SeekerAndDropZone";
 import Controller from "./components/Controller";
 import SettingPanel from "./components/SettingPanel";
 import CommentArea from "./components/CommentArea";
+import Banner from "./components/Banner";
 
 import useComment from "./use-comment";
 import useConfig from "./use-config";
 import useVideo from "./use-video";
+import useWindowError from "./util/useWindowError";
 
 const safari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 const ios = !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
@@ -51,6 +53,7 @@ const App: React.FC = () => {
 
   const seekbarDuration = duration === 0 ? commentDuration : duration;
 
+  const error = useWindowError();
   const [controllerHidden, setControllerHidden] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
 
@@ -166,6 +169,7 @@ const App: React.FC = () => {
         onClose={handleMenuClose}
         onChange={updateSettings}
       />
+      <Banner error={!!error}>{error}</Banner>
     </Fragment>
   );
 };
