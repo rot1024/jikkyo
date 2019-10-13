@@ -29,6 +29,7 @@ const commonStyles = css`
   /* text-stroke: 1px #000; */
 `;
 
+// incomplete
 const ChatComponent: React.FC<Props> = ({
   className,
   frame,

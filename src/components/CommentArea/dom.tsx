@@ -19,6 +19,7 @@ export interface Props {
   playing?: boolean;
 }
 
+// incomplete
 const DOMRenderer: React.FC<Props> = ({
   className,
   chats = [],
