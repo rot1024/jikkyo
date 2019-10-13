@@ -91,6 +91,12 @@ export const settingSchema: SettingSchema = [
     defaultValue: false
   },
   {
+    id: "seekable",
+    name: "Enable to seek with scroll",
+    type: "check",
+    defaultValue: true
+  },
+  {
     id: "limitComments",
     name: "Comment limtiation",
     type: "check",
@@ -217,6 +223,7 @@ export type Settings = {
   filterKeywords: string;
   limitComments: boolean;
   visibleCommentCount: number;
+  seekable: boolean;
 };
 
 export type SettingsDebounced =

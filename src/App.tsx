@@ -175,7 +175,7 @@ const App: React.FC = () => {
         }
       />
       <SeekerAndDropZone
-        seekable={seekbarDuration > 0}
+        seekable={settings.seekable && seekbarDuration > 0}
         droppable
         onSeek={handleSeek}
         onDrop={handleDrop}
