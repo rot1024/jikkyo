@@ -19,7 +19,8 @@ export interface Chat extends Comment {
   danmaku: boolean;
   ueshita: boolean;
   speed: number;
-  fontSize?: number;
+  fontSize: number;
+  hidden?: boolean;
 }
 
 export interface ChatCommonStyle {

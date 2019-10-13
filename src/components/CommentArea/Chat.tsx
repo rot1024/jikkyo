@@ -7,14 +7,14 @@ import useLatest from "../../util/useLatest";
 
 export interface Props {
   className?: string;
-  frame?: number;
-  chat?: Chat;
+  frame: number;
+  chat: Chat;
   styles: ChatActualStyle;
-  playing?: boolean;
+  playing: boolean;
   screenWidth: number;
-  opacity?: number;
-  opacityDanmaku?: number;
-  colorize?: boolean;
+  opacity: number;
+  opacityDanmaku: number;
+  colorize: boolean;
   hidden?: boolean;
 }
 
@@ -31,13 +31,13 @@ const commonStyles = css`
 
 const ChatComponent: React.FC<Props> = ({
   className,
-  frame = 0,
+  frame,
   chat,
   playing,
   styles,
   screenWidth,
-  opacity = 1,
-  opacityDanmaku = 0.4,
+  opacity,
+  opacityDanmaku,
   colorize,
   hidden
 }) => {

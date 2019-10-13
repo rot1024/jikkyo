@@ -9,10 +9,10 @@ import React, {
 } from "react";
 import { css, jsx } from "@emotion/core";
 import useComponentSize from "@rehooks/component-size";
-import { useThrottle } from "react-use";
 
 import useRequestAnimationFrame from "../../util/useRequestAnimationFrame";
-import ChatComponent from "./Chat";
+import DOMRenderer from "./dom";
+// import Canvas2dRenderer from "./canvas2d";
 import {
   getVisibleChats,
   commentsToChats,
@@ -43,6 +43,10 @@ export interface Props {
   onCommentsRemeasurementRequire?: () => void;
 }
 
+export interface Ref {
+  updateComment: () => void;
+}
+
 const emptyComents: Comment[] = [];
 const emptyChats: Chat[] = [];
 
@@ -67,9 +71,9 @@ const CommentArea: React.FC<Props> = (
   ref
 ) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const size = useComponentSize(wrapperRef);
-  const screenWidth = useThrottle(size.width, 1000);
-  const screenHeight = useThrottle(size.height, 1000);
+  const { width: screenWidth, height: screenHeight } = useComponentSize(
+    wrapperRef
+  );
   const innerStyles = useMemo(() => getChatActualStyle(styles, screenHeight), [
     screenHeight,
     styles
@@ -84,16 +88,20 @@ const CommentArea: React.FC<Props> = (
     innerStyles
   });
 
-  useImperativeHandle(ref, () => ({
-    updateComment: () => {
-      setBufferedComment({
-        comments,
-        screenWidth,
-        screenHeight,
-        innerStyles
-      });
-    }
-  }));
+  useImperativeHandle<any, Ref>(
+    ref,
+    () => ({
+      updateComment: () => {
+        setBufferedComment({
+          comments,
+          screenWidth,
+          screenHeight,
+          innerStyles
+        });
+      }
+    }),
+    [comments, screenWidth, screenHeight, innerStyles]
+  );
 
   useEffect(() => {
     if (
@@ -191,22 +199,16 @@ const CommentArea: React.FC<Props> = (
 
   return (
     <div className={className} ref={wrapperRef} css={wrapperStyles}>
-      {visibleChats.map(c => (
-        <ChatComponent
-          key={c.id}
-          frame={correctedFrame}
-          chat={c}
-          playing={playing}
-          styles={innerStyles}
-          screenWidth={screenWidth}
-          opacity={opacity}
-          opacityDanmaku={opacityDanmaku}
-          hidden={
-            c.hidden || (thinning && c.id % thinning[1] !== thinning[0] - 1)
-          }
-          colorize={colorize}
-        />
-      ))}
+      <DOMRenderer
+        frame={correctedFrame}
+        chats={visibleChats}
+        playing={playing}
+        styles={innerStyles}
+        opacity={opacity}
+        opacityDanmaku={opacityDanmaku}
+        thinning={thinning}
+        colorize={colorize}
+      />
     </div>
   );
 };
@@ -219,9 +221,4 @@ const wrapperStyles = css`
   bottom: 0;
 `;
 
-export default forwardRef<
-  {
-    updateComment: () => void;
-  },
-  Props
->(CommentArea);
+export default forwardRef<Ref, Props>(CommentArea);
