@@ -36,6 +36,7 @@ export interface Ref {
   toggle: () => boolean;
   seek: (t: number) => void;
   seekRelative: (t: number) => void;
+  currentTime: () => number;
 }
 
 const event = (
@@ -105,7 +106,8 @@ const Video: React.FC<Props> = (
     seekRelative: t => {
       if (!videoRef.current) return;
       videoRef.current.currentTime = videoRef.current.currentTime + t;
-    }
+    },
+    currentTime: () => (videoRef.current ? videoRef.current.currentTime : 0)
   }));
 
   useEffect(() => {

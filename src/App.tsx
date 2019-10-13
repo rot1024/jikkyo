@@ -131,6 +131,11 @@ const App: React.FC = () => {
 
   const handleMenuClose = useCallback(() => setMenuVisible(false), []);
 
+  const handleGetCurrentTime = useCallback(
+    () => (videoRef.current ? videoRef.current.currentTime() * 1000 : 0),
+    [videoRef]
+  );
+
   return (
     <Fragment>
       <Global styles={globalStyles} />
@@ -160,6 +165,7 @@ const App: React.FC = () => {
         muteKeywords={muteKeywords}
         filterKeywords={filterKeywords}
         onCommentsRemeasurementRequire={handleCommentUpdateRequire}
+        getCurrentTime={!!src ? handleGetCurrentTime : undefined}
       />
       <SeekerAndDropZone
         seekable={seekbarDuration > 0}

@@ -39,6 +39,8 @@ export interface Props {
   muteKeywords?: RegExp;
   filterKeywords?: RegExp;
   autoCommentsRemeasurement?: boolean;
+  manual?: boolean;
+  getCurrentTime?: () => number;
   onCommentsRemeasurementRequire?: () => void;
 }
 
@@ -65,7 +67,9 @@ const CommentArea: React.FC<Props> = (
     muteKeywords,
     filterKeywords,
     autoCommentsRemeasurement,
-    onCommentsRemeasurementRequire
+    onCommentsRemeasurementRequire,
+    manual,
+    getCurrentTime
   },
   ref
 ) => {
@@ -151,6 +155,7 @@ const CommentArea: React.FC<Props> = (
     bufferedComment.screenWidth
   ]);
 
+  const timeDelayCorrection = useRef(1);
   const prevTime = useRef(Date.now());
   const [frame, setFrame] = useState(currentTime);
 
@@ -166,9 +171,15 @@ const CommentArea: React.FC<Props> = (
   }, [playing]);
 
   useRequestAnimationFrame(() => {
-    setFrame(f => f + Date.now() - prevTime.current);
+    if (getCurrentTime) {
+      setFrame(getCurrentTime());
+      return;
+    }
+    setFrame(
+      f => f + (Date.now() - prevTime.current) * timeDelayCorrection.current
+    );
     prevTime.current = Date.now();
-  }, !!playing);
+  }, !!playing && !manual);
 
   const correctedFrame = frame + timeCorrection;
   const visibleChats = useMemo(
