@@ -5,6 +5,7 @@ import useTransition from "@rot1024/use-transition";
 import { useHotkeys } from "react-hotkeys-hook";
 
 import Form, { SettingValues } from "./Form";
+import Button from "./Button";
 import {
   settingSchema,
   Settings,
@@ -23,6 +24,8 @@ export interface Props {
   debounce?: boolean;
   onChange?: (s: Settings) => void;
   onClose?: () => void;
+  onVideoClose?: () => void;
+  onCommentsClose?: () => void;
 }
 
 const SettingPanel: React.FC<Props> = ({
@@ -30,8 +33,10 @@ const SettingPanel: React.FC<Props> = ({
   shown,
   onClose,
   initialSettings,
+  debounce,
   onChange,
-  debounce
+  onVideoClose,
+  onCommentsClose
 }) => {
   const state = useTransition(!!shown, 100);
 
@@ -115,6 +120,7 @@ const SettingPanel: React.FC<Props> = ({
           overflow-y: auto;
           padding: 1em;
           box-shadow: 0 3px 20px #000000aa;
+          -webkit-overflow-scrolling: touch;
         `}
       >
         <Form
@@ -122,6 +128,22 @@ const SettingPanel: React.FC<Props> = ({
           initialValues={initialSettings}
           onChange={handleChange}
         />
+        <Button
+          onClick={onVideoClose}
+          css={css`
+            margin-top: 1em;
+          `}
+        >
+          Close video
+        </Button>
+        <Button
+          onClick={onCommentsClose}
+          css={css`
+            margin-top: 1em;
+          `}
+        >
+          Close comments
+        </Button>
       </div>
     </div>
   );

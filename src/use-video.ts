@@ -41,6 +41,11 @@ export default function useViode() {
     setCurrentTime(ct * 1000);
   }, []);
 
+  const unloadVideo = useCallback(() => {
+    setSrc(undefined);
+    setDuration(0);
+  }, []);
+
   return {
     videoRef,
     loadVideo,
@@ -52,6 +57,7 @@ export default function useViode() {
     duration,
     timeRanges,
     handleVideoEvent,
-    handleTimeUpdate
+    handleTimeUpdate,
+    unloadVideo
   };
 }

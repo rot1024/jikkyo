@@ -113,6 +113,7 @@ const SeekerAndDropZone: React.FC<Props> = ({
         right: 0;
         bottom: 0;
         overflow-x: ${seekable ? "scroll" : "hidden"};
+        -webkit-overflow-scrolling: touch;
         border: 10px dotted transparent;
         transition: all 0.2s ease-in-out;
         ${dropping &&

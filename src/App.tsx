@@ -42,14 +42,16 @@ const App: React.FC = () => {
     duration,
     timeRanges,
     handleVideoEvent,
-    handleTimeUpdate
+    handleTimeUpdate,
+    unloadVideo
   } = useVideo();
 
   const {
     comments,
     duration: commentDuration,
     influence,
-    loadComments
+    loadComments,
+    unloadComments
   } = useComment(duration, settings.commentTimeCorrection);
 
   const seekbarDuration = duration === 0 ? commentDuration : duration;
@@ -205,6 +207,8 @@ const App: React.FC = () => {
         initialSettings={settings}
         onClose={handleMenuClose}
         onChange={updateSettings}
+        onVideoClose={unloadVideo}
+        onCommentsClose={unloadComments}
       />
       <Banner error>{error}</Banner>
       <Banner

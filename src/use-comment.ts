@@ -54,10 +54,15 @@ export default function useComment(
     );
   }, [comments, duration, commentTimeCorrection]);
 
+  const unloadComments = useCallback(() => {
+    setComments(undefined);
+  }, []);
+
   return {
     comments: comments && comments.comments.length > 0 ? comments.comments : [],
     duration: comments ? comments.duration : 0,
     influence,
-    loadComments
+    loadComments,
+    unloadComments
   };
 }
