@@ -53,7 +53,9 @@ const Canvas2DRenderer: React.FC<Props> = ({
       }px ${styles.fontFamily || "sans-serif"}`;
       ctx.globalAlpha = c.danmaku ? opacityDanmaku : opacity;
       ctx.fillStyle = (colorize ? c.color2 : c.color) || "#fff";
-      const x = (w + c.width) * (1 - (frame - c.vpos) / c.duration) - c.width;
+      const x = c.ueshita
+        ? (w - c.width) / 2
+        : (w + c.width) * (1 - (frame - c.vpos) / c.duration) - c.width;
       ctx.fillText(c.text, x, c.y);
       ctx.strokeText(c.text, x, c.y);
     }
