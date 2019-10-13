@@ -71,12 +71,13 @@ const SeekBar: React.FC<Props> = ({
           <div
             css={barStyles}
             style={{
+              display: !!disabled || max === 0 ? "none" : "block",
               width: (max === 0 ? 0 : (value / max) * 100) + "%"
             }}
           />
         </div>
         <div
-          css={thumbStyles(hovered || isDragging, !!disabled)}
+          css={thumbStyles(hovered || isDragging, !!disabled || max === 0)}
           style={{
             left: (max === 0 ? 0 : (value / max) * 100) + "%"
           }}
@@ -156,6 +157,7 @@ const thumbStyles = (hovered: boolean, disabled: boolean) => css`
   height: 18px;
   background-color: #ff9d00;
   border-radius: 50%;
+  display: ${disabled ? "none" : "block"};
   cursor: ${disabled ? "default" : "pointer"};
   transition: transform 0.2s ease, background-color 0.2s ease, opacity 0.2s ease;
   transform: translate(-50%, -50%) scale(${hovered ? "1" : "0"});
