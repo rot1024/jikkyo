@@ -1,5 +1,12 @@
 /** @jsx jsx */
-import React, { useEffect, useRef, useState, useMemo } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useMemo,
+  useImperativeHandle,
+  forwardRef
+} from "react";
 import { css, jsx } from "@emotion/core";
 import useComponentSize from "@rehooks/component-size";
 import { useThrottle } from "react-use";
@@ -32,29 +39,35 @@ export interface Props {
   colorize?: boolean;
   muteKeywords?: RegExp;
   filterKeywords?: RegExp;
+  autoCommentsRemeasurement?: boolean;
+  onCommentsRemeasurementRequire?: () => void;
 }
 
 const emptyComents: Comment[] = [];
 const emptyChats: Chat[] = [];
 
-const CommentArea: React.FC<Props> = ({
-  className,
-  playing,
-  comments = emptyComents,
-  currentTime = 0,
-  styles,
-  visibleCommentCount = Infinity,
-  opacity,
-  opacityDanmaku,
-  thinning,
-  timeCorrection = 0,
-  colorize,
-  muteKeywords,
-  filterKeywords
-}) => {
-  const ref = useRef<HTMLDivElement>(null);
-
-  const size = useComponentSize(ref);
+const CommentArea: React.FC<Props> = (
+  {
+    className,
+    playing,
+    comments = emptyComents,
+    currentTime = 0,
+    styles,
+    visibleCommentCount = Infinity,
+    opacity,
+    opacityDanmaku,
+    thinning,
+    timeCorrection = 0,
+    colorize,
+    muteKeywords,
+    filterKeywords,
+    autoCommentsRemeasurement,
+    onCommentsRemeasurementRequire
+  },
+  ref
+) => {
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const size = useComponentSize(wrapperRef);
   const screenWidth = useThrottle(size.width, 1000);
   const screenHeight = useThrottle(size.height, 1000);
   const innerStyles = useMemo(() => getChatActualStyle(styles, screenHeight), [
@@ -63,15 +76,73 @@ const CommentArea: React.FC<Props> = ({
   ]);
 
   const [chats, setChats] = useState(emptyChats);
+  const bufferedCommentLength = useRef(0);
+  const [bufferedComment, setBufferedComment] = useState({
+    comments,
+    screenWidth,
+    screenHeight,
+    innerStyles
+  });
+
+  useImperativeHandle(ref, () => ({
+    updateComment: () => {
+      setBufferedComment({
+        comments,
+        screenWidth,
+        screenHeight,
+        innerStyles
+      });
+    }
+  }));
 
   useEffect(() => {
-    if (screenHeight === 0) return;
-    if (!comments || comments.length === 0) {
+    if (
+      comments.length > 0 &&
+      bufferedCommentLength.current > 0 &&
+      !autoCommentsRemeasurement
+    ) {
+      if (onCommentsRemeasurementRequire) {
+        onCommentsRemeasurementRequire();
+      }
+      return;
+    }
+
+    setBufferedComment({
+      comments,
+      screenWidth,
+      screenHeight,
+      innerStyles
+    });
+    bufferedCommentLength.current = comments.length;
+  }, [
+    comments,
+    screenWidth,
+    screenHeight,
+    innerStyles,
+    autoCommentsRemeasurement,
+    onCommentsRemeasurementRequire
+  ]);
+
+  useEffect(() => {
+    if (bufferedComment.screenHeight === 0) return;
+    if (!bufferedComment.comments || bufferedComment.comments.length === 0) {
       setChats([]);
       return;
     }
-    setChats(commentsToChats(comments, screenWidth, screenHeight, innerStyles));
-  }, [comments, screenWidth, screenHeight, innerStyles]);
+    setChats(
+      commentsToChats(
+        bufferedComment.comments,
+        bufferedComment.screenWidth,
+        bufferedComment.screenHeight,
+        bufferedComment.innerStyles
+      )
+    );
+  }, [
+    bufferedComment.comments,
+    bufferedComment.innerStyles,
+    bufferedComment.screenHeight,
+    bufferedComment.screenWidth
+  ]);
 
   const prevTime = useRef(Date.now());
   const [frame, setFrame] = useState(currentTime);
@@ -119,7 +190,7 @@ const CommentArea: React.FC<Props> = ({
   );
 
   return (
-    <div className={className} ref={ref} css={wrapperStyles}>
+    <div className={className} ref={wrapperRef} css={wrapperStyles}>
       {visibleChats.map(c => (
         <ChatComponent
           key={c.id}
@@ -148,4 +219,9 @@ const wrapperStyles = css`
   bottom: 0;
 `;
 
-export default CommentArea;
+export default forwardRef<
+  {
+    updateComment: () => void;
+  },
+  Props
+>(CommentArea);

@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import React, { Fragment, useState, useCallback } from "react";
+import React, { Fragment, useState, useCallback, useRef } from "react";
 import { css, jsx } from "@emotion/core";
 import { hot } from "react-hot-loader/root";
 import { Global } from "@emotion/core";
@@ -53,9 +53,26 @@ const App: React.FC = () => {
 
   const seekbarDuration = duration === 0 ? commentDuration : duration;
 
+  const commentAreaRef = useRef<{ updateComment: () => void }>(null);
   const error = useWindowError();
+  const [commentUpdateRequired, setCommentUpdateRequired] = useState(false);
   const [controllerHidden, setControllerHidden] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
+
+  const handleCommentUpdateRequire = useCallback(() => {
+    setCommentUpdateRequired(true);
+  }, []);
+
+  const handleUpdateComment = useCallback(() => {
+    if (commentAreaRef.current) {
+      setCommentUpdateRequired(false);
+      commentAreaRef.current.updateComment();
+    }
+  }, []);
+
+  const handleUpdateCommentClose = useCallback(() => {
+    setCommentUpdateRequired(false);
+  }, []);
 
   const handleVideoClick = useCallback(() => setControllerHidden(p => !p), []);
 
@@ -118,6 +135,7 @@ const App: React.FC = () => {
       <Global styles={globalStyles} />
       <Video ref={videoRef} src={src} onEvent={handleVideoEvent} />
       <CommentArea
+        ref={commentAreaRef}
         comments={comments}
         currentTime={currentTime}
         playing={playing}
@@ -135,6 +153,7 @@ const App: React.FC = () => {
         timeCorrection={settings.commentTimeCorrection}
         muteKeywords={muteKeywords}
         filterKeywords={filterKeywords}
+        onCommentsRemeasurementRequire={handleCommentUpdateRequire}
       />
       <SeekerAndDropZone
         seekable={seekbarDuration > 0}
@@ -169,7 +188,16 @@ const App: React.FC = () => {
         onClose={handleMenuClose}
         onChange={updateSettings}
       />
-      <Banner error={!!error}>{error}</Banner>
+      <Banner error>{error}</Banner>
+      <Banner
+        buttonText="Update"
+        onButtonClick={handleUpdateComment}
+        onClose={handleUpdateCommentClose}
+      >
+        {commentUpdateRequired
+          ? "Recalculation is required to update the comments display."
+          : ""}
+      </Banner>
     </Fragment>
   );
 };

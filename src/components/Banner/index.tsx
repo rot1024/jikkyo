@@ -8,6 +8,7 @@ export interface Props {
   error?: boolean;
   buttonText?: string;
   onButtonClick?: () => void;
+  onClose?: () => void;
 }
 
 const Banner: React.FC<Props> = ({
@@ -15,7 +16,8 @@ const Banner: React.FC<Props> = ({
   children,
   buttonText,
   error,
-  onButtonClick
+  onButtonClick,
+  onClose
 }) => {
   const [visible, setVisible] = useState(!!children);
 
@@ -23,7 +25,12 @@ const Banner: React.FC<Props> = ({
     setVisible(!!children);
   }, [children]);
 
-  const handleClose = useCallback(() => setVisible(false), []);
+  const handleClose = useCallback(() => {
+    setVisible(false);
+    if (onClose) {
+      onClose();
+    }
+  }, [onClose]);
 
   return (
     <div
