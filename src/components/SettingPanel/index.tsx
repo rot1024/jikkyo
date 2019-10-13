@@ -20,6 +20,7 @@ export interface Props {
   className?: string;
   shown?: boolean;
   initialSettings?: Settings;
+  debounce?: boolean;
   onChange?: (s: Settings) => void;
   onClose?: () => void;
 }
@@ -29,7 +30,8 @@ const SettingPanel: React.FC<Props> = ({
   shown,
   onClose,
   initialSettings,
-  onChange
+  onChange,
+  debounce
 }) => {
   const state = useTransition(!!shown, 100);
 
@@ -69,7 +71,11 @@ const SettingPanel: React.FC<Props> = ({
       }),
     [onChange]
   );
-  useDebounce(changedValueDebounced.current, 1000, handleDebounce);
+  useDebounce(
+    changedValueDebounced.current,
+    debounce ? 1000 : 0,
+    handleDebounce
+  );
 
   useHotkeys("esc", () => onClose && onClose(), [onClose]);
 
