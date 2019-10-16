@@ -69,16 +69,6 @@ export const settingSchema: SettingSchema = [
     defaultValue: 80
   },
   {
-    id: "commentTimeCorrection",
-    type: "number",
-    name: "Comment Time Correction",
-    suffix: "s",
-    min: -60 * 60 * 1000,
-    max: 60 * 60 * 1000,
-    step: 1000,
-    defaultValue: 0
-  },
-  {
     id: "cleanComment",
     name: "Remove hashtags and URLs",
     type: "check",
@@ -211,7 +201,6 @@ export type Settings = {
   ueShitaCommentDuration: number;
   commentOpacity: number;
   danmakuCommentOpacity: number;
-  commentTimeCorrection: number;
   cleanComment: boolean;
   coloriseComments: boolean;
   devision: "1" | "2" | "3" | "5" | "10";

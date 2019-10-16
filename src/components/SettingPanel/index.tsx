@@ -82,7 +82,9 @@ const SettingPanel: React.FC<Props> = ({
     handleDebounce
   );
 
-  useHotkeys("esc", () => onClose && onClose(), [onClose]);
+  useHotkeys("esc", () => onClose && state === "entered" && onClose(), [
+    onClose
+  ]);
 
   return (
     <div

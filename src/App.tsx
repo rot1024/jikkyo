@@ -4,6 +4,7 @@ import { css, jsx } from "@emotion/core";
 import { hot } from "react-hot-loader/root";
 import { Global } from "@emotion/core";
 import useFileInput from "use-file-input";
+import { useHotkeys } from "react-hotkeys-hook";
 
 import globalStyles from "./styles";
 import Video from "./components/Video";
@@ -51,8 +52,10 @@ const App: React.FC = () => {
     duration: commentDuration,
     influence,
     loadComments,
-    unloadComments
-  } = useComment(duration, settings.commentTimeCorrection);
+    unloadComments,
+    commentTimeCorrection,
+    setCommentTimeCorrection
+  } = useComment(duration);
 
   const seekbarDuration = duration === 0 ? commentDuration : duration;
 
@@ -140,6 +143,16 @@ const App: React.FC = () => {
     [videoRef]
   );
 
+  useHotkeys(",", () => setCommentTimeCorrection(s => s - 1000), [
+    setCommentTimeCorrection
+  ]);
+  useHotkeys(".", () => setCommentTimeCorrection(s => s + 1000), [
+    setCommentTimeCorrection
+  ]);
+  useHotkeys("/", () => setCommentTimeCorrection(0), [
+    setCommentTimeCorrection
+  ]);
+
   return (
     <Fragment>
       <Global styles={globalStyles} />
@@ -165,7 +178,7 @@ const App: React.FC = () => {
         }
         thinning={thinning}
         colorize={settings.coloriseComments}
-        timeCorrection={settings.commentTimeCorrection}
+        timeCorrection={commentTimeCorrection}
         muteKeywords={muteKeywords}
         filterKeywords={filterKeywords}
         onCommentsRemeasurementRequire={handleCommentUpdateRequire}

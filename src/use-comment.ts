@@ -1,16 +1,14 @@
 import { useState, useEffect, useCallback } from "react";
 import load, { Comment } from "./util/commentLoader";
 
-export default function useComment(
-  duration: number,
-  commentTimeCorrection: number
-) {
+export default function useComment(duration: number) {
   const [comments, setComments] = useState<{
     comments: Comment[];
     duration: number;
     influence: number[];
   }>();
   const [influence, setInfluence] = useState<number[]>();
+  const [commentTimeCorrection, setCommentTimeCorrection] = useState(0);
 
   const loadComments = useCallback(async (file: File) => {
     setComments(await load(file));
@@ -19,6 +17,7 @@ export default function useComment(
   useEffect(() => {
     if (!comments) {
       setInfluence(undefined);
+      setCommentTimeCorrection(0);
       return;
     }
 
@@ -63,6 +62,8 @@ export default function useComment(
     duration: comments ? comments.duration : 0,
     influence,
     loadComments,
-    unloadComments
+    unloadComments,
+    commentTimeCorrection,
+    setCommentTimeCorrection
   };
 }
