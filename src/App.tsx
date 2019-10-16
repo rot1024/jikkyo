@@ -60,7 +60,7 @@ const App: React.FC = () => {
   const seekbarDuration = duration === 0 ? commentDuration : duration;
 
   const commentAreaRef = useRef<{ updateComment: () => void }>(null);
-  const error = useWindowError();
+  const [error, setError] = useWindowError();
   const [commentUpdateRequired, setCommentUpdateRequired] = useState(false);
   const [controllerHidden, setControllerHidden] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
@@ -114,10 +114,12 @@ const App: React.FC = () => {
       if (file.type.indexOf("video/") === 0) {
         loadVideo(file);
       } else if (file.type === "text/xml" || file.type === "application/xml") {
-        await loadComments(file);
+        await loadComments(file).catch(err =>
+          setError(err.message || err.toString())
+        );
       }
     },
-    [loadComments, loadVideo]
+    [loadComments, loadVideo, setError]
   );
 
   const handleVideoOpen = useFileInput(
@@ -131,13 +133,15 @@ const App: React.FC = () => {
   const handleCommentOpen = useFileInput(
     async files => {
       if (files.length === 0) return;
-      await loadComments(files[0]);
+      await loadComments(files[0]).catch(err =>
+        setError(err.message || err.toString())
+      );
     },
     { accept: "application/xml" }
   );
 
   const handleMenuClose = useCallback(() => setMenuVisible(false), []);
-
+  const handleErrorClose = useCallback(() => setError(undefined), [setError]);
   const handleGetCurrentTime = useCallback(
     () => (videoRef.current ? videoRef.current.currentTime() * 1000 : 0),
     [videoRef]
@@ -223,7 +227,9 @@ const App: React.FC = () => {
         onVideoClose={unloadVideo}
         onCommentsClose={unloadComments}
       />
-      <Banner error>{error}</Banner>
+      <Banner error onClose={handleErrorClose}>
+        {error}
+      </Banner>
       <Banner
         buttonText="Update"
         onButtonClick={handleUpdateComment}

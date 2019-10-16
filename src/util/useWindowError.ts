@@ -21,5 +21,5 @@ export default function useWindowError() {
     };
   }, []);
 
-  return error;
+  return [error, setError] as const;
 }

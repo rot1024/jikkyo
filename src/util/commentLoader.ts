@@ -57,8 +57,9 @@ export const readText = (file: File) =>
 export const readComments = async (xml: string) => {
   const parser = new DOMParser();
   const dom = parser.parseFromString(xml, "application/xml");
-  if (dom.documentElement.nodeName === "parsererror") {
-    throw new Error("xml parse error");
+  const error = dom.querySelector("parsererror");
+  if (error) {
+    throw new Error(`xml parse error: ${(error.textContent || "").trim()}`);
   }
 
   const comments = Array.from(dom.querySelectorAll("chat")).map(
@@ -108,6 +109,8 @@ export const readComments = async (xml: string) => {
       };
     }
   );
+
+  console.log(dom);
 
   let validComments = comments
     .filter(
