@@ -1,6 +1,5 @@
-/** @jsx jsx */
 import React, { useRef, useEffect } from "react";
-import { css, jsx } from "@emotion/core";
+import { css } from "@emotion/react";
 
 import binarySearch from "../../util/binarySearch";
 
@@ -58,7 +57,7 @@ const HeatMap: React.FC<Props> = ({ className, influence }) => {
     const band = w / influence.length;
     for (let i = 0; i < w; i++) {
       const k = Math.floor((i / w) * (influence.length - 1));
-      let r = prev === k ? (band * (k + 1) - i) / band : 0;
+      const r = prev === k ? (band * (k + 1) - i) / band : 0;
       const currentColor = getColor(influence[k], max, 0);
       const nextColor = getColor(influence[k + 1], max, 0);
       const color = currentColor.map((c, i) => c * r + nextColor[i] * (1 - r));

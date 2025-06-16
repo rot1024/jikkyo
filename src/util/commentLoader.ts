@@ -68,7 +68,7 @@ export const readComments = async (xml: string) => {
       let color;
       mail.some(m => {
         if (m in niconicoColors) {
-          color = (niconicoColors as any)[m];
+          color = niconicoColors[m as keyof typeof niconicoColors];
           return true;
         }
         if (/^#([\w\d]{3}|[\w\d]{6})$/.test(m)) {
@@ -112,7 +112,7 @@ export const readComments = async (xml: string) => {
 
   console.log(dom);
 
-  let validComments = comments
+  const validComments = comments
     .filter(
       c => c.text !== "" && !isNaN(c.vpos)
       // && !isNaN(c.date.getTime()) && c.commenter !== ""

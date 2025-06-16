@@ -1,7 +1,6 @@
-/** @jsx jsx */
 import React, { useRef } from "react";
-import { css, jsx } from "@emotion/core";
-import useComponentSize from "@rehooks/component-size";
+import { css } from "@emotion/react";
+import useResizeObserver from "use-resize-observer";
 import { useThrottle } from "react-use";
 
 import ChatComponent from "./dom-chat";
@@ -32,7 +31,9 @@ const DOMRenderer: React.FC<Props> = ({
   playing
 }) => {
   const ref = useRef<HTMLDivElement>(null);
-  const { width } = useComponentSize(ref);
+  const { width = 0 } = useResizeObserver({
+    ref
+  });
   const screenWidth = useThrottle(width, 1000);
 
   return (

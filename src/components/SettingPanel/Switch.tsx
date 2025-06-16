@@ -1,6 +1,5 @@
-/** @jsx jsx */
 import React from "react";
-import { css, jsx } from "@emotion/core";
+import { css } from "@emotion/react";
 
 export interface Props {
   className?: string;

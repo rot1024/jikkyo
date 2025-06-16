@@ -1,4 +1,3 @@
-/** @jsx jsx */
 import React, {
   useRef,
   useMemo,
@@ -7,7 +6,7 @@ import React, {
   forwardRef,
   useImperativeHandle
 } from "react";
-import { css, jsx } from "@emotion/core";
+import { css } from "@emotion/react";
 
 export type EventType =
   | "load"
@@ -54,7 +53,7 @@ const event = (
   handler(type, currentTime, duration, e.currentTarget.buffered);
 };
 
-const Video: React.FC<Props> = (
+const Video = forwardRef<Ref, Props>((
   { className, src, onEvent, onTimeUpdate },
   ref
 ) => {
@@ -77,6 +76,7 @@ const Video: React.FC<Props> = (
 
   // In iOS safari, the video cannnot be started playing without a user interaction
   // such as a mouse event, so we have to expose some methods to outside via ref.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   useImperativeHandle<any, Ref>(ref, () => ({
     play: () => {
       if (!videoRef.current) return;
@@ -136,6 +136,6 @@ const Video: React.FC<Props> = (
       `}
     />
   );
-};
+});
 
-export default forwardRef<Ref, Props>(Video);
+export default Video;

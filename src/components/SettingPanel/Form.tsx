@@ -1,6 +1,5 @@
-/** @jsx jsx */
 import React, { useState, useCallback } from "react";
-import { css, jsx } from "@emotion/core";
+import { css } from "@emotion/react";
 
 import Switch from "./Switch";
 import Range from "./Range";
@@ -9,6 +8,7 @@ import Text from "./Text";
 export type SettingSchema = ({
   id: string;
   name?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   when?: [string, any];
   debounce?: boolean;
 } & (

@@ -1,6 +1,5 @@
-/** @jsx jsx */
 import React, { useState, useEffect, useCallback } from "react";
-import { css, jsx } from "@emotion/core";
+import { css } from "@emotion/react";
 
 export interface Props {
   className?: string;
@@ -9,6 +8,7 @@ export interface Props {
   buttonText?: string;
   onButtonClick?: () => void;
   onClose?: () => void;
+  children?: React.ReactNode;
 }
 
 const Banner: React.FC<Props> = ({

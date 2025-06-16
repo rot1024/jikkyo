@@ -5,9 +5,9 @@ import { EventType, Ref } from "./components/Video";
 const convertTimeRanges = (buffered: TimeRanges): [number, number][] =>
   new Array(buffered.length)
     .fill(0)
-    .map((e, i) => [buffered.start(i) * 1000, buffered.end(i) * 1000]);
+    .map((_, i) => [buffered.start(i) * 1000, buffered.end(i) * 1000]);
 
-export default function useViode() {
+export default function useVideo() {
   const videoRef = useRef<Ref>(null);
   const [src, setSrc] = useState<string>();
   const [playing, setPlaying] = useState(false);

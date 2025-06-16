@@ -1,6 +1,5 @@
-/** @jsx jsx */
 import React, { useCallback, useRef } from "react";
-import { css, jsx } from "@emotion/core";
+import { css } from "@emotion/react";
 
 import { useDrag, useHover } from "./useDrag";
 import HeatMap from "./HeatMap";

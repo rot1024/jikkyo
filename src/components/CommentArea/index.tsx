@@ -1,5 +1,4 @@
-/** @jsx jsx */
-import React, {
+import {
   useEffect,
   useRef,
   useState,
@@ -7,8 +6,8 @@ import React, {
   useImperativeHandle,
   forwardRef
 } from "react";
-import { css, jsx } from "@emotion/core";
-import useComponentSize from "@rehooks/component-size";
+import { css } from "@emotion/react";
+import useResizeObserver from "use-resize-observer";
 
 import useRequestAnimationFrame from "../../util/useRequestAnimationFrame";
 import Canvas2dRenderer from "./canvas2d";
@@ -16,17 +15,17 @@ import {
   getVisibleChats,
   commentsToChats,
   Chat,
-  Comment,
+  Comment as CommentType,
   ChatStyle,
   getChatActualStyle
 } from "./util";
 
-export type Comment = Comment;
+export type Comment = CommentType;
 export type CommentStyle = Partial<ChatStyle>;
 
 export interface Props {
   className?: string;
-  comments?: Comment[];
+  comments?: CommentType[];
   currentTime?: number; // ms
   playing?: boolean;
   styles?: Partial<ChatStyle>;
@@ -48,10 +47,10 @@ export interface Ref {
   updateComment: () => void;
 }
 
-const emptyComents: Comment[] = [];
+const emptyComents: CommentType[] = [];
 const emptyChats: Chat[] = [];
 
-const CommentArea: React.FC<Props> = (
+const CommentArea = forwardRef<Ref, Props>((
   {
     className,
     playing,
@@ -74,9 +73,9 @@ const CommentArea: React.FC<Props> = (
   ref
 ) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const { width: screenWidth, height: screenHeight } = useComponentSize(
-    wrapperRef
-  );
+  const { width: screenWidth = 0, height: screenHeight = 0 } = useResizeObserver({
+    ref: wrapperRef
+  });
   const innerStyles = useMemo(() => getChatActualStyle(styles, screenHeight), [
     screenHeight,
     styles
@@ -91,7 +90,7 @@ const CommentArea: React.FC<Props> = (
     innerStyles
   });
 
-  useImperativeHandle<any, Ref>(
+  useImperativeHandle(
     ref,
     () => ({
       updateComment: () => {
@@ -242,7 +241,7 @@ const CommentArea: React.FC<Props> = (
       /> */}
     </div>
   );
-};
+});
 
 const wrapperStyles = css`
   position: absolute;
@@ -252,4 +251,4 @@ const wrapperStyles = css`
   bottom: 0;
 `;
 
-export default forwardRef<Ref, Props>(CommentArea);
+export default CommentArea;

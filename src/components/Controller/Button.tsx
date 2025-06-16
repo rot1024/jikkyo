@@ -1,6 +1,5 @@
-/** @jsx jsx */
 import React, { useCallback } from "react";
-import { css, jsx } from "@emotion/core";
+import { css } from "@emotion/react";
 import { IconDefinition } from "@fortawesome/fontawesome-common-types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -41,6 +40,7 @@ export interface Props {
   large?: boolean;
   title?: string;
   onClick?: () => void;
+  children?: React.ReactNode;
 }
 
 const Button: React.FC<Props> = ({

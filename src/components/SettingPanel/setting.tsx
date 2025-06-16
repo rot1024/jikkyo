@@ -172,8 +172,11 @@ export const getSettings = (s?: Settings) =>
             {
               ...a[1],
               [b.id]:
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 typeof (s as any)[b.id] !== "undefined"
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   ? (s as any)[b.id]
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   : (defaultSettings as any)[b.id]
             }
           ]
@@ -181,8 +184,11 @@ export const getSettings = (s?: Settings) =>
             {
               ...a[0],
               [b.id]:
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 typeof (s as any)[b.id] !== "undefined"
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   ? (s as any)[b.id]
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   : (defaultSettings as any)[b.id]
             },
             a[1]

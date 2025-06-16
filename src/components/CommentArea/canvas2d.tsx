@@ -1,7 +1,6 @@
-/** @jsx jsx */
 import React, { useRef, useEffect } from "react";
-import { css, jsx } from "@emotion/core";
-import useComponentSize from "@rehooks/component-size";
+import { css } from "@emotion/react";
+import useResizeObserver from "use-resize-observer";
 
 import { Chat, ChatActualStyle } from "./util";
 
@@ -27,7 +26,9 @@ const Canvas2DRenderer: React.FC<Props> = ({
   colorize
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { width, height } = useComponentSize(canvasRef);
+  const { width = 0, height = 0 } = useResizeObserver({
+    ref: canvasRef
+  });
 
   useEffect(() => {
     if (!canvasRef.current) return;

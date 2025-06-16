@@ -1,10 +1,10 @@
-/** @jsx jsx */
 import React from "react";
-import { css, jsx } from "@emotion/core";
+import { css } from "@emotion/react";
 
 export interface Props {
   className?: string;
   onClick?: () => void;
+  children?: React.ReactNode;
 }
 
 const Button: React.FC<Props> = ({ className, onClick, children }) => {

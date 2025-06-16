@@ -1,6 +1,5 @@
-/** @jsx jsx */
 import React, { useMemo } from "react";
-import { css, jsx, keyframes } from "@emotion/core";
+import { css, keyframes } from "@emotion/react";
 
 import { Chat, ChatActualStyle } from "./util";
 import useLatest from "../../util/useLatest";

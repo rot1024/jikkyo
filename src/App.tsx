@@ -1,8 +1,6 @@
-/** @jsx jsx */
 import React, { Fragment, useState, useCallback, useRef } from "react";
-import { css, jsx } from "@emotion/core";
-import { hot } from "react-hot-loader/root";
-import { Global } from "@emotion/core";
+import { css } from "@emotion/react";
+import { Global } from "@emotion/react";
 import useFileInput from "use-file-input";
 import { useHotkeys } from "react-hotkeys-hook";
 
@@ -173,26 +171,26 @@ const App: React.FC = () => {
         playing={playing}
         styles={styles}
         opacity={
-          settings.commentOpacity ? settings.commentOpacity / 100 : undefined
+          settings?.commentOpacity ? settings?.commentOpacity / 100 : undefined
         }
         opacityDanmaku={
-          settings.danmakuCommentOpacity
-            ? settings.danmakuCommentOpacity / 100
+          settings?.danmakuCommentOpacity
+            ? settings?.danmakuCommentOpacity / 100
             : undefined
         }
         thinning={thinning}
-        colorize={settings.coloriseComments}
+        colorize={settings?.coloriseComments}
         timeCorrection={commentTimeCorrection}
         muteKeywords={muteKeywords}
         filterKeywords={filterKeywords}
         onCommentsRemeasurementRequire={handleCommentUpdateRequire}
-        getCurrentTime={!!src ? handleGetCurrentTime : undefined}
+        getCurrentTime={src ? handleGetCurrentTime : undefined}
         visibleCommentCount={
-          settings.limitComments ? settings.visibleCommentCount : undefined
+          settings?.limitComments ? settings?.visibleCommentCount : undefined
         }
       />
       <SeekerAndDropZone
-        seekable={settings.seekable && seekbarDuration > 0}
+        seekable={settings?.seekable && seekbarDuration > 0}
         droppable
         onSeek={handleSeek}
         onDrop={handleDrop}
@@ -243,4 +241,4 @@ const App: React.FC = () => {
   );
 };
 
-export default hot(App);
+export default App;

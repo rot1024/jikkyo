@@ -1,28 +1,26 @@
-/** @jsx jsx */
-import React, { useCallback, useRef, useMemo } from "react";
-import { css, jsx } from "@emotion/core";
-import useTransition from "@rot1024/use-transition";
+import { useCallback, useRef, useMemo } from "react";
+import { css } from "@emotion/react";
 import { useHotkeys } from "react-hotkeys-hook";
 
 import Form, { SettingValues } from "./Form";
 import Button from "./Button";
 import {
   settingSchema,
-  Settings,
+  Settings as SettingsType,
   defaultSettings,
   getSettings
 } from "./setting";
 import useDebounce from "../../util/useDebounce";
 
-export type Settings = Settings;
+export type Settings = SettingsType;
 export { defaultSettings };
 
 export interface Props {
   className?: string;
   shown?: boolean;
-  initialSettings?: Settings;
+  initialSettings?: SettingsType;
   debounce?: boolean;
-  onChange?: (s: Settings) => void;
+  onChange?: (s: SettingsType) => void;
   onClose?: () => void;
   onVideoClose?: () => void;
   onCommentsClose?: () => void;
@@ -38,7 +36,7 @@ const SettingPanel: React.FC<Props> = ({
   onVideoClose,
   onCommentsClose
 }) => {
-  const state = useTransition(!!shown, 100);
+  // Animation state management removed for simplicity
 
   const handleOutsideClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
@@ -55,7 +53,7 @@ const SettingPanel: React.FC<Props> = ({
   const changedValueDebounced = useRef(initialSettings2[1]);
   const handleChange = useCallback(
     (v: SettingValues) => {
-      const newSettings = getSettings(v as Settings);
+      const newSettings = getSettings(v as SettingsType);
       if (onChange) {
         onChange({
           ...newSettings[0],
@@ -82,8 +80,8 @@ const SettingPanel: React.FC<Props> = ({
     handleDebounce
   );
 
-  useHotkeys("esc", () => onClose && state === "entered" && onClose(), [
-    onClose
+  useHotkeys("esc", () => onClose && shown && onClose(), [
+    onClose, shown
   ]);
 
   return (
@@ -100,11 +98,9 @@ const SettingPanel: React.FC<Props> = ({
         align-items: center;
         justify-content: center;
         font-size: 1.2rem;
-        pointer-events: ${state === "entered" ? "auto" : "none"};
-        transition: ${state === "entering" || state === "exiting"
-          ? "all 0.1s ease-in-out"
-          : ""};
-        opacity: ${state === "entering" || state === "entered" ? 1 : 0};
+        pointer-events: ${shown ? "auto" : "none"};
+        transition: all 0.1s ease-in-out;
+        opacity: ${shown ? 1 : 0};
       `}
     >
       <div

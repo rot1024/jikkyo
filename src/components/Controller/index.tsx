@@ -1,6 +1,5 @@
-/** @jsx jsx */
 import React, { useCallback, useMemo } from "react";
-import { css, jsx } from "@emotion/core";
+import { css } from "@emotion/react";
 import { useHotkeys } from "react-hotkeys-hook";
 
 import Button from "./Button";
