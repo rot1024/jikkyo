@@ -36,7 +36,14 @@ const Canvas2DRenderer: React.FC<Props> = ({
     if (!ctx) return;
     const w = canvasRef.current.width;
     const h = canvasRef.current.height;
+    
+    // Clear canvas
     ctx.clearRect(0, 0, w, h);
+    
+    // Early return if no chats to render
+    if (chats.length === 0) return;
+    
+    // Set up context properties once
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
     ctx.strokeStyle = "rgba(0, 0, 0, 0.5)";
@@ -46,12 +53,16 @@ const Canvas2DRenderer: React.FC<Props> = ({
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 0;
 
-    for (const c of chats) {
-      if (c.hidden || frame <= c.vpos || frame >= c.vpos + c.duration) continue;
-      if (thinning && c.id % thinning[1] !== thinning[0] - 1) continue;
-      ctx.font = `${styles.fontWeight || ""} ${
-        c.fontSize
-      }px ${styles.fontFamily || "sans-serif"}`;
+    // Filter visible chats first to reduce iterations
+    const visibleChats = chats.filter(c => {
+      if (c.hidden || frame <= c.vpos || frame >= c.vpos + c.duration) return false;
+      if (thinning && c.id % thinning[1] !== thinning[0] - 1) return false;
+      return true;
+    });
+
+    // Render visible chats
+    for (const c of visibleChats) {
+      ctx.font = `${styles.fontWeight || ""} ${c.fontSize}px ${styles.fontFamily || "sans-serif"}`;
       ctx.globalAlpha = c.danmaku ? opacityDanmaku : opacity;
       ctx.fillStyle = (colorize ? c.color2 : c.color) || "#fff";
       const x = c.ueshita

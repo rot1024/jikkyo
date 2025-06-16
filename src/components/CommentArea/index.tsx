@@ -156,6 +156,7 @@ const CommentArea = forwardRef<Ref, Props>((
 
   const timeDelayCorrection = useRef(1);
   const prevTime = useRef(Date.now());
+  const lastRenderTime = useRef(Date.now());
   const [frame, setFrame] = useState(currentTime);
 
   useEffect(() => {
@@ -170,14 +171,21 @@ const CommentArea = forwardRef<Ref, Props>((
   }, [playing]);
 
   useRequestAnimationFrame(() => {
+    const now = Date.now();
+    
     if (getCurrentTime) {
-      setFrame(getCurrentTime());
+      // For video playback, limit comment frame updates to 60fps to maintain video performance
+      if (now - lastRenderTime.current >= 16) { // ~60fps
+        setFrame(getCurrentTime());
+        lastRenderTime.current = now;
+      }
       return;
     }
+    
     setFrame(
-      f => f + (Date.now() - prevTime.current) * timeDelayCorrection.current
+      f => f + (now - prevTime.current) * timeDelayCorrection.current
     );
-    prevTime.current = Date.now();
+    prevTime.current = now;
   }, !!playing && !manual);
 
   const correctedFrame = frame + timeCorrection;
