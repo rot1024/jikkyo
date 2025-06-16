@@ -64,10 +64,25 @@ const Canvas2DRenderer: React.FC<Props> = ({
     for (const c of visibleChats) {
       ctx.font = `${styles.fontWeight || ""} ${c.fontSize}px ${styles.fontFamily || "sans-serif"}`;
       ctx.globalAlpha = c.danmaku ? opacityDanmaku : opacity;
-      ctx.fillStyle = (colorize ? c.color2 : c.color) || "#fff";
+      
       const x = c.ueshita
         ? (w - c.width) / 2
         : (w + c.width) * (1 - (frame - c.vpos) / c.duration) - c.width;
+
+      // Highlight background for search results
+      if (c.isHighlighted && c.searchQuery) {
+        const bgColor = c.isCurrentResult ? "#ff6600" : "#cc4400"; // Orange highlight
+        ctx.fillStyle = bgColor;
+        ctx.fillRect(x - 2, c.y - 2, c.width + 4, c.height + 4);
+      }
+
+      // Text color
+      if (c.isHighlighted) {
+        ctx.fillStyle = "#fff"; // White text for highlighted comments
+      } else {
+        ctx.fillStyle = (colorize ? c.color2 : c.color) || "#fff";
+      }
+      
       ctx.fillText(c.text, x, c.y);
       ctx.strokeText(c.text, x, c.y);
     }

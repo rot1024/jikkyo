@@ -7,12 +7,14 @@ export interface Props {
   suffix?: string;
   placeholder?: string;
   onChange?: (v: string) => void;
+  onEnter?: (v: string) => void;
 }
 
 const Text: React.FC<Props> = ({
   className,
   value,
   onChange,
+  onEnter,
   suffix,
   placeholder
 }) => {
@@ -29,6 +31,11 @@ const Text: React.FC<Props> = ({
         value={value}
         placeholder={placeholder}
         onChange={e => onChange && onChange(e.currentTarget.value)}
+        onKeyDown={e => {
+          if (e.key === 'Enter' && !(e.nativeEvent as any).isComposing && onEnter) {
+            onEnter(e.currentTarget.value);
+          }
+        }}
         css={css`
           flex: auto;
           width: 100%;

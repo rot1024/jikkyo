@@ -1,9 +1,10 @@
-import { useCallback, useRef, useMemo } from "react";
+import { useCallback, useRef, useMemo, useState } from "react";
 import { css } from "@emotion/react";
 import { useHotkeys } from "react-hotkeys-hook";
 
 import Form, { SettingValues } from "./Form";
 import Button from "./Button";
+import Text from "./Text";
 import {
   settingSchema,
   Settings as SettingsType,
@@ -24,6 +25,8 @@ export interface Props {
   onClose?: () => void;
   onVideoClose?: () => void;
   onCommentsClose?: () => void;
+  onSearch?: (query: string, direction?: 'next' | 'prev') => void;
+  searchResultsCount?: number;
 }
 
 const SettingPanel: React.FC<Props> = ({
@@ -34,7 +37,9 @@ const SettingPanel: React.FC<Props> = ({
   debounce,
   onChange,
   onVideoClose,
-  onCommentsClose
+  onCommentsClose,
+  onSearch,
+  searchResultsCount = 0
 }) => {
   // Animation state management removed for simplicity
 
@@ -79,6 +84,31 @@ const SettingPanel: React.FC<Props> = ({
     debounce ? 1000 : 0,
     handleDebounce
   );
+
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearchEnter = useCallback((query: string) => {
+    if (onSearch) {
+      if (query.trim()) {
+        onSearch(query.trim(), 'next');
+      } else {
+        // Clear search when empty query is entered
+        onSearch('', 'next');
+      }
+    }
+  }, [onSearch]);
+
+  const handleSearchPrev = useCallback(() => {
+    if (onSearch && searchResultsCount > 0) {
+      onSearch(searchQuery.trim(), 'prev');
+    }
+  }, [onSearch, searchQuery, searchResultsCount]);
+
+  const handleSearchNext = useCallback(() => {
+    if (onSearch && searchResultsCount > 0) {
+      onSearch(searchQuery.trim(), 'next');
+    }
+  }, [onSearch, searchQuery, searchResultsCount]);
 
   useHotkeys("esc", () => onClose && shown && onClose(), [
     onClose, shown
@@ -126,22 +156,86 @@ const SettingPanel: React.FC<Props> = ({
           initialValues={initialSettings}
           onChange={handleChange}
         />
-        <Button
-          onClick={onVideoClose}
+
+        {/* Search Section */}
+        <div
           css={css`
-            margin-top: 1em;
+            margin-top: 1.5em;
+            padding-top: 1em;
+            border-top: 1px solid #555;
           `}
         >
-          Close video
-        </Button>
-        <Button
-          onClick={onCommentsClose}
+          <div
+            css={css`
+              color: #aaa;
+              font-size: 0.8rem;
+              margin-bottom: 0.5em;
+            `}
+          >
+            Comment Search
+          </div>
+          <Text
+            value={searchQuery}
+            placeholder="Search comments..."
+            onChange={setSearchQuery}
+            onEnter={handleSearchEnter}
+            css={css`
+              margin-bottom: 0.5em;
+            `}
+          />
+          <div
+            css={css`
+              display: flex;
+              gap: 0.5em;
+            `}
+          >
+            <Button
+              onClick={handleSearchPrev}
+              disabled={searchResultsCount === 0}
+              css={css`
+                flex: 1;
+                font-size: 0.8rem;
+              `}
+            >
+              ← Prev
+            </Button>
+            <Button
+              onClick={handleSearchNext}
+              disabled={searchResultsCount === 0}
+              css={css`
+                flex: 1;
+                font-size: 0.8rem;
+              `}
+            >
+              Next →
+            </Button>
+          </div>
+        </div>
+
+        <div
           css={css`
-            margin-top: 1em;
+            margin-top: 1.5em;
+            padding-top: 1em;
+            border-top: 1px solid #555;
           `}
         >
-          Close comments
-        </Button>
+          <Button
+            onClick={onVideoClose}
+            css={css`
+              margin-top: 1em;
+            `}
+          >
+            Close video
+          </Button>
+          <Button
+            onClick={onCommentsClose}
+            css={css`
+              margin-top: 1em;
+            `}
+          >
+            Close comments
+          </Button>
+        </div>
       </div>
     </div>
   );

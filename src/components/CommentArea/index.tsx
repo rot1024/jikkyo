@@ -41,6 +41,9 @@ export interface Props {
   manual?: boolean;
   getCurrentTime?: () => number;
   onCommentsRemeasurementRequire?: () => void;
+  searchResults?: number[];
+  currentSearchIndex?: number;
+  searchQuery?: string;
 }
 
 export interface Ref {
@@ -68,7 +71,10 @@ const CommentArea = forwardRef<Ref, Props>((
     autoCommentsRemeasurement,
     onCommentsRemeasurementRequire,
     manual,
-    getCurrentTime
+    getCurrentTime,
+    searchResults = [],
+    currentSearchIndex = -1,
+    searchQuery = ""
   },
   ref
 ) => {
@@ -207,12 +213,29 @@ const CommentArea = forwardRef<Ref, Props>((
     );
 
     setVisibleChats(
-      newVisibleChats.slice(-visibleCommentCount).map(c => ({
-        ...c,
-        hidden:
-          (muteKeywords && muteKeywords.test(c.text)) ||
-          (filterKeywords && !filterKeywords.test(c.text))
-      }))
+      newVisibleChats.slice(-visibleCommentCount).map((c) => {
+        let isHighlighted = false;
+        let isCurrentResult = false;
+        let searchQueryForComment = "";
+        
+        // Only perform search-related calculations if there are search results
+        if (searchResults.length > 0) {
+          const originalIndex = comments.findIndex(comment => comment.id === c.id);
+          isHighlighted = searchResults.includes(originalIndex);
+          isCurrentResult = searchResults[currentSearchIndex] === originalIndex;
+          searchQueryForComment = isHighlighted ? searchQuery : "";
+        }
+        
+        return {
+          ...c,
+          hidden:
+            (muteKeywords && muteKeywords.test(c.text)) ||
+            (filterKeywords && !filterKeywords.test(c.text)),
+          isHighlighted,
+          isCurrentResult,
+          searchQuery: searchQueryForComment
+        };
+      })
     );
   }, [
     chats,
@@ -221,7 +244,11 @@ const CommentArea = forwardRef<Ref, Props>((
     innerStyles.duration,
     innerStyles.ueshitaDuration,
     muteKeywords,
-    visibleCommentCount
+    visibleCommentCount,
+    searchResults,
+    currentSearchIndex,
+    searchQuery,
+    comments
   ]);
 
   return (

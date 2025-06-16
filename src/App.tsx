@@ -62,6 +62,9 @@ const App: React.FC = () => {
   const [commentUpdateRequired, setCommentUpdateRequired] = useState(false);
   const [controllerHidden, setControllerHidden] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
+  const [searchResults, setSearchResults] = useState<number[]>([]);
+  const [currentSearchIndex, setCurrentSearchIndex] = useState(-1);
+  const [activeSearchQuery, setActiveSearchQuery] = useState("");
 
   const handleCommentUpdateRequire = useCallback(() => {
     setCommentUpdateRequired(true);
@@ -151,6 +154,87 @@ const App: React.FC = () => {
     [videoRef]
   );
 
+  const clearSearch = useCallback(() => {
+    setSearchResults([]);
+    setCurrentSearchIndex(-1);
+    setActiveSearchQuery("");
+  }, []);
+
+  const performSearch = useCallback((query: string) => {
+    if (!query || comments.length === 0) {
+      clearSearch();
+      return;
+    }
+
+    // Find all matching comments
+    const matches = comments
+      .map((comment, index) => ({ comment, index }))
+      .filter(({ comment }) => 
+        comment.text.toLowerCase().includes(query.toLowerCase())
+      )
+      .map(({ index }) => index);
+
+    setSearchResults(matches);
+    setActiveSearchQuery(query);
+
+    if (matches.length === 0) {
+      setCurrentSearchIndex(-1);
+      return;
+    }
+
+    // Start with first result
+    setCurrentSearchIndex(0);
+    const targetComment = comments[matches[0]];
+    if (targetComment) {
+      // Seek to a position where the comment will be visible
+      // Use comment duration from settings to calculate appropriate offset
+      const isUeshita = targetComment.pos === "ue" || targetComment.pos === "shita";
+      const commentDuration = isUeshita ? styles.ueshitaDuration : styles.duration;
+      const seekTime = targetComment.vpos + Math.min(commentDuration * 0.1, 500); // 10% of duration or 0.5s max
+      handleSeek(seekTime);
+    }
+  }, [comments, handleSeek, styles.duration, styles.ueshitaDuration]);
+
+  const navigateSearch = useCallback((direction: 'next' | 'prev') => {
+    if (searchResults.length === 0) return;
+
+    let targetIndex;
+    if (direction === 'next') {
+      targetIndex = (currentSearchIndex + 1) % searchResults.length;
+    } else {
+      targetIndex = currentSearchIndex === 0 ? searchResults.length - 1 : currentSearchIndex - 1;
+    }
+
+    setCurrentSearchIndex(targetIndex);
+    const targetComment = comments[searchResults[targetIndex]];
+    if (targetComment) {
+      // Seek to a position where the comment will be visible
+      // Use comment duration from settings to calculate appropriate offset
+      const isUeshita = targetComment.pos === "ue" || targetComment.pos === "shita";
+      const commentDuration = isUeshita ? styles.ueshitaDuration : styles.duration;
+      const seekTime = targetComment.vpos + Math.min(commentDuration * 0.1, 500); // 10% of duration or 0.5s max
+      handleSeek(seekTime);
+    }
+  }, [searchResults, currentSearchIndex, comments, handleSeek, styles.duration, styles.ueshitaDuration]);
+
+  const handleSearch = useCallback((query: string, direction: 'next' | 'prev' = 'next') => {
+    if (direction === 'next') {
+      if (!query) {
+        // Clear search when empty query
+        clearSearch();
+      } else if (activeSearchQuery !== query) {
+        // New search
+        performSearch(query);
+      } else {
+        // Navigate existing results
+        navigateSearch(direction);
+      }
+    } else {
+      // Navigate existing results
+      navigateSearch(direction);
+    }
+  }, [activeSearchQuery, performSearch, navigateSearch, clearSearch]);
+
   useHotkeys(",", () => setCommentTimeCorrection(s => s - 1000), [
     setCommentTimeCorrection
   ]);
@@ -194,6 +278,9 @@ const App: React.FC = () => {
         visibleCommentCount={
           settings?.limitComments ? settings?.visibleCommentCount : undefined
         }
+        searchResults={searchResults}
+        currentSearchIndex={currentSearchIndex}
+        searchQuery={activeSearchQuery}
       />
       <SeekerAndDropZone
         seekable={settings?.seekable && seekbarDuration > 0}
@@ -230,6 +317,8 @@ const App: React.FC = () => {
         onChange={updateSettings}
         onVideoClose={unloadVideo}
         onCommentsClose={unloadComments}
+        onSearch={handleSearch}
+        searchResultsCount={searchResults.length}
       />
       <Banner error onClose={handleErrorClose}>
         {error}

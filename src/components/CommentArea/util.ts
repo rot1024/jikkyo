@@ -21,6 +21,9 @@ export interface Chat extends Comment {
   speed: number;
   fontSize: number;
   hidden?: boolean;
+  isHighlighted?: boolean;
+  isCurrentResult?: boolean;
+  searchQuery?: string;
 }
 
 export interface ChatCommonStyle {
