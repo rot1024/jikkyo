@@ -161,6 +161,7 @@ const CommentArea = forwardRef<Ref, Props>((
   useEffect(() => {
     setFrame(currentTime);
     prevTime.current = Date.now();
+    nextVpos.current = -1;
   }, [currentTime]);
 
   useEffect(() => {
