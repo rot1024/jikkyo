@@ -54,6 +54,65 @@ export const readText = (file: File) =>
     reader.readAsText(file);
   });
 
+export const readCommentsFromJSON = async (jsonStr: string) => {
+  let data;
+  try {
+    data = JSON.parse(jsonStr);
+  } catch (error) {
+    throw new Error(`JSON parse error: ${error}`);
+  }
+
+  if (!Array.isArray(data)) {
+    throw new Error("JSON must be an array of comment objects");
+  }
+
+  const comments = data
+    .filter(item => item.data && item.data.type === "user/send-comment" && item.data.comment)
+    .map((item, i): Comment => {
+      const playtime = parseFloat(item.playtime) || 0;
+      const comment = Array.isArray(item.data.comment) 
+        ? item.data.comment.join(' ') 
+        : item.data.comment;
+      const color = item.data.color || "#fff";
+      const userName = item.data.userName || "";
+      const memberId = item.data.memberId || "";
+      
+      const commenter = userName || memberId;
+      const hash = commenter ? hashCode(commenter) : Math.random() * 0xffffff;
+      const [r, g, b] = hashCode2Color(hash);
+
+      return {
+        id: i,
+        text: comment,
+        date: new Date(item.time),
+        vpos: Math.floor(playtime * 1000), // Convert seconds to milliseconds
+        commenter,
+        pos: undefined, // asobistage doesn't have position info
+        size: undefined, // asobistage doesn't have size info
+        color,
+        color2: `#${toHex(r)}${toHex(g)}${toHex(b)}`,
+        hash
+      };
+    });
+
+  const validComments = comments
+    .filter(c => c.text !== "" && !isNaN(c.vpos))
+    .sort((a, b) => a.vpos - b.vpos);
+
+  const invalidCommnents = comments.length - validComments.length;
+  if (invalidCommnents > 0) {
+    console.warn(`${invalidCommnents} invalid comments are ignored.`);
+  }
+
+  const duration = validComments.length === 0 ? 0 : validComments[validComments.length - 1].vpos;
+
+  return {
+    comments: validComments,
+    duration,
+    influence: calcInfluence(validComments, duration, 100)
+  };
+};
+
 export const readComments = async (xml: string) => {
   const parser = new DOMParser();
   const dom = parser.parseFromString(xml, "application/xml");
@@ -186,4 +245,15 @@ const calcInfluence = (
   return influence;
 };
 
-export default async (file: File) => readComments(await readText(file));
+export default async (file: File) => {
+  const content = await readText(file);
+  
+  // Detect file format by trying to parse as JSON first
+  try {
+    JSON.parse(content);
+    return readCommentsFromJSON(content);
+  } catch {
+    // If JSON parsing fails, treat as XML
+    return readComments(content);
+  }
+};

@@ -111,7 +111,13 @@ const App: React.FC = () => {
     async (file: File) => {
       if (file.type.indexOf("video/") === 0) {
         loadVideo(file);
-      } else if (file.type === "text/xml" || file.type === "application/xml") {
+      } else if (
+        file.type === "text/xml" || 
+        file.type === "application/xml" ||
+        file.type === "application/json" ||
+        file.name.endsWith('.json') ||
+        file.name.endsWith('.xml')
+      ) {
         await loadComments(file).catch(err =>
           setError(err.message || err.toString())
         );
@@ -135,7 +141,7 @@ const App: React.FC = () => {
         setError(err.message || err.toString())
       );
     },
-    { accept: "application/xml" }
+    { accept: "application/xml,application/json,.xml,.json" }
   );
 
   const handleMenuClose = useCallback(() => setMenuVisible(false), []);
