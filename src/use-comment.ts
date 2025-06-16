@@ -11,6 +11,7 @@ export default function useComment(duration: number) {
   const [commentTimeCorrection, setCommentTimeCorrection] = useState(0);
 
   const loadComments = useCallback(async (file: File) => {
+    setComments(undefined); // Clear existing comments first
     setComments(await load(file));
   }, []);
 

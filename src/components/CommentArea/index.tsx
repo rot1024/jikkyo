@@ -106,10 +106,19 @@ const CommentArea = forwardRef<Ref, Props>((
   );
 
   useEffect(() => {
+    // Reset buffer when comments are cleared
+    if (comments.length === 0) {
+      bufferedCommentLength.current = 0;
+      return;
+    }
+    
+    const isNewCommentFile = bufferedCommentLength.current === 0 && comments.length > 0;
+    
     if (
       comments.length > 0 &&
       bufferedCommentLength.current > 0 &&
-      !autoCommentsRemeasurement
+      !autoCommentsRemeasurement &&
+      !isNewCommentFile
     ) {
       if (onCommentsRemeasurementRequire) {
         onCommentsRemeasurementRequire();
