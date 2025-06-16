@@ -161,14 +161,12 @@ const CommentArea = forwardRef<Ref, Props>((
   useEffect(() => {
     setFrame(currentTime);
     prevTime.current = Date.now();
-    nextVpos.current = -1;
   }, [currentTime]);
 
   useEffect(() => {
     if (playing) {
       prevTime.current = Date.now();
     }
-    nextVpos.current = -1;
   }, [playing]);
 
   useRequestAnimationFrame(() => {
@@ -183,14 +181,9 @@ const CommentArea = forwardRef<Ref, Props>((
   }, !!playing && !manual);
 
   const correctedFrame = frame + timeCorrection;
-  const nextVpos = useRef(-1);
   const [visibleChats, setVisibleChats] = useState<Chat[]>([]);
   useEffect(() => {
-    if (playing && nextVpos.current >= 0 && correctedFrame < nextVpos.current) {
-      return;
-    }
-
-    const [newVisibleChats, end] = getVisibleChats(
+    const [newVisibleChats] = getVisibleChats(
       chats,
       correctedFrame,
       Math.max(innerStyles.duration, innerStyles.ueshitaDuration)
@@ -204,18 +197,13 @@ const CommentArea = forwardRef<Ref, Props>((
           (filterKeywords && !filterKeywords.test(c.text))
       }))
     );
-
-    const next = chats[end];
-    nextVpos.current = next ? next.vpos : -1;
   }, [
     chats,
     correctedFrame,
     filterKeywords,
-    frame,
     innerStyles.duration,
     innerStyles.ueshitaDuration,
     muteKeywords,
-    playing,
     visibleCommentCount
   ]);
 
