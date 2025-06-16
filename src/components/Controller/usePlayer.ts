@@ -28,16 +28,22 @@ export default (
     if (!innerPlaying.current || manual) return;
     seek(Date.now() - prevTime.current, true);
   }, [manual, seek]);
-  useInterval(handleInterval, 100);
+  useInterval(handleInterval, manual ? null : 100);
 
   useEffect(() => {
     innerPlaying.current = !!playing;
-    seek(0, true);
-  }, [playing, seek]);
+    if (playing) {
+      prevTime.current = Date.now();
+    }
+  }, [playing]);
 
   useEffect(() => {
-    seek(currentTime);
-  }, [currentTime, seek]);
+    if (manual) {
+      setSeekTime(currentTime);
+    } else {
+      seek(currentTime);
+    }
+  }, [currentTime, manual, seek]);
 
   useEffect(() => {
     if (seekTime >= duration) {
