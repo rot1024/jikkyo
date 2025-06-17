@@ -14,12 +14,18 @@ export default (
   const [seekTime, setSeekTime] = useState(0);
   const prevTime = useRef(0);
   const innerPlaying = useRef(false);
+  const isSeeking = useRef(false);
 
   const roundSeekTime = useMemo(() => round(duration), [duration]);
   const seek = useCallback<(t: number, relative?: boolean) => void>(
     (t, relative) => {
+      isSeeking.current = true;
       prevTime.current = Date.now();
       setSeekTime(relative ? t2 => roundSeekTime(t + t2) : roundSeekTime(t));
+      // Reset seeking flag after a short delay to allow video events to complete
+      setTimeout(() => {
+        isSeeking.current = false;
+      }, 100);
     },
     [roundSeekTime]
   );
@@ -38,6 +44,7 @@ export default (
   }, [playing]);
 
   useEffect(() => {
+    if (isSeeking.current) return; // Don't sync during active seeking
     if (manual) {
       setSeekTime(currentTime);
     } else {

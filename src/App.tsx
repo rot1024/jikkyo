@@ -193,7 +193,7 @@ const App: React.FC = () => {
       const seekTime = targetComment.vpos + Math.min(commentDuration * 0.1, 500); // 10% of duration or 0.5s max
       handleSeek(seekTime);
     }
-  }, [comments, handleSeek, styles.duration, styles.ueshitaDuration]);
+  }, [comments, handleSeek, styles.duration, styles.ueshitaDuration, clearSearch]);
 
   const navigateSearch = useCallback((direction: 'next' | 'prev') => {
     if (searchResults.length === 0) return;

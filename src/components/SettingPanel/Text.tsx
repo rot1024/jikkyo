@@ -32,7 +32,7 @@ const Text: React.FC<Props> = ({
         placeholder={placeholder}
         onChange={e => onChange && onChange(e.currentTarget.value)}
         onKeyDown={e => {
-          if (e.key === 'Enter' && !(e.nativeEvent as any).isComposing && onEnter) {
+          if (e.key === 'Enter' && !(e.nativeEvent as KeyboardEvent).isComposing && onEnter) {
             onEnter(e.currentTarget.value);
           }
         }}
