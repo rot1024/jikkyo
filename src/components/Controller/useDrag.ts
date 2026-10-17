@@ -17,7 +17,7 @@ const getOffset = (
   }
 };
 
-export function useHover(ref: React.RefObject<Element>, disabled?: boolean) {
+export function useHover(ref: React.RefObject<Element | null>, disabled?: boolean) {
   const [value, setValue] = useState(false);
   const [x, setX] = useState(0);
   const handleMouseOver = useCallback(() => setValue(true), []);
@@ -53,15 +53,17 @@ export function useHover(ref: React.RefObject<Element>, disabled?: boolean) {
     };
   }, [disabled, handleMouseOut, handleMouseOver, ref]);
 
-  useEffect(() => {
+  const [prevDisabled, setPrevDisabled] = useState(disabled);
+  if (prevDisabled !== disabled) {
+    setPrevDisabled(disabled);
     setValue(false);
-  }, [disabled]);
+  }
 
   return [value, x] as const;
 }
 
 export const useDrag = (
-  ref: React.RefObject<Element>,
+  ref: React.RefObject<Element | null>,
   onMove?: (state: {
     x: number;
     y: number;
@@ -78,11 +80,13 @@ export const useDrag = (
   const prevX = useRef(0);
   const prevY = useRef(0);
 
-  useEffect(() => {
+  const [prevDisabled, setPrevDisabled] = useState(disabled);
+  if (prevDisabled !== disabled) {
+    setPrevDisabled(disabled);
     if (disabled) {
       setDragging(false);
     }
-  }, [disabled]);
+  }
 
   const handleDragStart = useCallback(
     (e: React.MouseEvent | React.TouchEvent) => {

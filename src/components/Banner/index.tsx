@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { css } from "@emotion/react";
 
 export interface Props {
@@ -20,10 +20,11 @@ const Banner: React.FC<Props> = ({
   onClose
 }) => {
   const [visible, setVisible] = useState(!!children);
-
-  useEffect(() => {
+  const [prevChildren, setPrevChildren] = useState(children);
+  if (prevChildren !== children) {
+    setPrevChildren(children);
     setVisible(!!children);
-  }, [children]);
+  }
 
   const handleClose = useCallback(() => {
     setVisible(false);

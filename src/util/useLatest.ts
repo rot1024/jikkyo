@@ -1,13 +1,12 @@
-import { useRef } from "react";
+import { useState } from "react";
 
 const useLatest = <S, T>(state: S, trigger: T) => {
-  const stateRef = useRef<S>(state);
-  const triggerRef = useRef<T>(trigger);
-  if (triggerRef.current !== trigger) {
-    stateRef.current = state;
-    triggerRef.current = trigger;
+  const [latest, setLatest] = useState({ state, trigger });
+  if (latest.trigger !== trigger) {
+    setLatest({ state, trigger });
+    return state;
   }
-  return stateRef.current;
+  return latest.state;
 };
 
 export default useLatest;

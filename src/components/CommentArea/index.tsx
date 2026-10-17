@@ -7,7 +7,7 @@ import {
   forwardRef
 } from "react";
 import { css } from "@emotion/react";
-import useResizeObserver from "use-resize-observer";
+import { useResizeObserver } from "use-resize-observer";
 
 import useRequestAnimationFrame from "../../util/useRequestAnimationFrame";
 import Canvas2dRenderer from "./canvas2d";

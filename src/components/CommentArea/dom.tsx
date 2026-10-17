@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import { css } from "@emotion/react";
-import useResizeObserver from "use-resize-observer";
+import { useResizeObserver } from "use-resize-observer";
 import { useThrottle } from "react-use";
 
 import ChatComponent from "./dom-chat";

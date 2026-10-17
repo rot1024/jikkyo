@@ -75,12 +75,15 @@ Comments are loaded from XML files (NicoNico format) and processed by `util/comm
 
 ## Development Notes
 
-- Built with Vite + React 18 + TypeScript
+- Built with Vite 8 + React 19 + TypeScript 6
 - Uses modern React features (createRoot, automatic JSX runtime)
 - Emotion 11 for CSS-in-JS styling with automatic JSX transform
 - Comment time is handled in milliseconds internally
 - Video time synchronization converts between seconds (video API) and milliseconds (internal state)
 - Hot Module Replacement (HMR) provided by Vite for fast development
+- ESLint flat config with `eslint-plugin-react-hooks` v7 (React Compiler rules): avoid setState in effects and reading/writing refs during render; prefer derived values (`useMemo`) or the "adjust state during render" pattern
+- react-hotkeys-hook v5 matches `event.code` by default, so use key names like `comma`, `period`, `slash` instead of literal characters
+- TypeScript is pinned to 6.0.x because typescript-eslint does not yet support TypeScript 7
 
 ## Commit Message Style
 

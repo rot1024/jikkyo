@@ -56,6 +56,7 @@ const SettingPanel: React.FC<Props> = ({
   ]);
   const changedValue = useRef(initialSettings2[0]);
   const changedValueDebounced = useRef(initialSettings2[1]);
+  const [debouncedValue, setDebouncedValue] = useState(initialSettings2[1]);
   const handleChange = useCallback(
     (v: SettingValues) => {
       const newSettings = getSettings(v as SettingsType);
@@ -67,6 +68,7 @@ const SettingPanel: React.FC<Props> = ({
       }
       changedValue.current = newSettings[0];
       changedValueDebounced.current = newSettings[1];
+      setDebouncedValue(newSettings[1]);
     },
     [onChange]
   );
@@ -80,7 +82,7 @@ const SettingPanel: React.FC<Props> = ({
     [onChange]
   );
   useDebounce(
-    changedValueDebounced.current,
+    debouncedValue,
     debounce ? 1000 : 0,
     handleDebounce
   );

@@ -23,7 +23,7 @@ const SeekBar: React.FC<Props> = ({
   influence,
   onChange
 }) => {
-  const ref = useRef<HTMLInputElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
 
   const [isDragging, handleDragStart] = useDrag(
     ref,

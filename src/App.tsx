@@ -235,13 +235,13 @@ const App: React.FC = () => {
     }
   }, [activeSearchQuery, performSearch, navigateSearch, clearSearch]);
 
-  useHotkeys(",", () => setCommentTimeCorrection(s => s - 1000), [
+  useHotkeys("comma", () => setCommentTimeCorrection(s => s - 1000), [
     setCommentTimeCorrection
   ]);
-  useHotkeys(".", () => setCommentTimeCorrection(s => s + 1000), [
+  useHotkeys("period", () => setCommentTimeCorrection(s => s + 1000), [
     setCommentTimeCorrection
   ]);
-  useHotkeys("/", () => setCommentTimeCorrection(0), [
+  useHotkeys("slash", () => setCommentTimeCorrection(0), [
     setCommentTimeCorrection
   ]);
 

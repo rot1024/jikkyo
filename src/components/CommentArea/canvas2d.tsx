@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import { css } from "@emotion/react";
-import useResizeObserver from "use-resize-observer";
+import { useResizeObserver } from "use-resize-observer";
 
 import { Chat, ChatActualStyle } from "./util";
 

@@ -59,7 +59,7 @@ export const readCommentsFromJSON = async (jsonStr: string) => {
   try {
     data = JSON.parse(jsonStr);
   } catch (error) {
-    throw new Error(`JSON parse error: ${error}`);
+    throw new Error(`JSON parse error: ${error}`, { cause: error });
   }
 
   if (!Array.isArray(data)) {
