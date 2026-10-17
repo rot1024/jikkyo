@@ -12,6 +12,7 @@ import { useResizeObserver } from "use-resize-observer";
 
 import Canvas2dRenderer from "./canvas2d";
 import { layoutChats } from "./layout";
+import { TimeStore } from "../../util/timeStore";
 import {
   Chat,
   Comment as CommentType,
@@ -26,7 +27,7 @@ export interface Props {
   className?: string;
   comments?: CommentType[];
   // time (ms) synced on seek/pause; only used to trigger a redraw while paused
-  currentTime?: number;
+  time: TimeStore;
   playing?: boolean;
   styles?: Partial<ChatStyle>;
   visibleCommentCount?: number;
@@ -58,7 +59,7 @@ const CommentArea = forwardRef<Ref, Props>((
     className,
     playing,
     comments = emptyComents,
-    currentTime = 0,
+    time,
     styles,
     visibleCommentCount = Infinity,
     opacity,
@@ -183,7 +184,7 @@ const CommentArea = forwardRef<Ref, Props>((
       <Canvas2dRenderer
         chats={decoratedChats}
         getFrame={getFrame}
-        frameHint={currentTime + timeCorrection}
+        time={time}
         playing={playing}
         visibleCommentCount={visibleCommentCount}
         styles={innerStyles}

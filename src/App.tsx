@@ -67,7 +67,7 @@ const App: React.FC = () => {
 
   const {
     playing,
-    currentTime,
+    time,
     getTime,
     toggle,
     seek,
@@ -265,7 +265,7 @@ const App: React.FC = () => {
       <CommentArea
         ref={commentAreaRef}
         comments={comments}
-        currentTime={currentTime}
+        time={time}
         playing={playing}
         styles={styles}
         opacity={
@@ -308,7 +308,7 @@ const App: React.FC = () => {
         onMenuButtonClick={() => {
           if (!menuVisible) setMenuVisible(true);
         }}
-        currentTime={currentTime}
+        time={time}
         duration={seekbarDuration}
         buffered={timeRanges}
         influence={influence}

@@ -4,6 +4,7 @@ import { useResizeObserver } from "use-resize-observer";
 
 import { Chat, ChatActualStyle } from "./util";
 import { ChatRenderer } from "./chatRenderer";
+import { TimeStore } from "../../util/timeStore";
 
 export interface Props {
   className?: string;
@@ -11,8 +12,8 @@ export interface Props {
   chats?: Chat[];
   // returns the current comment time (ms); read every animation frame while playing
   getFrame: () => number;
-  // changes when the time is changed while paused (e.g. seek) to trigger a redraw
-  frameHint?: number;
+  // redraws when the time is changed while paused (e.g. seek)
+  time?: TimeStore;
   playing?: boolean;
   styles: ChatActualStyle;
   opacity?: number;
@@ -26,7 +27,7 @@ const Canvas2DRenderer: React.FC<Props> = ({
   className,
   chats = [],
   getFrame,
-  frameHint,
+  time,
   playing,
   styles,
   opacity = 1,
@@ -84,8 +85,12 @@ const Canvas2DRenderer: React.FC<Props> = ({
       handle = window.requestAnimationFrame(loop);
     });
     return () => window.cancelAnimationFrame(handle);
-    // redraw when the canvas is resized (canvas is cleared) or the time is changed while paused
-  }, [draw, playing, frameHint]);
+  }, [draw, playing]);
+
+  useEffect(() => {
+    if (playing || !time) return;
+    return time.subscribe(() => draw(true));
+  }, [draw, playing, time]);
 
   return (
     <canvas

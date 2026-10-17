@@ -31,12 +31,12 @@ describe("Canvas2DRenderer", () => {
 
   it("draws the comments at the time after seeking backward", () => {
     const { rerender } = render(
-      <Canvas2DRenderer chats={chats} getFrame={() => 80500} frameHint={80500} styles={styles} />
+      <Canvas2DRenderer chats={chats} getFrame={() => 80500} styles={styles} />
     );
     expect(drawImage).toHaveBeenCalledTimes(5); // vpos 76000..80000
     drawImage.mockClear();
     rerender(
-      <Canvas2DRenderer chats={chats} getFrame={() => 10500} frameHint={10500} styles={styles} />
+      <Canvas2DRenderer chats={chats} getFrame={() => 10500} styles={styles} />
     );
     expect(drawImage).toHaveBeenCalledTimes(5); // vpos 6000..10000
   });

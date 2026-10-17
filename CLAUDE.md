@@ -36,7 +36,7 @@ This is a React-based video player application called "jikkyo-web" that displays
 The application is built around these custom hooks that manage the core state:
 
 1. **useVideo** (`src/use-video.ts`) - Manages the video element: file loading, duration, buffered ranges
-2. **usePlayback** (`src/use-playback.ts`) - Single source of truth for playback time and play/pause. `getTime()` returns the video time, or a wall-clock based time without a video. `currentTime` state is only a throttled copy for UI
+2. **usePlayback** (`src/use-playback.ts`) - Single source of truth for playback time and play/pause. `getTime()` returns the video time, or a wall-clock based time without a video. `time` is a throttled copy for UI held in an external store (`util/timeStore.ts`) so that frequent updates re-render only subscribers (e.g. Controller via `useTime`)
 3. **useComment** (`src/use-comment.ts`) - Handles comment data loading, filtering, time correction, and influence calculation
 4. **useConfig** (`src/use-config.ts`) - Manages user settings and preferences
 

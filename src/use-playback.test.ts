@@ -33,7 +33,7 @@ describe("usePlayback without video", () => {
     now = 30000;
     act(() => result.current.seek(10000));
     expect(result.current.getTime()).toBe(10000);
-    expect(result.current.currentTime).toBe(10000);
+    expect(result.current.time.get()).toBe(10000);
     now = 31000;
     expect(result.current.getTime()).toBe(11000);
   });

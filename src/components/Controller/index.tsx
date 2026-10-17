@@ -4,10 +4,11 @@ import { useHotkeys } from "react-hotkeys-hook";
 
 import Button from "./Button";
 import SeekBar from "./Seekbar";
+import { TimeStore, useTime } from "../../util/timeStore";
 
 export interface Props {
   className?: string;
-  currentTime?: number; // ms
+  time: TimeStore; // ms
   duration?: number;
   playing?: boolean;
   hidden?: boolean;
@@ -22,7 +23,7 @@ export interface Props {
 
 const Controller: React.FC<Props> = ({
   className,
-  currentTime = 0,
+  time,
   duration = 0,
   playing,
   hidden,
@@ -34,6 +35,7 @@ const Controller: React.FC<Props> = ({
   onCommentButtonClick,
   onMenuButtonClick
 }) => {
+  const currentTime = useTime(time);
   const disabled = duration === 0;
 
   const handleSeek = useCallback((t: number) => onSeek && onSeek(t), [onSeek]);

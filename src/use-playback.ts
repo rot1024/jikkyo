@@ -1,8 +1,9 @@
 import { useRef, useState, useCallback, useEffect, RefObject } from "react";
 
 import { EventType, Ref as VideoRef } from "./components/Video";
+import { createTimeStore } from "./util/timeStore";
 
-// Interval for syncing `currentTime` state (used by UI such as the seekbar).
+// Interval for syncing `time` store (used by UI such as the seekbar).
 // Comments are not rendered with this value; they read `getTime` every animation frame.
 const uiUpdateInterval = 100;
 
@@ -18,7 +19,9 @@ export default function usePlayback(
   duration: number
 ) {
   const [playing, setPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
+  // time for UI; not React state to avoid re-rendering the whole app every interval
+  const [time] = useState(() => createTimeStore());
+  const setCurrentTime = time.set;
   // `startedAt` is defined only while the clock is running (without a video)
   const clock = useRef<{ base: number; startedAt?: number }>({ base: 0 });
 
@@ -38,17 +41,17 @@ export default function usePlayback(
   if (prevHasVideo !== hasVideo) {
     setPrevHasVideo(hasVideo);
     setPlaying(false);
-    setCurrentTime(0);
   }
   useEffect(() => {
     clock.current = { base: 0 };
-  }, [hasVideo]);
+    time.set(0);
+  }, [hasVideo, time]);
 
   const pause = useCallback(() => {
     clock.current = { base: getTime() };
     setPlaying(false);
     setCurrentTime(clock.current.base);
-  }, [getTime]);
+  }, [getTime, setCurrentTime]);
 
   const toggle = useCallback(() => {
     if (hasVideo) {
@@ -67,7 +70,7 @@ export default function usePlayback(
     };
     setPlaying(true);
     setCurrentTime(clock.current.base);
-  }, [duration, getTime, hasVideo, pause, videoRef]);
+  }, [duration, getTime, hasVideo, pause, setCurrentTime, videoRef]);
 
   const seek = useCallback(
     (t: number, relative?: boolean) => {
@@ -85,7 +88,7 @@ export default function usePlayback(
       }
       setCurrentTime(target);
     },
-    [duration, getTime, hasVideo, videoRef]
+    [duration, getTime, hasVideo, setCurrentTime, videoRef]
   );
 
   const handleVideoEvent = useCallback(
@@ -99,7 +102,7 @@ export default function usePlayback(
         setCurrentTime(ct * 1000);
       }
     },
-    []
+    [setCurrentTime]
   );
 
   // Sync UI time while playing and stop at the end (without a video)
@@ -113,11 +116,11 @@ export default function usePlayback(
       }
     }, uiUpdateInterval);
     return () => window.clearInterval(timer);
-  }, [duration, getTime, hasVideo, pause, playing]);
+  }, [duration, getTime, hasVideo, pause, playing, setCurrentTime]);
 
   return {
     playing,
-    currentTime,
+    time,
     getTime,
     toggle,
     seek,
