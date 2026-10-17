@@ -2,7 +2,8 @@ import React, { useRef, useEffect, useCallback } from "react";
 import { css } from "@emotion/react";
 import { useResizeObserver } from "use-resize-observer";
 
-import { Chat, ChatActualStyle, getVisibleChats } from "./util";
+import { Chat, ChatActualStyle } from "./util";
+import { ChatRenderer } from "./chatRenderer";
 
 export interface Props {
   className?: string;
@@ -20,48 +21,6 @@ export interface Props {
   colorize?: boolean;
   visibleCommentCount?: number;
 }
-
-// space around the text for the shadow and stroke
-const spritePadding = 4;
-
-type Sprite = HTMLCanvasElement;
-
-// Draws a chat once into an offscreen canvas. Drawing text with shadow and
-// stroke is expensive, so each frame only blits these sprites.
-const renderSprite = (
-  c: Chat,
-  styles: ChatActualStyle,
-  colorize: boolean | undefined,
-  dpr: number
-): Sprite => {
-  const sprite = document.createElement("canvas");
-  sprite.width = Math.ceil((c.width + spritePadding * 2) * dpr);
-  sprite.height = Math.ceil((c.height + spritePadding * 2) * dpr);
-  const ctx = sprite.getContext("2d");
-  if (!ctx) return sprite;
-
-  ctx.scale(dpr, dpr);
-  ctx.font = `${styles.fontWeight || ""} ${c.fontSize}px ${styles.fontFamily ||
-    "sans-serif"}`.trim();
-  ctx.textAlign = "left";
-  ctx.textBaseline = "top";
-  ctx.strokeStyle = "rgba(0, 0, 0, 0.5)";
-  ctx.lineWidth = 0.5;
-  ctx.shadowColor = "rgba(0, 0, 0, 1)";
-  ctx.shadowBlur = 2;
-  ctx.fillStyle = c.isHighlighted
-    ? "#fff"
-    : (colorize ? c.color2 : c.color) || "#fff";
-
-  const lines = c.text.split("\n");
-  const lineHeight = c.height / lines.length;
-  lines.forEach((line, i) => {
-    const y = spritePadding + i * lineHeight;
-    ctx.fillText(line, spritePadding, y);
-    ctx.strokeText(line, spritePadding, y);
-  });
-  return sprite;
-};
 
 const Canvas2DRenderer: React.FC<Props> = ({
   className,
@@ -81,74 +40,32 @@ const Canvas2DRenderer: React.FC<Props> = ({
     ref: canvasRef
   });
   const dpr = window.devicePixelRatio || 1;
-  const sprites = useRef(new Map<Chat, Sprite>());
-
-  // sprites depend on the appearance of chats
-  useEffect(() => {
-    sprites.current = new Map();
-  }, [chats, styles, colorize, dpr]);
+  const renderer = useRef<ChatRenderer>(null);
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (chats.length === 0) return;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-    const frame = getFrame();
-    const [visible] = getVisibleChats(
+    if (!renderer.current) renderer.current = new ChatRenderer();
+    renderer.current.draw(ctx, getFrame(), {
       chats,
-      frame,
-      Math.max(styles.duration, styles.ueshitaDuration)
-    );
-    const targets = visible
-      .filter(
-        c =>
-          !c.hidden &&
-          frame > c.vpos &&
-          (!thinning || c.id % thinning[1] === thinning[0] - 1)
-      )
-      .slice(-visibleCommentCount);
-
-    const prevSprites = sprites.current;
-    const nextSprites = new Map<Chat, Sprite>();
-
-    for (const c of targets) {
-      const x = c.ueshita
-        ? (width - c.width) / 2
-        : (width + c.width) * (1 - (frame - c.vpos) / c.duration) - c.width;
-
-      if (c.isHighlighted && c.searchQuery) {
-        ctx.globalAlpha = 1;
-        ctx.fillStyle = c.isCurrentResult ? "#ff6600" : "#cc4400";
-        ctx.fillRect(x - 2, c.y - 2, c.width + 4, c.height + 4);
-      }
-
-      let sprite = prevSprites.get(c);
-      if (!sprite) sprite = renderSprite(c, styles, colorize, dpr);
-      nextSprites.set(c, sprite);
-
-      ctx.globalAlpha = c.danmaku ? opacityDanmaku : opacity;
-      ctx.drawImage(
-        sprite,
-        x - spritePadding,
-        c.y - spritePadding,
-        sprite.width / dpr,
-        sprite.height / dpr
-      );
-    }
-
-    // keep only sprites of chats on the screen
-    sprites.current = nextSprites;
+      styles,
+      width,
+      height,
+      dpr,
+      opacity,
+      opacityDanmaku,
+      thinning,
+      colorize,
+      visibleCommentCount
+    });
   }, [
     chats,
     colorize,
     dpr,
     getFrame,
+    height,
     opacity,
     opacityDanmaku,
     styles,
@@ -168,7 +85,7 @@ const Canvas2DRenderer: React.FC<Props> = ({
     });
     return () => window.cancelAnimationFrame(handle);
     // redraw when the canvas is resized (canvas is cleared) or the time is changed while paused
-  }, [draw, playing, frameHint, height]);
+  }, [draw, playing, frameHint]);
 
   return (
     <canvas

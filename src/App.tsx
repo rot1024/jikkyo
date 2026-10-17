@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useCallback, useRef } from "react";
+import React, { Fragment, useState, useCallback, useRef, useEffect } from "react";
 import { css } from "@emotion/react";
 import { Global } from "@emotion/react";
 import useFileInput from "use-file-input";
@@ -18,6 +18,7 @@ import useVideo from "./use-video";
 import usePlayback from "./use-playback";
 import useWindowError from "./util/useWindowError";
 import { getFileKind } from "./util/fileType";
+import { parseDummyOptions } from "./util/dummyComments";
 
 const safari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 const ios = !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
@@ -50,10 +51,17 @@ const App: React.FC = () => {
     duration: commentDuration,
     influence,
     loadComments,
+    loadDummyComments,
     unloadComments,
     commentTimeCorrection,
     setCommentTimeCorrection
   } = useComment(duration, commentTail);
+
+  // hidden feature for testing: `?dummy` loads generated comments
+  useEffect(() => {
+    const options = parseDummyOptions(window.location.search);
+    if (options) loadDummyComments(options);
+  }, [loadDummyComments]);
 
   const seekbarDuration = src ? duration : commentDuration;
 

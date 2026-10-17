@@ -232,7 +232,7 @@ function toHex(num: number) {
   return ("0" + num.toString(16)).slice(-2);
 }
 
-const calcInfluence = (
+export const calcInfluence = (
   chats: Comment[],
   duration: number,
   divisions: number
@@ -242,7 +242,7 @@ const calcInfluence = (
   const d = duration / divisions;
   chats.forEach(c => {
     if (c.vpos < 0) return;
-    const i = Math.floor(c.vpos / d);
+    const i = Math.min(divisions - 1, Math.floor(c.vpos / d));
     influence[i]++;
   });
   return influence;

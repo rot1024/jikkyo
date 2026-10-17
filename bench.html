@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Jikkyo bench</title>
+    <style>
+      body { margin: 0; background: #000; color: #ccc; font-family: monospace; }
+      canvas { display: block; width: 1280px; height: 720px; }
+    </style>
+  </head>
+  <body>
+    <!-- dev only: open http://localhost:3000/bench.html and run `await runBench()` -->
+    <canvas id="canvas"></canvas>
+    <pre id="result"></pre>
+    <script type="module" src="/src/bench.ts"></script>
+  </body>
+</html>

@@ -86,87 +86,57 @@ const CommentArea = forwardRef<Ref, Props>((
     styles
   ]);
 
-  const [chats, setChats] = useState(emptyChats);
-  const bufferedCommentLength = useRef(0);
-  const [bufferedComment, setBufferedComment] = useState({
+  // Layout input. Relayout of all comments is expensive, so when only the screen
+  // size or styles change, it waits for the user's request unless auto remeasurement is on.
+  const [layout, setLayout] = useState({
     comments,
     screenWidth,
     screenHeight,
     innerStyles
   });
+  const layoutChanged =
+    layout.screenWidth !== screenWidth ||
+    layout.screenHeight !== screenHeight ||
+    layout.innerStyles !== innerStyles;
+  if (
+    layout.comments !== comments ||
+    (layoutChanged &&
+      (autoCommentsRemeasurement ||
+        layout.screenHeight === 0 ||
+        comments.length === 0))
+  ) {
+    setLayout({ comments, screenWidth, screenHeight, innerStyles });
+  }
+
+  const remeasurementRequired = layoutChanged && comments.length > 0;
+  useEffect(() => {
+    if (remeasurementRequired && onCommentsRemeasurementRequire) {
+      onCommentsRemeasurementRequire();
+    }
+  }, [remeasurementRequired, onCommentsRemeasurementRequire]);
 
   useImperativeHandle(
     ref,
     () => ({
       updateComment: () => {
-        setBufferedComment({
-          comments,
-          screenWidth,
-          screenHeight,
-          innerStyles
-        });
+        setLayout({ comments, screenWidth, screenHeight, innerStyles });
       }
     }),
     [comments, screenWidth, screenHeight, innerStyles]
   );
 
-  useEffect(() => {
-    // Reset buffer when comments are cleared
-    if (comments.length === 0) {
-      bufferedCommentLength.current = 0;
-      return;
-    }
-    
-    const isNewCommentFile = bufferedCommentLength.current === 0 && comments.length > 0;
-    
-    if (
-      comments.length > 0 &&
-      bufferedCommentLength.current > 0 &&
-      !autoCommentsRemeasurement &&
-      !isNewCommentFile
-    ) {
-      if (onCommentsRemeasurementRequire) {
-        onCommentsRemeasurementRequire();
-      }
-      return;
-    }
-
-    setBufferedComment({
-      comments,
-      screenWidth,
-      screenHeight,
-      innerStyles
-    });
-    bufferedCommentLength.current = comments.length;
-  }, [
-    comments,
-    screenWidth,
-    screenHeight,
-    innerStyles,
-    autoCommentsRemeasurement,
-    onCommentsRemeasurementRequire
-  ]);
-
-  useEffect(() => {
-    if (bufferedComment.screenHeight === 0) return;
-    if (!bufferedComment.comments || bufferedComment.comments.length === 0) {
-      setChats([]);
-      return;
-    }
-    setChats(
-      commentsToChats(
-        bufferedComment.comments,
-        bufferedComment.screenWidth,
-        bufferedComment.screenHeight,
-        bufferedComment.innerStyles
-      )
-    );
-  }, [
-    bufferedComment.comments,
-    bufferedComment.innerStyles,
-    bufferedComment.screenHeight,
-    bufferedComment.screenWidth
-  ]);
+  const chats = useMemo(
+    () =>
+      layout.screenHeight === 0 || layout.comments.length === 0
+        ? emptyChats
+        : commentsToChats(
+            layout.comments,
+            layout.screenWidth,
+            layout.screenHeight,
+            layout.innerStyles
+          ),
+    [layout]
+  );
 
   const getFrame = useCallback(
     () => getCurrentTime() + timeCorrection,

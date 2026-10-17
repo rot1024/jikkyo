@@ -1,8 +1,11 @@
 import { useState, useMemo, useCallback } from "react";
 import load, { Comment } from "./util/commentLoader";
+import { generateDummyComments, DummyOptions } from "./util/dummyComments";
 
 // `videoDuration` is 0 when no video is loaded. In that case the timeline is
 // the comment duration plus `tail` (time for the last comment to leave the screen).
+const emptyComments: Comment[] = [];
+
 export default function useComment(videoDuration: number, tail: number) {
   const [comments, setComments] = useState<{
     comments: Comment[];
@@ -50,17 +53,23 @@ export default function useComment(videoDuration: number, tail: number) {
       : [...influence.slice(tc), ...new Array(tc).fill(0)];
   }, [comments, videoDuration, tail, commentTimeCorrection]);
 
+  const loadDummyComments = useCallback((options?: DummyOptions) => {
+    setCommentTimeCorrection(0);
+    setComments(generateDummyComments(options));
+  }, []);
+
   const unloadComments = useCallback(() => {
     setComments(undefined);
     setCommentTimeCorrection(0);
   }, []);
 
   return {
-    comments: comments && comments.comments.length > 0 ? comments.comments : [],
+    comments: comments ? comments.comments : emptyComments,
     // timeline duration used when no video is loaded
     duration: comments ? comments.duration + tail : 0,
     influence,
     loadComments,
+    loadDummyComments,
     unloadComments,
     commentTimeCorrection,
     setCommentTimeCorrection
