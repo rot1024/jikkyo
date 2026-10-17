@@ -3,6 +3,8 @@ import { css } from "@emotion/react";
 
 import { useDrag, useHover } from "./useDrag";
 import HeatMap from "./HeatMap";
+import HighlightMarkers from "./HighlightMarkers";
+import { Highlight } from "../../util/highlights";
 
 export interface Props {
   className?: string;
@@ -11,6 +13,7 @@ export interface Props {
   buffered?: [number, number][];
   disabled?: boolean;
   influence?: number[];
+  highlights?: Highlight[];
   onChange?: (value: number) => void;
 }
 
@@ -21,6 +24,7 @@ const SeekBar: React.FC<Props> = ({
   buffered,
   disabled,
   influence,
+  highlights,
   onChange
 }) => {
   const ref = useRef<HTMLDivElement>(null);
@@ -75,6 +79,9 @@ const SeekBar: React.FC<Props> = ({
             }}
           />
         </div>
+        {!disabled && (
+          <HighlightMarkers highlights={highlights} max={max} onJump={onChange} />
+        )}
         <div
           css={thumbStyles(hovered || isDragging, !!disabled || max === 0)}
           style={{

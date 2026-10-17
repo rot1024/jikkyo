@@ -12,6 +12,9 @@ import {
   getSettings
 } from "./setting";
 import useDebounce from "../../util/useDebounce";
+import HighlightList from "./HighlightList";
+import { Highlight } from "../../util/highlights";
+import { TimeStore } from "../../util/timeStore";
 
 export type Settings = SettingsType;
 export { defaultSettings };
@@ -27,7 +30,12 @@ export interface Props {
   onCommentsClose?: () => void;
   onSearch?: (query: string, direction?: 'next' | 'prev') => void;
   searchResultsCount?: number;
+  highlights?: Highlight[];
+  time: TimeStore;
+  onJump?: (time: number) => void;
 }
+
+type Tab = "settings" | "highlights";
 
 const SettingPanel: React.FC<Props> = ({
   className,
@@ -39,8 +47,12 @@ const SettingPanel: React.FC<Props> = ({
   onVideoClose,
   onCommentsClose,
   onSearch,
-  searchResultsCount = 0
+  searchResultsCount = 0,
+  highlights = [],
+  time,
+  onJump
 }) => {
+  const [tab, setTab] = useState<Tab>("settings");
   // Animation state management removed for simplicity
 
   const handleOutsideClick = useCallback(
@@ -153,94 +165,127 @@ const SettingPanel: React.FC<Props> = ({
           -webkit-overflow-scrolling: touch;
         `}
       >
-        <Form
-          schema={settingSchema}
-          initialValues={initialSettings}
-          onChange={handleChange}
-        />
-
-        {/* Search Section */}
-        <div
-          css={css`
-            margin-top: 1.5em;
-            padding-top: 1em;
-            border-top: 1px solid #555;
-          `}
-        >
-          <div
-            css={css`
-              color: #aaa;
-              font-size: 0.8rem;
-              margin-bottom: 0.5em;
-            `}
-          >
-            Comment Search
-          </div>
-          <Text
-            value={searchQuery}
-            placeholder="Search comments..."
-            onChange={setSearchQuery}
-            onEnter={handleSearchEnter}
-            css={css`
-              margin-bottom: 0.5em;
-            `}
-          />
-          <div
-            css={css`
-              display: flex;
-              gap: 0.5em;
-            `}
-          >
-            <Button
-              onClick={handleSearchPrev}
-              disabled={searchResultsCount === 0}
-              css={css`
-                flex: 1;
-                font-size: 0.8rem;
-              `}
-            >
-              ← Prev
-            </Button>
-            <Button
-              onClick={handleSearchNext}
-              disabled={searchResultsCount === 0}
-              css={css`
-                flex: 1;
-                font-size: 0.8rem;
-              `}
-            >
-              Next →
-            </Button>
-          </div>
+        <div css={tabsStyles}>
+          {(["settings", "highlights"] as const).map(t => (
+            <div key={t} css={tabStyles(tab === t)} onClick={() => setTab(t)}>
+              {t === "settings" ? "Settings" : `Highlights (${highlights.length})`}
+            </div>
+          ))}
         </div>
 
-        <div
-          css={css`
-            margin-top: 1.5em;
-            padding-top: 1em;
-            border-top: 1px solid #555;
-          `}
-        >
-          <Button
-            onClick={onVideoClose}
+        {tab === "highlights" && shown && (
+          <HighlightList highlights={highlights} time={time} onJump={onJump} />
+        )}
+
+        {/* kept mounted to preserve the form state */}
+        <div style={{ display: tab === "settings" ? undefined : "none" }}>
+          <Form
+            schema={settingSchema}
+            initialValues={initialSettings}
+            onChange={handleChange}
+          />
+
+          {/* Search Section */}
+          <div
             css={css`
-              margin-top: 1em;
+              margin-top: 1.5em;
+              padding-top: 1em;
+              border-top: 1px solid #555;
             `}
           >
-            Close video
-          </Button>
-          <Button
-            onClick={onCommentsClose}
+            <div
+              css={css`
+                color: #aaa;
+                font-size: 0.8rem;
+                margin-bottom: 0.5em;
+              `}
+            >
+              Comment Search
+            </div>
+            <Text
+              value={searchQuery}
+              placeholder="Search comments..."
+              onChange={setSearchQuery}
+              onEnter={handleSearchEnter}
+              css={css`
+                margin-bottom: 0.5em;
+              `}
+            />
+            <div
+              css={css`
+                display: flex;
+                gap: 0.5em;
+              `}
+            >
+              <Button
+                onClick={handleSearchPrev}
+                disabled={searchResultsCount === 0}
+                css={css`
+                  flex: 1;
+                  font-size: 0.8rem;
+                `}
+              >
+                ← Prev
+              </Button>
+              <Button
+                onClick={handleSearchNext}
+                disabled={searchResultsCount === 0}
+                css={css`
+                  flex: 1;
+                  font-size: 0.8rem;
+                `}
+              >
+                Next →
+              </Button>
+            </div>
+          </div>
+
+          <div
             css={css`
-              margin-top: 1em;
+              margin-top: 1.5em;
+              padding-top: 1em;
+              border-top: 1px solid #555;
             `}
           >
-            Close comments
-          </Button>
+            <Button
+              onClick={onVideoClose}
+              css={css`
+                margin-top: 1em;
+              `}
+            >
+              Close video
+            </Button>
+            <Button
+              onClick={onCommentsClose}
+              css={css`
+                margin-top: 1em;
+              `}
+            >
+              Close comments
+            </Button>
+          </div>
         </div>
       </div>
     </div>
   );
 };
+
+const tabsStyles = css`
+  display: flex;
+  margin-bottom: 1em;
+  border-bottom: 1px solid #555;
+`;
+
+const tabStyles = (active: boolean) => css`
+  flex: 1;
+  text-align: center;
+  padding: 0.4em 0;
+  font-size: 0.8rem;
+  cursor: pointer;
+  user-select: none;
+  color: ${active ? "#ff9d00" : "#aaa"};
+  border-bottom: 2px solid ${active ? "#ff9d00" : "transparent"};
+  margin-bottom: -1px;
+`;
 
 export default SettingPanel;

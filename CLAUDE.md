@@ -69,6 +69,7 @@ Comments are loaded from XML files (NicoNico format) and processed by `util/comm
 - **Comment Filtering**: Keyword-based filtering and muting
 - **Display Modes**: Canvas2D renderer (an incomplete DOM renderer also exists but is unused)
 - **Heat Map**: Visual representation of comment density over time
+- **Highlights** (`util/highlights.ts`): detects sudden comment surges (5s window vs. median rate of the previous minute, Poisson z-score). Shown as seekbar markers, a list in the menu, and `[` / `]` hotkeys (matched by produced key for JIS keyboards)
 
 ## File Organization
 

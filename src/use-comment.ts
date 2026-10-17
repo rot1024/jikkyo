@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from "react";
 import load, { Comment } from "./util/commentLoader";
 import { generateDummyComments, DummyOptions } from "./util/dummyComments";
 import { calcInfluence } from "./util/influence";
+import { detectHighlights } from "./util/highlights";
 
 // resolution of the heat map on the seekbar
 const influenceDivisions = 300;
@@ -36,6 +37,15 @@ export default function useComment(videoDuration: number, tail: number) {
     );
   }, [comments, videoDuration, tail, commentTimeCorrection]);
 
+  const highlights = useMemo(() => {
+    if (!comments) return [];
+    return detectHighlights(
+      comments.comments,
+      videoDuration || comments.duration + tail,
+      commentTimeCorrection
+    );
+  }, [comments, videoDuration, tail, commentTimeCorrection]);
+
   const loadDummyComments = useCallback((options?: DummyOptions) => {
     setCommentTimeCorrection(0);
     setComments(generateDummyComments(options));
@@ -51,6 +61,7 @@ export default function useComment(videoDuration: number, tail: number) {
     // timeline duration used when no video is loaded
     duration: comments ? comments.duration + tail : 0,
     influence,
+    highlights,
     loadComments,
     loadDummyComments,
     unloadComments,

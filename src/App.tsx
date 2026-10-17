@@ -50,6 +50,7 @@ const App: React.FC = () => {
     comments,
     duration: commentDuration,
     influence,
+    highlights,
     loadComments,
     loadDummyComments,
     unloadComments,
@@ -244,6 +245,23 @@ const App: React.FC = () => {
     }
   }, [activeSearchQuery, performSearch, navigateSearch, clearSearch]);
 
+  // jump to the previous / next comment surge
+  const jumpHighlight = useCallback(
+    (direction: 1 | -1) => {
+      const now = getTime();
+      const target =
+        direction > 0
+          ? highlights.find(h => h.jumpTime > now + 1000)
+          : // skip the one just jumped to so that pressing repeatedly goes back
+            [...highlights].reverse().find(h => h.jumpTime < now - 2000);
+      if (target) handleSeek(target.jumpTime);
+    },
+    [getTime, handleSeek, highlights]
+  );
+  // `useKey`: the bracket keys are at different positions on JIS keyboards
+  useHotkeys("[", () => jumpHighlight(-1), { useKey: true }, [jumpHighlight]);
+  useHotkeys("]", () => jumpHighlight(1), { useKey: true }, [jumpHighlight]);
+
   useHotkeys("comma", () => setCommentTimeCorrection(s => s - 1000), [
     setCommentTimeCorrection
   ]);
@@ -312,6 +330,7 @@ const App: React.FC = () => {
         duration={seekbarDuration}
         buffered={timeRanges}
         influence={influence}
+        highlights={highlights}
         css={css`
           position: fixed;
           bottom: 0;
@@ -326,6 +345,9 @@ const App: React.FC = () => {
         onCommentsClose={unloadComments}
         onSearch={handleSearch}
         searchResultsCount={searchResults.length}
+        highlights={highlights}
+        time={time}
+        onJump={handleSeek}
       />
       <Banner error onClose={handleErrorClose}>
         {error}

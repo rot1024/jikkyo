@@ -5,6 +5,8 @@ import { useHotkeys } from "react-hotkeys-hook";
 import Button from "./Button";
 import SeekBar from "./Seekbar";
 import { TimeStore, useTime } from "../../util/timeStore";
+import { humanReadableTime } from "../../util/time";
+import { Highlight } from "../../util/highlights";
 
 export interface Props {
   className?: string;
@@ -14,6 +16,7 @@ export interface Props {
   hidden?: boolean;
   buffered?: [number, number][];
   influence?: number[];
+  highlights?: Highlight[];
   onSeek?: (time: number, relative?: boolean) => void;
   onPlayButtonClick?: () => void;
   onVideoButtonClick?: () => void;
@@ -29,6 +32,7 @@ const Controller: React.FC<Props> = ({
   hidden,
   buffered,
   influence,
+  highlights,
   onSeek,
   onPlayButtonClick,
   onVideoButtonClick,
@@ -119,6 +123,7 @@ const Controller: React.FC<Props> = ({
         disabled={disabled}
         buffered={buffered}
         influence={influence}
+        highlights={highlights}
         onChange={handleSeek}
         css={css`
           flex: auto;
@@ -150,17 +155,5 @@ const Controller: React.FC<Props> = ({
   );
 };
 
-const humanReadableTime = (t?: number) => {
-  if (typeof t !== "number") {
-    return "00:00:00";
-  }
-  const second = t / 1000;
-  const s = Math.floor(second % 60);
-  const m = Math.floor((second / 60) % 60);
-  const h = Math.floor(second / 3600);
-  return `${h >= 100 ? h : ("0" + h).slice(-2)}:${("0" + m).slice(-2)}:${(
-    "0" + s
-  ).slice(-2)}`;
-};
 
 export default Controller;
