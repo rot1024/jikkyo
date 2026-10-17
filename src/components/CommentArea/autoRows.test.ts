@@ -15,6 +15,16 @@ describe("getCommentDensity", () => {
     expect(d.emWidth).toBe(8);
   });
 
+  it("counts more comments on the screen with a longer display duration", () => {
+    const c = comments(10, 60);
+    const short = getCommentDensity(c, 3000);
+    const long = getCommentDensity(c, 8000);
+    expect(short.concurrency).toBe(30);
+    expect(long.concurrency).toBe(80);
+    const rows = (d: typeof short) => estimateRows(d, 1280, 720, 1.4, 5, 50);
+    expect(rows(long)).toBeGreaterThan(rows(short));
+  });
+
   it("ignores short bursts above the percentile", () => {
     const normal = comments(10, 100);
     const burst = Array.from({ length: 1000 }, (_, i) => ({ vpos: 50000 + i, text: "w" }));

@@ -12,6 +12,9 @@ export interface CommentDensity {
 // percentile of the number of comments on the screen over time used as the "peak".
 // Short bursts above this are allowed to overlap.
 const peakPercentile = 0.9;
+// rows are not filled perfectly as comments have different speeds,
+// so a little more rows than the ideal are used to reduce overlapping
+const packingEfficiency = 0.8;
 const sampleInterval = 1000;
 
 // half-width characters are about half as wide as full-width ones
@@ -55,9 +58,10 @@ export const getCommentDensity = (
   return { concurrency, emWidth };
 };
 
-// A row can show about W / w comments in sequence while each scrolls across the
-// screen, where w = emWidth * fontSize and fontSize = H / rows / lineHeight.
-// Solving rows = concurrency * (w / W) / (1 + w / W) for rows gives the result.
+// A row accepts a new comment every D * w / (W + w) (D: display duration), so
+// rows = rate * D * w / (W + w) = concurrency * (w / W) / (1 + w / W), where
+// w = emWidth * fontSize and fontSize = H / rows / lineHeight.
+// The display duration is included in `concurrency` (comments on the screen).
 export const estimateRows = (
   { concurrency, emWidth }: CommentDensity,
   width: number,
@@ -71,6 +75,7 @@ export const estimateRows = (
     return minRows;
   }
   const a = (emWidth * height) / (lineHeight * width);
-  const rows = (-a + Math.sqrt(a * a + 4 * concurrency * a)) / 2;
+  const n = concurrency / packingEfficiency;
+  const rows = (-a + Math.sqrt(a * a + 4 * n * a)) / 2;
   return Math.min(max, Math.max(minRows, Math.round(rows)));
 };
