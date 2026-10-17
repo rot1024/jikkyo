@@ -11,8 +11,8 @@ import { css } from "@emotion/react";
 import { useResizeObserver } from "use-resize-observer";
 
 import Canvas2dRenderer from "./canvas2d";
+import { layoutChats } from "./layout";
 import {
-  commentsToChats,
   Chat,
   Comment as CommentType,
   ChatStyle,
@@ -125,18 +125,21 @@ const CommentArea = forwardRef<Ref, Props>((
     [comments, screenWidth, screenHeight, innerStyles]
   );
 
-  const chats = useMemo(
-    () =>
-      layout.screenHeight === 0 || layout.comments.length === 0
-        ? emptyChats
-        : commentsToChats(
-            layout.comments,
-            layout.screenWidth,
-            layout.screenHeight,
-            layout.innerStyles
-          ),
-    [layout]
-  );
+  const [chats, setChats] = useState(emptyChats);
+  useEffect(() => {
+    let cancelled = false;
+    layoutChats(
+      layout.comments,
+      layout.screenWidth,
+      layout.screenHeight,
+      layout.innerStyles
+    ).then(c => {
+      if (!cancelled) setChats(c);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [layout]);
 
   const getFrame = useCallback(
     () => getCurrentTime() + timeCorrection,

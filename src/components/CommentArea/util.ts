@@ -249,14 +249,27 @@ export const commentsToChats = (
   );
 };
 
-const canvas = document.createElement("canvas");
+type MeasureContext =
+  | CanvasRenderingContext2D
+  | OffscreenCanvasRenderingContext2D;
+
+// created lazily so that this module can also be loaded in a worker
+let measureContext: MeasureContext | undefined;
+const getMeasureContext = () => {
+  if (!measureContext) {
+    measureContext = (typeof OffscreenCanvas !== "undefined"
+      ? new OffscreenCanvas(1, 1).getContext("2d")
+      : document.createElement("canvas").getContext("2d")) as MeasureContext;
+  }
+  return measureContext;
+};
 
 // Text widths per font. Many comments share the same text (e.g. "www"),
 // and measureText is the most expensive part of the layout.
 const widthCache = new Map<string, Map<string, number>>();
 const maxCachedTexts = 100000;
 
-const measureWidth = (ctx: CanvasRenderingContext2D, font: string, text: string) => {
+const measureWidth = (ctx: MeasureContext, font: string, text: string) => {
   let cache = widthCache.get(font);
   if (!cache) {
     cache = new Map();
@@ -278,7 +291,7 @@ const measureSize = (
   screenWidth: number,
   s: ChatActualStyle
 ) => {
-  const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+  const ctx = getMeasureContext();
   let fontSize = Math.floor(
     (size === "big"
       ? s.bigSizeScale
