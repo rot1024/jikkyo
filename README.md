@@ -15,6 +15,11 @@ Video player that displays NicoNico-style synchronized comments. Load a video fi
 - `npm run lint` - Run ESLint
 - `npm run check` - Run typecheck, lint, and tests
 
+## Deployment
+
+- GitHub Pages: pushing to `main` builds with `BASE_PATH=/jikkyo/` and deploys via GitHub Actions (`.github/workflows/pages.yml`)
+- Netlify: builds with `npm run build` and serves `dist` at the root (configured on Netlify)
+
 ## Hotkeys
 
 - `←` / `→` - Seek -10s / +10s (`Shift` for -1s / +1s)

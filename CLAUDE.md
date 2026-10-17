@@ -26,6 +26,8 @@ This is a React-based video player application called "jikkyo-web" that displays
 - `npm run check` - Run typecheck, lint, and tests (CI/CD friendly)
 
 ### Build Configuration
+- `BASE_PATH` env sets Vite `base` (GitHub Pages uses `/jikkyo/`; default `/` for Netlify)
+- GitHub Pages is deployed by `.github/workflows/pages.yml` on push to `main`
 - Uses Vite with React plugin and Emotion support
 - TypeScript configuration optimized for Vite
 - Project references for separate build configurations
