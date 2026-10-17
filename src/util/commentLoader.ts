@@ -109,7 +109,6 @@ export const readCommentsFromJSON = async (jsonStr: string) => {
   return {
     comments: validComments,
     duration,
-    influence: calcInfluence(validComments, duration, 100)
   };
 };
 
@@ -205,7 +204,6 @@ export const readComments = async (xml: string) => {
             }))
             .sort((a, b) => a.vpos - b.vpos),
     duration,
-    influence: calcInfluence(validComments, duration, 100)
   };
 };
 
@@ -232,21 +230,6 @@ function toHex(num: number) {
   return ("0" + num.toString(16)).slice(-2);
 }
 
-export const calcInfluence = (
-  chats: Comment[],
-  duration: number,
-  divisions: number
-): number[] => {
-  const influence: number[] = new Array(divisions).fill(0);
-  if (chats.length === 0) return influence;
-  const d = duration / divisions;
-  chats.forEach(c => {
-    if (c.vpos < 0) return;
-    const i = Math.min(divisions - 1, Math.floor(c.vpos / d));
-    influence[i]++;
-  });
-  return influence;
-};
 
 export default async (file: File) => {
   const content = await readText(file);

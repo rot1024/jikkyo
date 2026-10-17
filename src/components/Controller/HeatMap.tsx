@@ -38,39 +38,33 @@ const getColor = (value: number, max: number, min: number) => {
   ] as [number, number, number, number];
 };
 
+// Draws one pixel per division; the canvas is stretched by CSS, and the
+// browser's image smoothing interpolates colors between divisions.
 const HeatMap: React.FC<Props> = ({ className, influence }) => {
-  const ref = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    if (!canvasRef.current) return;
-    const ctx = canvasRef.current.getContext("2d");
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    canvas.width = Math.max(1, influence?.length ?? 0);
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
-    const w = canvasRef.current.width;
-    ctx.clearRect(0, 0, w, canvasRef.current.height);
-    if (!influence || influence.length === 0 || w === 0) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (!influence || influence.length === 0) return;
     const max = influence.reduce((a, b) => (a < b ? b : a), 0);
     if (max === 0) return;
-    const img = ctx.getImageData(0, 0, w, canvasRef.current.height);
 
-    let prev = -1;
-    const band = w / influence.length;
-    for (let i = 0; i < w; i++) {
-      const k = Math.floor((i / w) * (influence.length - 1));
-      const r = prev === k ? (band * (k + 1) - i) / band : 0;
-      const currentColor = getColor(influence[k], max, 0);
-      const nextColor = getColor(influence[k + 1], max, 0);
-      const color = currentColor.map((c, i) => c * r + nextColor[i] * (1 - r));
-      img.data.set(color, i * 4);
-      prev = k;
-    }
-
+    const img = ctx.createImageData(influence.length, 1);
+    // square root scale so that normal sections are still visible next to bursts
+    const sqrtMax = Math.sqrt(max);
+    influence.forEach((v, i) => {
+      img.data.set(getColor(Math.sqrt(v), sqrtMax, 0), i * 4);
+    });
     ctx.putImageData(img, 0, 0);
   }, [influence]);
 
   return (
     <div
-      ref={ref}
       className={className}
       css={css`
         width: 100%;
@@ -79,7 +73,6 @@ const HeatMap: React.FC<Props> = ({ className, influence }) => {
     >
       <canvas
         ref={canvasRef}
-        width={100}
         height={1}
         css={css`
           display: block;
@@ -87,7 +80,6 @@ const HeatMap: React.FC<Props> = ({ className, influence }) => {
           height: 100%;
         `}
       />
-      ;
     </div>
   );
 };

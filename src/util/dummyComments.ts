@@ -1,4 +1,4 @@
-import { Comment, calcInfluence } from "./commentLoader";
+import { Comment } from "./commentLoader";
 
 // Generates dummy comments for testing and benchmarking.
 // Enabled by the hidden URL parameter `?dummy` (see App.tsx).
@@ -85,8 +85,7 @@ export const generateDummyComments = ({
 
   return {
     comments,
-    duration,
-    influence: calcInfluence(comments, duration, 100)
+    duration
   };
 };
 
