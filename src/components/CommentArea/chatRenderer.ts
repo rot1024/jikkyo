@@ -1,4 +1,5 @@
 import { Chat, ChatActualStyle, getVisibleChats } from "./util";
+import binarySearch from "../../util/binarySearch";
 
 export interface DrawOptions {
   // all laid-out chats sorted by vpos
@@ -17,6 +18,10 @@ export interface DrawOptions {
 
 // space around the text for the shadow and stroke
 const spritePadding = 4;
+// sprites of chats appearing within this time (ms) are rendered in advance
+const lookahead = 1000;
+// max time (ms) spent on rendering sprites per frame while playing
+const spriteBudget = 4;
 
 type Sprite = HTMLCanvasElement;
 
@@ -83,7 +88,14 @@ export class ChatRenderer {
     this.sprites = new Map();
   }
 
-  draw(ctx: CanvasRenderingContext2D, frame: number, o: DrawOptions) {
+  // `complete`: draw all chats even if rendering sprites takes long (e.g. while paused).
+  // Otherwise chats whose sprites do not fit in the budget appear in later frames.
+  draw(
+    ctx: CanvasRenderingContext2D,
+    frame: number,
+    o: DrawOptions,
+    complete = false
+  ) {
     this.syncAppearance(o);
 
     ctx.setTransform(o.dpr, 0, 0, o.dpr, 0, 0);
@@ -91,18 +103,16 @@ export class ChatRenderer {
     if (o.chats.length === 0) return;
 
     const { styles, thinning } = o;
+    const deadline = complete ? Infinity : performance.now() + spriteBudget;
+    const isTarget = (c: Chat) =>
+      !c.hidden && (!thinning || c.id % thinning[1] === thinning[0] - 1);
     const [visible] = getVisibleChats(
       o.chats,
       frame,
       Math.max(styles.duration, styles.ueshitaDuration)
     );
     const targets = visible
-      .filter(
-        c =>
-          !c.hidden &&
-          frame > c.vpos &&
-          (!thinning || c.id % thinning[1] === thinning[0] - 1)
-      )
+      .filter(c => frame > c.vpos && isTarget(c))
       .slice(-o.visibleCommentCount);
 
     const prevSprites = this.sprites;
@@ -120,7 +130,10 @@ export class ChatRenderer {
       }
 
       let sprite = prevSprites.get(c);
-      if (!sprite) sprite = renderSprite(c, styles, o.colorize, o.dpr);
+      if (!sprite) {
+        if (performance.now() > deadline) continue;
+        sprite = renderSprite(c, styles, o.colorize, o.dpr);
+      }
       nextSprites.set(c, sprite);
 
       ctx.globalAlpha = c.danmaku ? o.opacityDanmaku : o.opacity;
@@ -133,7 +146,20 @@ export class ChatRenderer {
       );
     }
 
-    // keep only sprites of chats on the screen
+    // render sprites of upcoming chats with the remaining budget
+    const end = binarySearch(o.chats, frame + lookahead, c => c.vpos);
+    for (let i = binarySearch(o.chats, frame, c => c.vpos); i < end; i++) {
+      const c = o.chats[i];
+      if (!isTarget(c)) continue;
+      let sprite = prevSprites.get(c);
+      if (!sprite) {
+        if (performance.now() > deadline) break;
+        sprite = renderSprite(c, styles, o.colorize, o.dpr);
+      }
+      nextSprites.set(c, sprite);
+    }
+
+    // keep only sprites of chats on the screen or coming soon
     this.sprites = nextSprites;
   }
 }

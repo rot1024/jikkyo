@@ -42,7 +42,7 @@ const Canvas2DRenderer: React.FC<Props> = ({
   const dpr = window.devicePixelRatio || 1;
   const renderer = useRef<ChatRenderer>(null);
 
-  const draw = useCallback(() => {
+  const draw = useCallback((complete: boolean) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -59,7 +59,7 @@ const Canvas2DRenderer: React.FC<Props> = ({
       thinning,
       colorize,
       visibleCommentCount
-    });
+    }, complete);
   }, [
     chats,
     colorize,
@@ -76,11 +76,11 @@ const Canvas2DRenderer: React.FC<Props> = ({
 
   useEffect(() => {
     if (!playing) {
-      draw();
+      draw(true);
       return;
     }
     let handle = window.requestAnimationFrame(function loop() {
-      draw();
+      draw(false);
       handle = window.requestAnimationFrame(loop);
     });
     return () => window.cancelAnimationFrame(handle);
