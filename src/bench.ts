@@ -23,7 +23,9 @@ const runBench = async ({ dpr = 1, frames = 300 } = {}) => {
 
   // layout
   const layoutTimes: number[] = [];
+  const t0 = performance.now();
   let chats = commentsToChats(comments, width, height, styles);
+  const layoutFirst = Math.round(performance.now() - t0);
   for (let i = 0; i < 3; i++) {
     const t = performance.now();
     chats = commentsToChats(comments, width, height, styles);
@@ -75,6 +77,7 @@ const runBench = async ({ dpr = 1, frames = 300 } = {}) => {
 
   const result = {
     comments: comments.length,
+    layoutFirst,
     layout: stats(layoutTimes),
     // the first 3 seconds of each minute is a burst (300 comments/s)
     burst: await render(60000),

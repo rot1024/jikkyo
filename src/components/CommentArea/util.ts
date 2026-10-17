@@ -100,6 +100,23 @@ export const getVisibleChats = (
   ];
 };
 
+// Whether the new comment (vpos, speed) will overlap with the chat `l` on the X axis
+const willOverlap = (l: Chat, vpos: number, speed: number) => {
+  const diffVpos = vpos - l.vpos;
+  if (diffVpos <= 0) return true; // already overlapping
+
+  const diffDistance = diffVpos * l.speed - l.width;
+  if (diffDistance < 0) return true; // already overlapping
+
+  const relativeSpeed = speed - l.speed;
+  if (relativeSpeed <= 0) return false; // never overlap
+
+  // Time until the comment is completely hidden at the left edge of the screen
+  const leftTime = l.duration - diffVpos;
+
+  return diffDistance / relativeSpeed < leftTime;
+};
+
 export const commentsToChats = (
   comments: Comment[],
   screenWidth: number,
@@ -154,44 +171,21 @@ export const commentsToChats = (
           while (true) {
             const bottom = y + height;
 
-            // Extract all chats that intersect from the top to the bottom of the current comment on the Y axis
-            const y2 = y;
-            const intersectedChats = lines.filter(
-              l =>
-                (y2 < l.y && l.y + l.height < bottom) ||
-                (y2 < l.y + l.height && l.y < bottom) ||
-                (l.y < bottom && y2 < l.y + l.height) ||
-                (l.y < y2 && bottom < l.y + l.height)
-            );
-
-            if (intersectedChats.length === 0) break;
-
-            const overlappedChats = intersectedChats.filter(l => {
-              const diffVpos = c.vpos - l.vpos;
-              if (diffVpos <= 0) return true; // already overlapping
-
-              const diffDistance = diffVpos * l.speed - l.width;
-              if (diffDistance < 0) return true; // already overlapping
-
-              const relativeSpeed = speed - l.speed;
-              if (relativeSpeed <= 0) return false; // never overlap
-
-              // Time until the comment is completely hidden at the left edge of the screen
-              const leftTime = l.duration - diffVpos;
-
-              return diffDistance / relativeSpeed < leftTime;
-            });
-
-            if (overlappedChats.length === 0) {
-              // Does not overlap
-              break;
+            // The lowest bottom of chats that intersect with the current comment
+            // on the Y axis and will overlap with it on the X axis
+            let maxBottom = -1;
+            for (const l of lines) {
+              // lines are sorted by y
+              if (l.y >= bottom) break;
+              if (l.y + l.height <= y) continue;
+              if (!willOverlap(l, c.vpos, speed)) continue;
+              maxBottom = Math.max(maxBottom, l.y + l.height);
             }
 
+            // Does not overlap
+            if (maxBottom < 0) break;
+
             // Set new Y
-            const maxBottom = overlappedChats.reduce((a, b) => {
-              const bottom = b.y + b.height;
-              return a < bottom ? bottom : a;
-            }, 0);
             if (maxBottom <= y) {
               // invalid
               danmaku = true;
@@ -227,8 +221,12 @@ export const commentsToChats = (
     };
 
     if (!danmaku) {
-      lines.push(chat);
-      lines.sort((a, b) => a.y - b.y);
+      // keep lines sorted by y
+      lines.splice(
+        binarySearch(lines, chat.y, l => l.y),
+        0,
+        chat
+      );
     }
 
     chats.push(chat);
@@ -253,6 +251,27 @@ export const commentsToChats = (
 
 const canvas = document.createElement("canvas");
 
+// Text widths per font. Many comments share the same text (e.g. "www"),
+// and measureText is the most expensive part of the layout.
+const widthCache = new Map<string, Map<string, number>>();
+const maxCachedTexts = 100000;
+
+const measureWidth = (ctx: CanvasRenderingContext2D, font: string, text: string) => {
+  let cache = widthCache.get(font);
+  if (!cache) {
+    cache = new Map();
+    widthCache.set(font, cache);
+  }
+  let width = cache.get(text);
+  if (width === undefined) {
+    if (cache.size >= maxCachedTexts) cache.clear();
+    if (ctx.font !== font) ctx.font = font;
+    width = ctx.measureText(text).width;
+    cache.set(text, width);
+  }
+  return width;
+};
+
 const measureSize = (
   text: string,
   size: "big" | "small" | undefined,
@@ -268,12 +287,12 @@ const measureSize = (
       : 1) * s.size
   );
 
-  ctx.font = `${s.fontWeight || ""} ${fontSize}px ${s.fontFamily ||
+  const font = `${s.fontWeight || ""} ${fontSize}px ${s.fontFamily ||
     "sans-serif"}`.trim();
   const lines = text.split("\n");
 
   let width = lines
-    .map(t => ctx.measureText(t).width)
+    .map(t => measureWidth(ctx, font, t))
     .reduce((a, b) => (a < b ? b : a), 0);
   let height = lines.length * fontSize * s.lineHeight;
 
