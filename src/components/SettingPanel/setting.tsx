@@ -4,8 +4,28 @@ export const settingSchema: SettingSchema = [
   {
     id: "sizeCalcMethod",
     type: "enum",
-    enum: [["rows", "Rows"], ["fontSize", "Font Size"]],
-    defaultValue: "rows",
+    enum: [["auto", "Auto"], ["rows", "Rows"], ["fontSize", "Font Size"]],
+    defaultValue: "auto",
+    debounce: true
+  },
+  {
+    id: "autoRowsMin",
+    type: "number",
+    name: "Min rows",
+    min: 5,
+    max: 50,
+    when: ["sizeCalcMethod", "auto"],
+    defaultValue: 10,
+    debounce: true
+  },
+  {
+    id: "autoRowsMax",
+    type: "number",
+    name: "Max rows",
+    min: 5,
+    max: 50,
+    when: ["sizeCalcMethod", "auto"],
+    defaultValue: 20,
     debounce: true
   },
   {
@@ -200,7 +220,9 @@ export const getSettings = (s?: Settings) =>
   );
 
 export type Settings = {
-  sizeCalcMethod: "rows" | "fontSize";
+  sizeCalcMethod: "auto" | "rows" | "fontSize";
+  autoRowsMin: number;
+  autoRowsMax: number;
   rows: number;
   fontSize: number;
   commentDuration: number;
@@ -223,6 +245,8 @@ export type Settings = {
 
 export type SettingsDebounced =
   | "sizeCalcMethod"
+  | "autoRowsMin"
+  | "autoRowsMax"
   | "rows"
   | "fontSize"
   | "commentDuration"

@@ -60,7 +60,8 @@ Comments are loaded from XML files (NicoNico format) and processed by `util/comm
 ### Comment Rendering
 - `CommentArea` lays out comments into chats (`commentsToChats`), sorted by vpos; selection per frame uses binary search (`getVisibleChats`), so chats must stay sorted
 - `Canvas2DRenderer` runs its own requestAnimationFrame loop while playing and reads the time via `getFrame()` every frame; do not drive per-frame rendering through React state
-- Each chat is pre-rendered into a sprite canvas (text + shadow + stroke) and blitted each frame
+- Each chat is pre-rendered into a sprite canvas (text + outline) and blitted each frame
+- Auto sizing (default, `autoRows.ts`): when comments are loaded, the 90th percentile of the number of scrolling comments on screen and the median comment width give the number of rows, clamped to min/max rows. Bursts above it may overlap by design
 
 ### Key Features
 - **Dual Mode Operation**: Works with or without video files

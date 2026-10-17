@@ -17,8 +17,10 @@ import {
   Chat,
   Comment as CommentType,
   ChatStyle,
-  getChatActualStyle
+  getChatActualStyle,
+  defaultChatStyle
 } from "./util";
+import { getCommentDensity, estimateRows } from "./autoRows";
 
 export type Comment = CommentType;
 export type CommentStyle = Partial<ChatStyle>;
@@ -82,10 +84,27 @@ const CommentArea = forwardRef<Ref, Props>((
   const { width: screenWidth = 0, height: screenHeight = 0 } = useResizeObserver({
     ref: wrapperRef
   });
-  const innerStyles = useMemo(() => getChatActualStyle(styles, screenHeight), [
-    screenHeight,
-    styles
-  ]);
+  // the comment density is measured once when comments are loaded
+  const density = useMemo(
+    () =>
+      getCommentDensity(comments, styles?.duration ?? defaultChatStyle.duration),
+    [comments, styles?.duration]
+  );
+  const autoRows = useMemo(() => {
+    const s = { ...defaultChatStyle, ...styles };
+    return estimateRows(
+      density,
+      screenWidth,
+      screenHeight,
+      s.lineHeight,
+      s.minRows,
+      s.maxRows
+    );
+  }, [density, screenHeight, screenWidth, styles]);
+  const innerStyles = useMemo(
+    () => getChatActualStyle(styles, screenHeight, autoRows),
+    [autoRows, screenHeight, styles]
+  );
 
   // Layout input. Relayout of all comments is expensive, so when only the screen
   // size or styles change, it waits for the user's request unless auto remeasurement is on.

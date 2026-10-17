@@ -37,8 +37,11 @@ export interface ChatCommonStyle {
 }
 
 export interface ChatStyle extends ChatCommonStyle {
-  sizing: "rows" | "fontSize";
+  sizing: "auto" | "rows" | "fontSize";
   rows: number;
+  // range of rows in the auto sizing mode
+  minRows: number;
+  maxRows: number;
   fontSize: number;
 }
 
@@ -54,14 +57,18 @@ export const defaultChatStyle: ChatStyle = {
   smallSizeScale: 0.5,
   duration: 5000,
   ueshitaDuration: 3000,
-  sizing: "rows",
+  sizing: "auto",
   rows: 10,
+  minRows: 10,
+  maxRows: 20,
   fontSize: 32
 };
 
+// `autoRows` is the number of rows estimated from the comment density (auto sizing mode)
 export const getChatActualStyle = (
   s: Partial<ChatStyle> | undefined,
-  height: number
+  height: number,
+  autoRows?: number
 ): ChatActualStyle => {
   const ss = Object.entries(s || {}).reduce(
     (a, [k, v]) => (typeof v === "undefined" ? a : { ...a, [k]: v }),
@@ -76,7 +83,9 @@ export const getChatActualStyle = (
     size: Math.round(
       styles.sizing === "fontSize"
         ? styles.fontSize
-        : height / styles.rows / styles.lineHeight
+        : height /
+            (styles.sizing === "auto" ? autoRows ?? styles.minRows : styles.rows) /
+            styles.lineHeight
     )
   };
 };

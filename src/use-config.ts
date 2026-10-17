@@ -12,10 +12,21 @@ const regexp = (p?: string) => {
   }
 };
 
+// Settings saved before the auto sizing mode was added are switched to it once,
+// as it is the new default.
+const migrate = (value: string): Settings => {
+  const s = JSON.parse(value) as Partial<Settings>;
+  if (s && s.autoRowsMin === undefined) {
+    return { ...defaultSettings, ...s, sizeCalcMethod: "auto" };
+  }
+  return { ...defaultSettings, ...s };
+};
+
 export default function useConfig() {
   const [settings, updateSettings] = useLocalStorage<Settings>(
     "jikkyo_settings",
-    defaultSettings
+    defaultSettings,
+    { raw: false, serializer: JSON.stringify, deserializer: migrate }
   );
 
   const styles = useMemo(
@@ -24,6 +35,8 @@ export default function useConfig() {
       ueshitaDuration: settings?.ueShitaCommentDuration ?? defaultSettings.ueShitaCommentDuration,
       fontSize: settings?.fontSize ?? defaultSettings.fontSize,
       rows: settings?.rows ?? defaultSettings.rows,
+      minRows: settings?.autoRowsMin ?? defaultSettings.autoRowsMin,
+      maxRows: settings?.autoRowsMax ?? defaultSettings.autoRowsMax,
       sizing: settings?.sizeCalcMethod ?? defaultSettings.sizeCalcMethod
       // fontFamily: settings?.fontFamily,
       // fontWeight: settings?.fontWeight,
@@ -35,6 +48,8 @@ export default function useConfig() {
       settings?.commentDuration,
       settings?.fontSize,
       settings?.rows,
+      settings?.autoRowsMin,
+      settings?.autoRowsMax,
       settings?.sizeCalcMethod,
       settings?.ueShitaCommentDuration
     ]
