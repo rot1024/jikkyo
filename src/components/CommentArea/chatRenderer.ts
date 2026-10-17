@@ -1,5 +1,6 @@
 import { Chat, ChatActualStyle, getVisibleChats } from "./util";
 import binarySearch from "../../util/binarySearch";
+import { SpriteAtlas, Sprite, isValid } from "./spriteAtlas";
 
 export interface DrawOptions {
   // all laid-out chats sorted by vpos
@@ -23,22 +24,27 @@ const lookahead = 1000;
 // max time (ms) spent on rendering sprites per frame while playing
 const spriteBudget = 4;
 
-type Sprite = HTMLCanvasElement;
-
-// Draws a chat once into an offscreen canvas. Drawing text with shadow and
-// stroke is expensive, so each frame only blits these sprites.
+// Draws a chat once into the sprite atlas. Drawing text with outline is
+// expensive, so each frame only blits these sprites.
 const renderSprite = (
+  atlas: SpriteAtlas,
   c: Chat,
   styles: ChatActualStyle,
   colorize: boolean | undefined,
   dpr: number
-): Sprite => {
-  const sprite = document.createElement("canvas");
-  sprite.width = Math.ceil((c.width + spritePadding * 2) * dpr);
-  sprite.height = Math.ceil((c.height + spritePadding * 2) * dpr);
-  const ctx = sprite.getContext("2d");
-  if (!ctx) return sprite;
+): Sprite | undefined => {
+  const sprite = atlas.allocate(
+    Math.ceil((c.width + spritePadding * 2) * dpr),
+    Math.ceil((c.height + spritePadding * 2) * dpr)
+  );
+  if (!sprite) return undefined;
+  const ctx = sprite.page.ctx;
 
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(sprite.x, sprite.y, sprite.width, sprite.height);
+  ctx.clip();
+  ctx.translate(sprite.x, sprite.y);
   ctx.scale(dpr, dpr);
   ctx.font = `${styles.fontWeight || ""} ${c.fontSize}px ${styles.fontFamily ||
     "sans-serif"}`.trim();
@@ -59,12 +65,14 @@ const renderSprite = (
     ctx.strokeText(line, spritePadding, y);
     ctx.fillText(line, spritePadding, y);
   });
+  ctx.restore();
   return sprite;
 };
 
 // Renders chats onto a canvas. Holds sprites of chats on the screen between frames.
 export class ChatRenderer {
   private sprites = new Map<Chat, Sprite>();
+  private atlas = new SpriteAtlas();
   private appearance?: Pick<DrawOptions, "chats" | "styles" | "colorize" | "dpr">;
 
   // sprites depend on the appearance of chats
@@ -86,6 +94,7 @@ export class ChatRenderer {
       dpr: o.dpr
     };
     this.sprites = new Map();
+    this.atlas.clear();
   }
 
   // `complete`: draw all chats even if rendering sprites takes long (e.g. while paused).
@@ -130,15 +139,20 @@ export class ChatRenderer {
       }
 
       let sprite = prevSprites.get(c);
-      if (!sprite) {
+      if (!sprite || !isValid(sprite)) {
         if (performance.now() > deadline) continue;
-        sprite = renderSprite(c, styles, o.colorize, o.dpr);
+        sprite = renderSprite(this.atlas, c, styles, o.colorize, o.dpr);
+        if (!sprite) continue;
       }
       nextSprites.set(c, sprite);
 
       ctx.globalAlpha = c.danmaku ? o.opacityDanmaku : o.opacity;
       ctx.drawImage(
-        sprite,
+        sprite.page.canvas,
+        sprite.x,
+        sprite.y,
+        sprite.width,
+        sprite.height,
         x - spritePadding,
         c.y - spritePadding,
         sprite.width / o.dpr,
@@ -152,14 +166,16 @@ export class ChatRenderer {
       const c = o.chats[i];
       if (!isTarget(c)) continue;
       let sprite = prevSprites.get(c);
-      if (!sprite) {
+      if (!sprite || !isValid(sprite)) {
         if (performance.now() > deadline) break;
-        sprite = renderSprite(c, styles, o.colorize, o.dpr);
+        sprite = renderSprite(this.atlas, c, styles, o.colorize, o.dpr);
+        if (!sprite) break;
       }
       nextSprites.set(c, sprite);
     }
 
     // keep only sprites of chats on the screen or coming soon
     this.sprites = nextSprites;
+    this.atlas.collect(nextSprites.values());
   }
 }
