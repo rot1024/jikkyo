@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { detectHighlights } from "./highlights";
+import { calcInfluence } from "./influence";
 
 // `rate` comments per second in [from, to) seconds
 const steady = (rate: number, from: number, to: number, text = "a") =>
@@ -49,5 +50,65 @@ describe("detectHighlights", () => {
     const comments = sorted([...steady(2, 0, 600), ...steady(30, 120, 123)]);
     const [h] = detectHighlights(comments, 600000, -10000);
     expect(h.time).toBeGreaterThan(125000);
+  });
+});
+
+describe("detectHighlights with various surges", () => {
+  // 30 minutes: slowly varying base rate and 25 surges of different shapes
+  const make = () => {
+    const c: { vpos: number; text: string }[] = [];
+    let seed = 1;
+    const random = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    const add = (from: number, to: number, rate: (t: number) => number) => {
+      for (let t = from; t < to; t += 10) {
+        if (random() < rate(t) / 100) c.push({ vpos: t, text: "a" });
+      }
+    };
+    const duration = 30 * 60000;
+    add(0, duration, t => 3 + 2 * Math.sin(t / 200000));
+    for (let k = 0; k < 25; k++) {
+      const s = 40000 + k * 70000;
+      const kind = k % 4;
+      if (kind === 0) add(s, s + 3000, () => 40); // sharp
+      if (kind === 1) add(s, s + 20000, t => ((t - s) / 20000) * 30); // gradual
+      if (kind === 2) add(s, s + 40000, () => 20); // long busy section
+      if (kind === 3) {
+        // two surges close to each other
+        add(s, s + 3000, () => 30);
+        add(s + 15000, s + 18000, () => 30);
+      }
+    }
+    return { comments: c.sort((a, b) => a.vpos - b.vpos), duration };
+  };
+
+  it("has a highlight for every red section of the heat map", () => {
+    const { comments, duration } = make();
+    // same as the heat map: 300 divisions, red when sqrt(v / max) > 0.75
+    const influence = calcInfluence(comments, duration, 300);
+    const max = Math.max(...influence);
+    const division = duration / 300;
+    const red = influence.map(v => Math.sqrt(v / max) > 0.75);
+    const sections: [number, number][] = [];
+    red.forEach((r, i) => {
+      if (r && (i === 0 || !red[i - 1])) sections.push([i * division, 0]);
+      if (r) sections[sections.length - 1][1] = (i + 1) * division;
+    });
+
+    const highlights = detectHighlights(comments, duration);
+    expect(sections.length).toBeGreaterThan(15);
+    for (const [start, end] of sections) {
+      expect(
+        highlights.some(h => h.time >= start - 10000 && h.time <= end),
+        `red section at ${start / 1000}s`
+      ).toBe(true);
+    }
+  });
+
+  it("does not mark a long busy section repeatedly", () => {
+    const { comments, duration } = make();
+    const highlights = detectHighlights(comments, duration);
+    // long busy sections (kind 2) at 180-220s and 460-500s
+    expect(highlights.filter(h => h.time >= 180000 && h.time < 220000)).toHaveLength(1);
+    expect(highlights.filter(h => h.time >= 460000 && h.time < 500000)).toHaveLength(1);
   });
 });
