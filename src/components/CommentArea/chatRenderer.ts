@@ -44,10 +44,10 @@ const renderSprite = (
     "sans-serif"}`.trim();
   ctx.textAlign = "left";
   ctx.textBaseline = "top";
-  ctx.strokeStyle = "rgba(0, 0, 0, 0.5)";
-  ctx.lineWidth = 0.5;
-  ctx.shadowColor = "rgba(0, 0, 0, 1)";
-  ctx.shadowBlur = 2;
+  // outline instead of a blurred shadow, which is much slower to draw
+  ctx.strokeStyle = "rgba(0, 0, 0, 0.8)";
+  ctx.lineWidth = Math.min(spritePadding, Math.max(2, c.fontSize * 0.08));
+  ctx.lineJoin = "round";
   ctx.fillStyle = c.isHighlighted
     ? "#fff"
     : (colorize ? c.color2 : c.color) || "#fff";
@@ -56,8 +56,8 @@ const renderSprite = (
   const lineHeight = c.height / lines.length;
   lines.forEach((line, i) => {
     const y = spritePadding + i * lineHeight;
-    ctx.fillText(line, spritePadding, y);
     ctx.strokeText(line, spritePadding, y);
+    ctx.fillText(line, spritePadding, y);
   });
   return sprite;
 };
