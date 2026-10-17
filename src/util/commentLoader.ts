@@ -169,7 +169,6 @@ export const readComments = async (xml: string) => {
     }
   );
 
-  console.log(dom);
 
   const validComments = comments
     .filter(
@@ -194,13 +193,17 @@ export const readComments = async (xml: string) => {
       : validComments[validComments.length - 1].vpos;
 
   return {
+    // the random spread can change the order, so sort again
+    // (comment selection relies on binary search by vpos)
     comments:
       margin === 1
         ? validComments
-        : validComments.map(c => ({
-            ...c,
-            vpos: Math.floor(c.vpos + margin * Math.random() - margin / 2)
-          })),
+        : validComments
+            .map(c => ({
+              ...c,
+              vpos: Math.floor(c.vpos + margin * Math.random() - margin / 2)
+            }))
+            .sort((a, b) => a.vpos - b.vpos),
     duration,
     influence: calcInfluence(validComments, duration, 100)
   };

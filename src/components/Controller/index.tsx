@@ -4,23 +4,20 @@ import { useHotkeys } from "react-hotkeys-hook";
 
 import Button from "./Button";
 import SeekBar from "./Seekbar";
-import usePlayer from "./usePlayer";
 
 export interface Props {
   className?: string;
-  currentTime?: number; // seconds
+  currentTime?: number; // ms
   duration?: number;
   playing?: boolean;
   hidden?: boolean;
   buffered?: [number, number][];
   influence?: number[];
-  manual?: boolean;
   onSeek?: (time: number, relative?: boolean) => void;
   onPlayButtonClick?: () => void;
   onVideoButtonClick?: () => void;
   onCommentButtonClick?: () => void;
   onMenuButtonClick?: () => void;
-  onEnd?: () => void;
 }
 
 const Controller: React.FC<Props> = ({
@@ -31,33 +28,22 @@ const Controller: React.FC<Props> = ({
   hidden,
   buffered,
   influence,
-  manual,
   onSeek,
   onPlayButtonClick,
   onVideoButtonClick,
   onCommentButtonClick,
-  onMenuButtonClick,
-  onEnd
+  onMenuButtonClick
 }) => {
   const disabled = duration === 0;
-  const [seekTime, seek] = usePlayer(
-    !!playing,
-    currentTime,
-    duration,
-    !!manual,
-    onEnd
-  );
 
   const handleSeek = useCallback((t: number) => onSeek && onSeek(t), [onSeek]);
   const handleSeekRelative = useCallback(
     (second: number) => () => {
-      const st = second * 1000;
-      seek(st, true);
       if (onSeek) {
-        onSeek(st, true);
+        onSeek(second * 1000, true);
       }
     },
-    [onSeek, seek]
+    [onSeek]
   );
   const handleSeekMinus10 = useMemo(() => handleSeekRelative(-10), [
     handleSeekRelative
@@ -126,7 +112,7 @@ const Controller: React.FC<Props> = ({
         onClick={handleSeekPlus10}
       />
       <SeekBar
-        value={seekTime}
+        value={Math.min(currentTime, duration)}
         max={duration}
         disabled={disabled}
         buffered={buffered}
@@ -145,7 +131,7 @@ const Controller: React.FC<Props> = ({
           text-align: center;
         `}
       >
-        {humanReadableTime(seekTime)}
+        {humanReadableTime(Math.min(currentTime, duration))}
       </div>
       <Button
         icon="video"

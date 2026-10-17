@@ -7,68 +7,45 @@ const convertTimeRanges = (buffered: TimeRanges): [number, number][] =>
     .fill(0)
     .map((_, i) => [buffered.start(i) * 1000, buffered.end(i) * 1000]);
 
+// Manages the video element itself (source, duration, buffered ranges).
+// Playback time and play/pause state are handled by usePlayback.
 export default function useVideo() {
   const videoRef = useRef<Ref>(null);
   const [src, setSrc] = useState<string>();
-  const [playing, setPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [timeRanges, setTimeRanges] = useState<[number, number][]>();
-  const isSeekingRef = useRef(false);
 
   const loadVideo = useCallback((file: File) => {
-    setSrc(URL.createObjectURL(file));
-    setPlaying(false);
-    setCurrentTime(0);
+    setSrc(prev => {
+      if (prev) URL.revokeObjectURL(prev);
+      return URL.createObjectURL(file);
+    });
   }, []);
 
   const handleVideoEvent = useCallback(
-    (e: EventType, ct: number, d: number, buffered: TimeRanges) => {
-      if (e === "load") {
-        setPlaying(false);
-      } else if (e === "pause") {
-        setPlaying(false);
-      } else if (e === "play") {
-        setPlaying(true);
-      } else if (e === "seeking") {
-        isSeekingRef.current = true;
-      } else if (e === "seeked") {
-        isSeekingRef.current = false;
-        setCurrentTime(ct * 1000); // Set final seek position
-      }
+    (_e: EventType, _ct: number, d: number, buffered: TimeRanges) => {
       setTimeRanges(convertTimeRanges(buffered));
-      // Don't update currentTime during seeking or on pause to avoid overriding seek position
-      if (e !== "pause" && !isSeekingRef.current) {
-        setCurrentTime(ct * 1000);
-      }
-      setDuration(d * 1000);
+      setDuration(isFinite(d) ? d * 1000 : 0);
     },
     []
   );
 
-  const handleTimeUpdate = useCallback((ct: number) => {
-    // Don't update currentTime during seeking to avoid overriding seek position
-    if (isSeekingRef.current) return;
-    setCurrentTime(ct * 1000);
-  }, []);
-
   const unloadVideo = useCallback(() => {
-    setSrc(undefined);
+    setSrc(prev => {
+      if (prev) URL.revokeObjectURL(prev);
+      return undefined;
+    });
     setDuration(0);
+    setTimeRanges(undefined);
   }, []);
 
   return {
     videoRef,
     loadVideo,
     src,
-    playing,
-    setPlaying,
-    currentTime,
-    setCurrentTime,
     duration,
     timeRanges,
     handleVideoEvent,
-    handleTimeUpdate,
     unloadVideo
   };
 }

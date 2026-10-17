@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useCallback,
   useRef,
   useState,
   useMemo,
@@ -9,10 +10,8 @@ import {
 import { css } from "@emotion/react";
 import { useResizeObserver } from "use-resize-observer";
 
-import useRequestAnimationFrame from "../../util/useRequestAnimationFrame";
 import Canvas2dRenderer from "./canvas2d";
 import {
-  getVisibleChats,
   commentsToChats,
   Chat,
   Comment as CommentType,
@@ -26,7 +25,8 @@ export type CommentStyle = Partial<ChatStyle>;
 export interface Props {
   className?: string;
   comments?: CommentType[];
-  currentTime?: number; // ms
+  // time (ms) synced on seek/pause; only used to trigger a redraw while paused
+  currentTime?: number;
   playing?: boolean;
   styles?: Partial<ChatStyle>;
   visibleCommentCount?: number;
@@ -38,8 +38,8 @@ export interface Props {
   muteKeywords?: RegExp;
   filterKeywords?: RegExp;
   autoCommentsRemeasurement?: boolean;
-  manual?: boolean;
-  getCurrentTime?: () => number;
+  // returns the precise current time (ms); called every animation frame while playing
+  getCurrentTime: () => number;
   onCommentsRemeasurementRequire?: () => void;
   searchResults?: number[];
   currentSearchIndex?: number;
@@ -70,7 +70,6 @@ const CommentArea = forwardRef<Ref, Props>((
     filterKeywords,
     autoCommentsRemeasurement,
     onCommentsRemeasurementRequire,
-    manual,
     getCurrentTime,
     searchResults = [],
     currentSearchIndex = -1,
@@ -169,109 +168,57 @@ const CommentArea = forwardRef<Ref, Props>((
     bufferedComment.screenWidth
   ]);
 
-  const timeDelayCorrection = useRef(1);
-  const prevTime = useRef(Date.now());
-  const lastRenderTime = useRef(Date.now());
-  const [frame, setFrame] = useState(currentTime);
+  const getFrame = useCallback(
+    () => getCurrentTime() + timeCorrection,
+    [getCurrentTime, timeCorrection]
+  );
 
-  useEffect(() => {
-    setFrame(currentTime);
-    prevTime.current = Date.now();
-  }, [currentTime]);
-
-  useEffect(() => {
-    if (playing) {
-      prevTime.current = Date.now();
+  // Attributes that do not change with time are computed once here, not every frame
+  const decoratedChats = useMemo(() => {
+    if (!muteKeywords && !filterKeywords && searchResults.length === 0) {
+      return chats;
     }
-  }, [playing]);
-
-  useRequestAnimationFrame(() => {
-    const now = Date.now();
-    
-    if (getCurrentTime) {
-      // For video playback, limit comment frame updates to 60fps to maintain video performance
-      if (now - lastRenderTime.current >= 16) { // ~60fps
-        setFrame(getCurrentTime());
-        lastRenderTime.current = now;
-      }
-      return;
-    }
-    
-    setFrame(
-      f => f + (now - prevTime.current) * timeDelayCorrection.current
-    );
-    prevTime.current = now;
-  }, !!playing && !manual);
-
-  const correctedFrame = frame + timeCorrection;
-  const [visibleChats, setVisibleChats] = useState<Chat[]>([]);
-  useEffect(() => {
-    const [newVisibleChats] = getVisibleChats(
-      chats,
-      correctedFrame,
-      Math.max(innerStyles.duration, innerStyles.ueshitaDuration)
-    );
-
-    setVisibleChats(
-      newVisibleChats.slice(-visibleCommentCount).map((c) => {
-        let isHighlighted = false;
-        let isCurrentResult = false;
-        let searchQueryForComment = "";
-        
-        // Only perform search-related calculations if there are search results
-        if (searchResults.length > 0) {
-          const originalIndex = comments.findIndex(comment => comment.id === c.id);
-          isHighlighted = searchResults.includes(originalIndex);
-          isCurrentResult = searchResults[currentSearchIndex] === originalIndex;
-          searchQueryForComment = isHighlighted ? searchQuery : "";
-        }
-        
-        return {
-          ...c,
-          hidden:
-            (muteKeywords && muteKeywords.test(c.text)) ||
-            (filterKeywords && !filterKeywords.test(c.text)),
-          isHighlighted,
-          isCurrentResult,
-          searchQuery: searchQueryForComment
-        };
-      })
-    );
+    // search results are indexes of `comments`
+    const indexById = new Map(comments.map((c, i) => [c.id, i]));
+    const results = new Set(searchResults);
+    const current = searchResults[currentSearchIndex];
+    return chats.map(c => {
+      const index = indexById.get(c.id);
+      const isHighlighted = index !== undefined && results.has(index);
+      return {
+        ...c,
+        hidden:
+          (muteKeywords && muteKeywords.test(c.text)) ||
+          (filterKeywords && !filterKeywords.test(c.text)),
+        isHighlighted,
+        isCurrentResult: isHighlighted && index === current,
+        searchQuery: isHighlighted ? searchQuery : ""
+      };
+    });
   }, [
     chats,
-    correctedFrame,
-    filterKeywords,
-    innerStyles.duration,
-    innerStyles.ueshitaDuration,
-    muteKeywords,
-    visibleCommentCount,
-    searchResults,
+    comments,
     currentSearchIndex,
+    filterKeywords,
+    muteKeywords,
     searchQuery,
-    comments
+    searchResults
   ]);
 
   return (
     <div className={className} ref={wrapperRef} css={wrapperStyles}>
       <Canvas2dRenderer
-        frame={correctedFrame}
-        chats={visibleChats}
+        chats={decoratedChats}
+        getFrame={getFrame}
+        frameHint={currentTime + timeCorrection}
+        playing={playing}
+        visibleCommentCount={visibleCommentCount}
         styles={innerStyles}
         opacity={opacity}
         opacityDanmaku={opacityDanmaku}
         thinning={thinning}
         colorize={colorize}
       />
-      {/* <DOMRenderer
-        frame={correctedFrame}
-        chats={visibleChats}
-        playing={playing}
-        styles={innerStyles}
-        opacity={opacity}
-        opacityDanmaku={opacityDanmaku}
-        thinning={thinning}
-        colorize={colorize}
-      /> */}
     </div>
   );
 });

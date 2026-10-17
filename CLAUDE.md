@@ -33,11 +33,12 @@ This is a React-based video player application called "jikkyo-web" that displays
 ## Architecture Overview
 
 ### Core State Management Hooks
-The application is built around three main custom hooks that manage the core state:
+The application is built around these custom hooks that manage the core state:
 
-1. **useVideo** (`src/use-video.ts`) - Manages video playback state, file loading, time synchronization
-2. **useComment** (`src/use-comment.ts`) - Handles comment data loading, filtering, time correction, and influence calculation
-3. **useConfig** (`src/use-config.ts`) - Manages user settings and preferences
+1. **useVideo** (`src/use-video.ts`) - Manages the video element: file loading, duration, buffered ranges
+2. **usePlayback** (`src/use-playback.ts`) - Single source of truth for playback time and play/pause. `getTime()` returns the video time, or a wall-clock based time without a video. `currentTime` state is only a throttled copy for UI
+3. **useComment** (`src/use-comment.ts`) - Handles comment data loading, filtering, time correction, and influence calculation
+4. **useConfig** (`src/use-config.ts`) - Manages user settings and preferences
 
 ### Component Structure
 - **App.tsx** - Main component orchestrating all functionality
@@ -54,11 +55,16 @@ Comments are loaded from XML files (NicoNico format) and processed by `util/comm
 - Calculates comment influence/density for heat map visualization
 - Handles time correction and synchronization
 
+### Comment Rendering
+- `CommentArea` lays out comments into chats (`commentsToChats`), sorted by vpos; selection per frame uses binary search (`getVisibleChats`), so chats must stay sorted
+- `Canvas2DRenderer` runs its own requestAnimationFrame loop while playing and reads the time via `getFrame()` every frame; do not drive per-frame rendering through React state
+- Each chat is pre-rendered into a sprite canvas (text + shadow + stroke) and blitted each frame
+
 ### Key Features
 - **Dual Mode Operation**: Works with or without video files
 - **Time Synchronization**: Comments can be time-corrected using hotkeys (`,` `-1s`, `.` `+1s`, `/` `reset`)
 - **Comment Filtering**: Keyword-based filtering and muting
-- **Display Modes**: Multiple rendering approaches (DOM-based, Canvas2D)
+- **Display Modes**: Canvas2D renderer (an incomplete DOM renderer also exists but is unused)
 - **Heat Map**: Visual representation of comment density over time
 
 ## File Organization

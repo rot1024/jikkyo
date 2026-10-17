@@ -5,7 +5,7 @@ import useFileInput from "use-file-input";
 import { useHotkeys } from "react-hotkeys-hook";
 
 import globalStyles from "./styles";
-import Video from "./components/Video";
+import Video, { EventType } from "./components/Video";
 import SeekerAndDropZone from "./components/SeekerAndDropZone";
 import Controller from "./components/Controller";
 import SettingPanel from "./components/SettingPanel";
@@ -15,6 +15,7 @@ import Banner from "./components/Banner";
 import useComment from "./use-comment";
 import useConfig from "./use-config";
 import useVideo from "./use-video";
+import usePlayback from "./use-playback";
 import useWindowError from "./util/useWindowError";
 
 const safari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
@@ -34,16 +35,14 @@ const App: React.FC = () => {
     videoRef,
     src,
     loadVideo,
-    playing,
-    setPlaying,
-    currentTime,
-    setCurrentTime,
     duration,
     timeRanges,
-    handleVideoEvent,
-    handleTimeUpdate,
+    handleVideoEvent: handleMediaEvent,
     unloadVideo
   } = useVideo();
+
+  // time for the last comment to leave the screen
+  const commentTail = Math.max(styles.duration, styles.ueshitaDuration);
 
   const {
     comments,
@@ -53,9 +52,26 @@ const App: React.FC = () => {
     unloadComments,
     commentTimeCorrection,
     setCommentTimeCorrection
-  } = useComment(duration);
+  } = useComment(duration, commentTail);
 
-  const seekbarDuration = duration === 0 ? commentDuration : duration;
+  const seekbarDuration = src ? duration : commentDuration;
+
+  const {
+    playing,
+    currentTime,
+    getTime,
+    toggle,
+    seek,
+    handleVideoEvent: handlePlaybackEvent
+  } = usePlayback(videoRef, !!src, seekbarDuration);
+
+  const handleVideoEvent = useCallback(
+    (e: EventType, ct: number, d: number, buffered: TimeRanges) => {
+      handleMediaEvent(e, ct, d, buffered);
+      handlePlaybackEvent(e, ct);
+    },
+    [handleMediaEvent, handlePlaybackEvent]
+  );
 
   const commentAreaRef = useRef<{ updateComment: () => void }>(null);
   const [error, setError] = useWindowError();
@@ -84,30 +100,16 @@ const App: React.FC = () => {
   const handleVideoClick = useCallback(() => setControllerHidden(p => !p), []);
 
   const handlePlayButtonClick = useCallback(() => {
-    if (!comments || seekbarDuration === 0) return;
-    if (videoRef.current && src) {
-      setPlaying(videoRef.current.toggle());
-    } else {
-      setPlaying(p => !p);
-    }
-  }, [comments, seekbarDuration, setPlaying, src, videoRef]);
+    if (seekbarDuration === 0) return;
+    toggle();
+  }, [seekbarDuration, toggle]);
 
   const handleSeek = useCallback(
     (t: number, relative?: boolean) => {
-      if (!comments || commentDuration === 0) return;
-      if (videoRef.current && src) {
-        if (relative) {
-          videoRef.current.seekRelative(t / 1000);
-        } else {
-          videoRef.current.seek(t / 1000);
-        }
-      } else {
-        setCurrentTime(t2 =>
-          Math.max(0, Math.min(seekbarDuration, relative ? t + t2 : t))
-        );
-      }
+      if (seekbarDuration === 0) return;
+      seek(t, relative);
     },
-    [commentDuration, comments, seekbarDuration, setCurrentTime, src, videoRef]
+    [seek, seekbarDuration]
   );
 
   const handleDrop = useCallback(
@@ -149,10 +151,6 @@ const App: React.FC = () => {
 
   const handleMenuClose = useCallback(() => setMenuVisible(false), []);
   const handleErrorClose = useCallback(() => setError(undefined), [setError]);
-  const handleGetCurrentTime = useCallback(
-    () => (videoRef.current ? videoRef.current.currentTime() * 1000 : 0),
-    [videoRef]
-  );
 
   const clearSearch = useCallback(() => {
     setSearchResults([]);
@@ -252,7 +250,6 @@ const App: React.FC = () => {
         ref={videoRef}
         src={src}
         onEvent={handleVideoEvent}
-        onTimeUpdate={handleTimeUpdate}
       />
       <CommentArea
         ref={commentAreaRef}
@@ -274,7 +271,7 @@ const App: React.FC = () => {
         muteKeywords={muteKeywords}
         filterKeywords={filterKeywords}
         onCommentsRemeasurementRequire={handleCommentUpdateRequire}
-        getCurrentTime={src ? handleGetCurrentTime : undefined}
+        getCurrentTime={getTime}
         visibleCommentCount={
           settings?.limitComments ? settings?.visibleCommentCount : undefined
         }
@@ -293,7 +290,6 @@ const App: React.FC = () => {
       <Controller
         hidden={controllerHidden}
         playing={playing}
-        manual={!!src}
         onPlayButtonClick={handlePlayButtonClick}
         onSeek={handleSeek}
         onVideoButtonClick={handleVideoOpen}

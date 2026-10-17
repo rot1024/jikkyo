@@ -1,7 +1,6 @@
 import React, {
   useRef,
   useMemo,
-  useEffect,
   useCallback,
   forwardRef,
   useImperativeHandle
@@ -34,7 +33,6 @@ export interface Ref {
   stop: () => void;
   toggle: () => boolean;
   seek: (t: number) => void;
-  seekRelative: (t: number) => void;
   currentTime: () => number;
 }
 
@@ -58,7 +56,6 @@ const Video = forwardRef<Ref, Props>((
   ref
 ) => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const playing = useRef(false);
   const handleLoad = useMemo(() => event("load", onEvent), [onEvent]);
   const handleCanPlay = useMemo(() => event("canplay", onEvent), [onEvent]);
   const handlePlay = useMemo(() => event("play", onEvent), [onEvent]);
@@ -80,20 +77,17 @@ const Video = forwardRef<Ref, Props>((
   useImperativeHandle<any, Ref>(ref, () => ({
     play: () => {
       if (!videoRef.current) return;
-      playing.current = true;
-      videoRef.current.play();
+      videoRef.current.play().catch(() => {});
     },
     stop: () => {
       if (!videoRef.current) return;
-      playing.current = false;
       videoRef.current.pause();
     },
     toggle: () => {
       if (!videoRef.current) return false;
-      const next = !playing.current;
-      playing.current = next;
+      const next = videoRef.current.paused;
       if (next) {
-        videoRef.current.play();
+        videoRef.current.play().catch(() => {});
       } else {
         videoRef.current.pause();
       }
@@ -103,16 +97,8 @@ const Video = forwardRef<Ref, Props>((
       if (!videoRef.current) return;
       videoRef.current.currentTime = t;
     },
-    seekRelative: t => {
-      if (!videoRef.current) return;
-      videoRef.current.currentTime = videoRef.current.currentTime + t;
-    },
     currentTime: () => (videoRef.current ? videoRef.current.currentTime : 0)
   }));
-
-  useEffect(() => {
-    playing.current = false;
-  }, [src]);
 
   return !src ? null : (
     <video
