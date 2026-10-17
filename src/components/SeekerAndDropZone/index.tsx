@@ -10,7 +10,7 @@ export interface Props {
   onClick?: () => void;
   onDoubleClick?: () => void;
   onSeek?: (t: number, relative?: boolean) => void;
-  onDrop?: (file: File) => void;
+  onDrop?: (files: File[]) => void;
 }
 
 const SeekerAndDropZone: React.FC<Props> = ({
@@ -58,14 +58,7 @@ const SeekerAndDropZone: React.FC<Props> = ({
       e.preventDefault();
       setDropping(false);
       if (!droppable || !onDrop || e.dataTransfer.files.length === 0) return;
-      const file = e.dataTransfer.files[0];
-      if (
-        file.type.indexOf("text/xml") === 0 ||
-        file.type.indexOf("application/xml") === 0 ||
-        file.type.indexOf("video/") === 0
-      ) {
-        onDrop(file);
-      }
+      onDrop(Array.from(e.dataTransfer.files));
     },
     [droppable, onDrop]
   );

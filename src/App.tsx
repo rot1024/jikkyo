@@ -17,6 +17,7 @@ import useConfig from "./use-config";
 import useVideo from "./use-video";
 import usePlayback from "./use-playback";
 import useWindowError from "./util/useWindowError";
+import { getFileKind } from "./util/fileType";
 
 const safari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 const ios = !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
@@ -112,18 +113,20 @@ const App: React.FC = () => {
     [seek, seekbarDuration]
   );
 
+  // Accepts a video and/or a comment file at once (the first one of each kind is used)
   const handleDrop = useCallback(
-    async (file: File) => {
-      if (file.type.indexOf("video/") === 0) {
-        loadVideo(file);
-      } else if (
-        file.type === "text/xml" || 
-        file.type === "application/xml" ||
-        file.type === "application/json" ||
-        file.name.endsWith('.json') ||
-        file.name.endsWith('.xml')
-      ) {
-        await loadComments(file).catch(err =>
+    async (files: File[]) => {
+      const video = files.find(f => getFileKind(f) === "video");
+      const comment = files.find(f => getFileKind(f) === "comment");
+      if (!video && !comment) {
+        setError(`Unsupported file: ${files.map(f => f.name).join(", ")}`);
+        return;
+      }
+      if (video) {
+        loadVideo(video);
+      }
+      if (comment) {
+        await loadComments(comment).catch(err =>
           setError(err.message || err.toString())
         );
       }

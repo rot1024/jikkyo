@@ -1,6 +1,6 @@
 # jikkyo-web
 
-Video player that displays NicoNico-style synchronized comments. Load a video file and an XML (or asobistage JSON) comment file, or play comments without a video.
+Video player that displays NicoNico-style synchronized comments. Load a video file and an XML (or asobistage JSON) comment file, or play comments without a video. Files can be opened from the buttons or dropped onto the window (a video and a comment file can be dropped together).
 
 ## Requirements
 
