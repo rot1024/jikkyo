@@ -17,8 +17,8 @@ const stats = (xs: number[]) => {
   };
 };
 
-const runBench = async ({ dpr = 1, frames = 300 } = {}) => {
-  const { comments } = generateDummyComments();
+const runBench = async ({ dpr = 1, frames = 300, burstRate = 300 } = {}) => {
+  const { comments } = generateDummyComments({ burstRate });
   const styles = getChatActualStyle({}, height);
 
   // layout
