@@ -5,6 +5,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 import Form, { SettingValues } from "./Form";
 import Button from "./Button";
 import Text from "./Text";
+import Range from "./Range";
 import {
   settingSchema,
   Settings as SettingsType,
@@ -31,6 +32,9 @@ export interface Props {
   onSearch?: (query: string, direction?: 'next' | 'prev') => void;
   searchResultsCount?: number;
   highlights?: Highlight[];
+  // comment timing offset (ms); positive values show comments later
+  commentOffset?: number;
+  onCommentOffsetChange?: (offset: number) => void;
   time: TimeStore;
   onJump?: (time: number) => void;
 }
@@ -49,6 +53,8 @@ const SettingPanel: React.FC<Props> = ({
   onSearch,
   searchResultsCount = 0,
   highlights = [],
+  commentOffset = 0,
+  onCommentOffsetChange,
   time,
   onJump
 }) => {
@@ -179,6 +185,22 @@ const SettingPanel: React.FC<Props> = ({
 
         {/* kept mounted to preserve the form state */}
         <div style={{ display: tab === "settings" ? undefined : "none" }}>
+          <div css={offsetSectionStyles}>
+            <div css={sectionTitleStyles}>Comment offset</div>
+            <Range
+              value={commentOffset}
+              min={-maxCommentOffset}
+              max={maxCommentOffset}
+              step={100}
+              format={formatOffset}
+              onChange={onCommentOffsetChange}
+              onValueClick={() => onCommentOffsetChange && onCommentOffsetChange(0)}
+            />
+            <div css={hintStyles}>
+              + shows comments later, − earlier. Click the value to reset.
+            </div>
+          </div>
+
           <Form
             schema={settingSchema}
             initialValues={initialSettings}
@@ -269,6 +291,30 @@ const SettingPanel: React.FC<Props> = ({
     </div>
   );
 };
+
+const maxCommentOffset = 60000;
+
+const formatOffset = (v: number) =>
+  `${v > 0 ? "+" : v < 0 ? "−" : ""}${(Math.abs(v) / 1000).toFixed(1)}s`;
+
+// at the top as it is adjusted for each comment file
+const offsetSectionStyles = css`
+  margin-bottom: 1.5em;
+  padding-bottom: 1em;
+  border-bottom: 1px solid #555;
+`;
+
+const sectionTitleStyles = css`
+  color: #aaa;
+  font-size: 0.8rem;
+  margin-bottom: 0.5em;
+`;
+
+const hintStyles = css`
+  color: #777;
+  font-size: 0.7rem;
+  margin-top: 0.3em;
+`;
 
 const tabsStyles = css`
   display: flex;

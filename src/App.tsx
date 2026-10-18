@@ -262,6 +262,13 @@ const App: React.FC = () => {
   useHotkeys("[", () => jumpHighlight(-1), { useKey: true }, [jumpHighlight]);
   useHotkeys("]", () => jumpHighlight(1), { useKey: true }, [jumpHighlight]);
 
+  // the offset in the settings is the opposite of the time correction:
+  // a positive offset shows comments later
+  const handleCommentOffsetChange = useCallback(
+    (offset: number) => setCommentTimeCorrection(-offset),
+    [setCommentTimeCorrection]
+  );
+
   useHotkeys("comma", () => setCommentTimeCorrection(s => s - 1000), [
     setCommentTimeCorrection
   ]);
@@ -346,6 +353,8 @@ const App: React.FC = () => {
         onSearch={handleSearch}
         searchResultsCount={searchResults.length}
         highlights={highlights}
+        commentOffset={-commentTimeCorrection}
+        onCommentOffsetChange={handleCommentOffsetChange}
         time={time}
         onJump={handleSeek}
       />

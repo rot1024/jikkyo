@@ -8,6 +8,8 @@ export interface Props {
   max?: number;
   suffix?: string;
   step?: number;
+  // formats the displayed value (`suffix` is not used then)
+  format?: (v: number) => string;
   onValueClick?: () => void;
   onChange?: (v: number) => void;
 }
@@ -20,7 +22,8 @@ const Range: React.FC<Props> = ({
   onChange,
   onValueClick,
   suffix,
-  step
+  step,
+  format
 }) => {
   return (
     <div
@@ -68,8 +71,14 @@ const Range: React.FC<Props> = ({
         `}
         onClick={onValueClick}
       >
-        {value && suffix === "s" ? ~~(value / 1000) : value}
-        {suffix}
+        {format && value !== undefined ? (
+          format(value)
+        ) : (
+          <>
+            {value && suffix === "s" ? ~~(value / 1000) : value}
+            {suffix}
+          </>
+        )}
       </div>
     </div>
   );

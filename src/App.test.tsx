@@ -28,6 +28,28 @@ describe("App", () => {
     expect(screen.queryByText(/Unsupported file/)).toBeNull();
   });
 
+  it("syncs the comment offset slider with the hotkeys", () => {
+    render(<App />);
+    const slider = document.querySelector(
+      'input[type="range"][min="-60000"]'
+    ) as HTMLInputElement;
+    expect(slider.value).toBe("0");
+
+    // "," shows comments 1s later
+    fireEvent.keyDown(document, { key: ",", code: "Comma" });
+    fireEvent.keyUp(document, { key: ",", code: "Comma" });
+    expect(slider.value).toBe("1000");
+    expect(screen.getByText("+1.0s")).toBeTruthy();
+
+    fireEvent.change(slider, { target: { value: "-2500" } });
+    expect(screen.getByText("−2.5s")).toBeTruthy();
+
+    // "/" resets
+    fireEvent.keyDown(document, { key: "/", code: "Slash" });
+    fireEvent.keyUp(document, { key: "/", code: "Slash" });
+    expect(slider.value).toBe("0");
+  });
+
   it("shows an error for unsupported files", async () => {
     render(<App />);
     fireEvent.drop(findDropZone(), {

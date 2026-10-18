@@ -65,7 +65,7 @@ Comments are loaded from XML files (NicoNico format) and processed by `util/comm
 
 ### Key Features
 - **Dual Mode Operation**: Works with or without video files
-- **Time Synchronization**: Comments can be time-corrected using hotkeys (`,` `-1s`, `.` `+1s`, `/` `reset`)
+- **Time Synchronization**: Comments can be time-corrected using hotkeys (`,` `-1s`, `.` `+1s`, `/` `reset`) or the "Comment offset" slider in the menu. Internally `commentTimeCorrection` is added to the playback time (negative = comments later); the slider shows the opposite sign (positive = later)
 - **Comment Filtering**: Keyword-based filtering and muting
 - **Display Modes**: Canvas2D renderer (an incomplete DOM renderer also exists but is unused)
 - **Heat Map**: Visual representation of comment density over time
