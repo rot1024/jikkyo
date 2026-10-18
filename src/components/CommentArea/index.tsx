@@ -1,12 +1,4 @@
-import {
-  useEffect,
-  useCallback,
-  useRef,
-  useState,
-  useMemo,
-  useImperativeHandle,
-  forwardRef
-} from "react";
+import React, { useEffect, useCallback, useRef, useState, useMemo } from "react";
 import { css } from "@emotion/react";
 import { useResizeObserver } from "use-resize-observer";
 
@@ -40,24 +32,20 @@ export interface Props {
   colorize?: boolean;
   muteKeywords?: RegExp;
   filterKeywords?: RegExp;
-  autoCommentsRemeasurement?: boolean;
   // returns the precise current time (ms); called every animation frame while playing
   getCurrentTime: () => number;
-  onCommentsRemeasurementRequire?: () => void;
   searchResults?: number[];
   currentSearchIndex?: number;
   searchQuery?: string;
 }
 
-export interface Ref {
-  updateComment: () => void;
-}
-
 const emptyComents: CommentType[] = [];
 const emptyChats: Chat[] = [];
 
-const CommentArea = forwardRef<Ref, Props>((
-  {
+// comments are laid out again when resizing stops for this time (ms)
+const resizeDebounce = 200;
+
+const CommentArea: React.FC<Props> = ({
     className,
     playing,
     comments = emptyComents,
@@ -71,19 +59,31 @@ const CommentArea = forwardRef<Ref, Props>((
     colorize,
     muteKeywords,
     filterKeywords,
-    autoCommentsRemeasurement,
-    onCommentsRemeasurementRequire,
     getCurrentTime,
     searchResults = [],
     currentSearchIndex = -1,
     searchQuery = ""
-  },
-  ref
-) => {
+}) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const { width: screenWidth = 0, height: screenHeight = 0 } = useResizeObserver({
     ref: wrapperRef
   });
+  // The screen size used for the layout follows the actual size after resizing
+  // stops, as laying out all comments on every resize event would be wasteful.
+  // The first size is applied immediately.
+  const [size, setSize] = useState({ width: screenWidth, height: screenHeight });
+  if (size.height === 0 && screenHeight > 0) {
+    setSize({ width: screenWidth, height: screenHeight });
+  }
+  useEffect(() => {
+    if (size.width === screenWidth && size.height === screenHeight) return;
+    const timer = window.setTimeout(
+      () => setSize({ width: screenWidth, height: screenHeight }),
+      resizeDebounce
+    );
+    return () => window.clearTimeout(timer);
+  }, [screenWidth, screenHeight, size]);
+
   // the comment density is measured once when comments are loaded
   const density = useMemo(
     () =>
@@ -94,72 +94,30 @@ const CommentArea = forwardRef<Ref, Props>((
     const s = { ...defaultChatStyle, ...styles };
     return estimateRows(
       density,
-      screenWidth,
-      screenHeight,
+      size.width,
+      size.height,
       s.lineHeight,
       s.minRows,
       s.maxRows
     );
-  }, [density, screenHeight, screenWidth, styles]);
+  }, [density, size, styles]);
   const innerStyles = useMemo(
-    () => getChatActualStyle(styles, screenHeight, autoRows),
-    [autoRows, screenHeight, styles]
+    () => getChatActualStyle(styles, size.height, autoRows),
+    [autoRows, size.height, styles]
   );
 
-  // Layout input. Relayout of all comments is expensive, so when only the screen
-  // size or styles change, it waits for the user's request unless auto remeasurement is on.
-  const [layout, setLayout] = useState({
-    comments,
-    screenWidth,
-    screenHeight,
-    innerStyles
-  });
-  const layoutChanged =
-    layout.screenWidth !== screenWidth ||
-    layout.screenHeight !== screenHeight ||
-    layout.innerStyles !== innerStyles;
-  if (
-    layout.comments !== comments ||
-    (layoutChanged &&
-      (autoCommentsRemeasurement ||
-        layout.screenHeight === 0 ||
-        comments.length === 0))
-  ) {
-    setLayout({ comments, screenWidth, screenHeight, innerStyles });
-  }
-
-  const remeasurementRequired = layoutChanged && comments.length > 0;
-  useEffect(() => {
-    if (remeasurementRequired && onCommentsRemeasurementRequire) {
-      onCommentsRemeasurementRequire();
-    }
-  }, [remeasurementRequired, onCommentsRemeasurementRequire]);
-
-  useImperativeHandle(
-    ref,
-    () => ({
-      updateComment: () => {
-        setLayout({ comments, screenWidth, screenHeight, innerStyles });
-      }
-    }),
-    [comments, screenWidth, screenHeight, innerStyles]
-  );
-
+  // Laid out again whenever comments, the screen size or styles change.
+  // Settings that affect styles are already debounced in the setting panel.
   const [chats, setChats] = useState(emptyChats);
   useEffect(() => {
     let cancelled = false;
-    layoutChats(
-      layout.comments,
-      layout.screenWidth,
-      layout.screenHeight,
-      layout.innerStyles
-    ).then(c => {
+    layoutChats(comments, size.width, size.height, innerStyles).then(c => {
       if (!cancelled) setChats(c);
     });
     return () => {
       cancelled = true;
     };
-  }, [layout]);
+  }, [comments, size, innerStyles]);
 
   const getFrame = useCallback(
     () => getCurrentTime() + timeCorrection,
@@ -214,7 +172,7 @@ const CommentArea = forwardRef<Ref, Props>((
       />
     </div>
   );
-});
+};
 
 const wrapperStyles = css`
   position: absolute;

@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useCallback, useRef, useEffect } from "react";
+import React, { Fragment, useState, useCallback, useEffect } from "react";
 import { css } from "@emotion/react";
 import { Global } from "@emotion/react";
 import useFileInput from "use-file-input";
@@ -83,29 +83,12 @@ const App: React.FC = () => {
     [handleMediaEvent, handlePlaybackEvent]
   );
 
-  const commentAreaRef = useRef<{ updateComment: () => void }>(null);
   const [error, setError] = useWindowError();
-  const [commentUpdateRequired, setCommentUpdateRequired] = useState(false);
   const [controllerHidden, setControllerHidden] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
   const [searchResults, setSearchResults] = useState<number[]>([]);
   const [currentSearchIndex, setCurrentSearchIndex] = useState(-1);
   const [activeSearchQuery, setActiveSearchQuery] = useState("");
-
-  const handleCommentUpdateRequire = useCallback(() => {
-    setCommentUpdateRequired(true);
-  }, []);
-
-  const handleUpdateComment = useCallback(() => {
-    if (commentAreaRef.current) {
-      setCommentUpdateRequired(false);
-      commentAreaRef.current.updateComment();
-    }
-  }, []);
-
-  const handleUpdateCommentClose = useCallback(() => {
-    setCommentUpdateRequired(false);
-  }, []);
 
   const handleVideoClick = useCallback(() => setControllerHidden(p => !p), []);
 
@@ -288,7 +271,6 @@ const App: React.FC = () => {
         onEvent={handleVideoEvent}
       />
       <CommentArea
-        ref={commentAreaRef}
         comments={comments}
         time={time}
         playing={playing}
@@ -306,7 +288,6 @@ const App: React.FC = () => {
         timeCorrection={commentTimeCorrection}
         muteKeywords={muteKeywords}
         filterKeywords={filterKeywords}
-        onCommentsRemeasurementRequire={handleCommentUpdateRequire}
         getCurrentTime={getTime}
         visibleCommentCount={
           settings?.limitComments ? settings?.visibleCommentCount : undefined
@@ -360,15 +341,6 @@ const App: React.FC = () => {
       />
       <Banner error onClose={handleErrorClose}>
         {error}
-      </Banner>
-      <Banner
-        buttonText="Update"
-        onButtonClick={handleUpdateComment}
-        onClose={handleUpdateCommentClose}
-      >
-        {commentUpdateRequired
-          ? "Recalculation is required to update the comments display."
-          : ""}
       </Banner>
     </Fragment>
   );
